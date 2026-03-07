@@ -401,8 +401,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const currentPath = window.location.pathname;
     document.querySelectorAll('.menu-item, .bottom-nav-item').forEach(item => {
         const href = item.getAttribute('href');
-        if (href && href !== 'javascript:void(0)' && currentPath.includes(href.split('?')[0])) {
-            item.classList.add('active');
+        if (href && href !== 'javascript:void(0)') {
+            try {
+                const resolved = new URL(href, window.location.href).pathname;
+                if (currentPath === resolved || currentPath.endsWith(resolved)) {
+                    item.classList.add('active');
+                }
+            } catch(e) {}
+        }
+        if (item.classList.contains('active')) {
             // Si el ítem activo no es visible en el nav, hacer scroll suave hacia él
             if (nav) {
                 const itemTop    = item.offsetTop;

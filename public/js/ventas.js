@@ -261,36 +261,44 @@ class PuntoVentaModule {
         
         if (productos.length === 0) {
             container.innerHTML = `
-                <div class="col-span-full text-center" style="padding: 40px; color: var(--text-secondary);">
-                    <i class="fas fa-search" style="font-size: 48px; margin-bottom: 15px; opacity: 0.5;"></i>
+                <div style="grid-column:1/-1;text-align:center;padding:40px;color:#888;">
+                    <i class="fas fa-search" style="font-size:48px;margin-bottom:15px;opacity:0.5;display:block;"></i>
                     <p>No se encontraron productos</p>
                 </div>
             `;
             return;
         }
 
+        const precio = (p) => typeof formatCurrency === 'function'
+            ? formatCurrency(p)
+            : '$' + parseFloat(p || 0).toLocaleString('es-AR', {minimumFractionDigits:2});
+
         let html = '';
         productos.forEach(producto => {
-            const fotoUrl = producto.foto ? 
-                `${base}/public/uploads/productos/${producto.foto}` : 
-                `${base}/public/img/no-image.svg`;
+            const fotoUrl = producto.foto
+                ? `${base}/public/uploads/productos/${producto.foto}`
+                : `${base}/public/img/no-image.svg`;
             const sinStock = producto.stock <= 0;
-            const badgeTop = producto._esTop && producto.total_vendido > 0
-                ? `<span style="position:absolute;top:4px;left:4px;background:#f59e0b;color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:10px;">🔥 ${producto.total_vendido}</span>`
-                : '';
-            
+            const nombre = (producto.nombre || '').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
             html += `
-                <div class="producto-card${sinStock ? ' sin-stock' : ''}"
-                     onclick="puntoVentaModule.agregarAlCarrito(${JSON.stringify(producto).replace(/"/g, '&quot;')})"
-                     title="${producto.nombre} — ${formatCurrency(producto.precio_venta)}">
-                    ${sinStock ? '<span style="position:absolute;top:4px;right:4px;background:#ef4444;color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:10px;">Sin stock</span>' : ''}
-                    ${badgeTop}
-                    <img src="${fotoUrl}" alt="${producto.nombre}" onerror="this.src='${base}/public/img/no-image.svg'">
-                    <div class="producto-info">
-                        <h4>${producto.nombre}</h4>
-                        ${producto.descripcion ? `<p class="producto-descripcion">${producto.descripcion}</p>` : ''}
-                        <p class="producto-precio">${formatCurrency(producto.precio_venta)}</p>
-                        <p class="producto-stock"><i class="fas fa-cubes" style="font-size:9px;"></i> ${producto.stock}</p>
+                <div onclick="puntoVentaModule.agregarAlCarrito(${JSON.stringify(producto).replace(/"/g, '&quot;')})"
+                     title="${nombre}"
+                     style="background:#fff;border-radius:10px;border:2px solid #e2e8f0;cursor:pointer;position:relative;display:flex;flex-direction:column;${sinStock ? 'opacity:.65;' : ''}"
+                     onmouseover="this.style.borderColor='#0fd186';this.style.boxShadow='0 4px 12px rgba(15,209,134,.25)'"
+                     onmouseout="this.style.borderColor='#e2e8f0';this.style.boxShadow='none'">
+                    ${sinStock ? '<span style="position:absolute;top:4px;right:4px;background:#ef4444;color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:6px;z-index:2;">Sin stock</span>' : ''}
+                    ${producto._esTop && producto.total_vendido > 0 ? `<span style="position:absolute;top:4px;left:4px;background:#f59e0b;color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:6px;z-index:2;">🔥${producto.total_vendido}</span>` : ''}
+                    <div style="width:100%;padding-top:75%;position:relative;background:#f1f5f9;flex-shrink:0;border-radius:8px 8px 0 0;overflow:hidden;">
+                        <img src="${fotoUrl}" alt="${nombre}"
+                             onerror="this.src='${base}/public/img/no-image.svg'"
+                             loading="lazy"
+                             style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block;">
+                    </div>
+                    <div style="padding:6px 8px 8px;display:flex;flex-direction:column;gap:2px;min-width:0;">
+                        <span style="font-size:12px;font-weight:700;color:#1e293b;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.3;">${nombre}</span>
+                        <span style="font-size:13px;font-weight:800;color:#059669;display:block;line-height:1.3;">${precio(producto.precio_venta)}</span>
+                        <span style="font-size:10px;color:#94a3b8;display:block;"><i class="fas fa-cubes" style="font-size:9px;margin-right:2px;"></i>${producto.stock}</span>
                     </div>
                 </div>
             `;

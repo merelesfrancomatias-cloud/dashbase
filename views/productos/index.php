@@ -583,7 +583,7 @@ if (!isset($_SESSION['user_id'])) {
 
     <!-- 1. APP_BASE primero, antes de cargar productos.js -->
     <script>
-        window.APP_BASE = '<?php echo rtrim(str_replace($_SERVER['DOCUMENT_ROOT'], '', dirname(dirname(dirname(realpath(__FILE__))))), '/'); ?>';
+        window.APP_BASE = '<?php echo rtrim(str_replace(str_replace(chr(92), chr(47), $_SERVER['DOCUMENT_ROOT']), '', str_replace(chr(92), chr(47), dirname(dirname(dirname(realpath(__FILE__)))))), '/'); ?>';
     </script>
 
     <!-- 2. Módulo de productos -->

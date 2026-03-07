@@ -144,37 +144,43 @@ if (!isset($_SESSION['user_id'])) {
         }
 
         /* Botones de método de pago en carrito */
-        .pm-btn {
+        #paymentMethodsContainer {
             display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+        .pm-btn {
+            display: inline-flex;
             align-items: center;
-            justify-content: center;
-            gap: 6px;
-            padding: 9px 8px;
+            gap: 4px;
+            padding: 5px 10px;
             border: 2px solid var(--border-color);
-            border-radius: 10px;
+            border-radius: 20px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             color: var(--text-secondary);
             background: var(--bg-secondary);
             transition: all .18s;
             user-select: none;
-            text-align: center;
+            white-space: nowrap;
+            flex: 1;
+            justify-content: center;
+            min-width: fit-content;
         }
         .pm-btn:hover {
             border-color: var(--primary);
             color: var(--primary);
-            background: var(--bg-card);
         }
         .pm-btn--active,
         input[name="metodo_pago"]:checked + .pm-btn {
             border-color: var(--primary) !important;
             background: var(--primary) !important;
             color: #fff !important;
-            box-shadow: 0 3px 10px rgba(0, 201, 167, .35);
+            box-shadow: 0 2px 8px rgba(0, 201, 167, .3);
         }
         .pm-btn i {
-            font-size: 14px;
+            font-size: 11px;
         }
     </style>
 </head>
@@ -256,11 +262,11 @@ if (!isset($_SESSION['user_id'])) {
                         </div>
 
                         <!-- Método de pago — siempre visible -->
-                        <div style="margin-bottom: 14px;">
-                            <p style="font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px;">
+                        <div style="margin-bottom: 10px;">
+                            <p style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px;">
                                 <i class="fas fa-wallet"></i> Método de pago
                             </p>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 7px;" id="paymentMethodsContainer">
+                            <div id="paymentMethodsContainer">
 
                                 <input type="radio" name="metodo_pago" value="efectivo" id="mp_efectivo" class="payment-method" checked hidden>
                                 <label for="mp_efectivo" class="pm-btn pm-btn--active" data-value="efectivo">
@@ -283,8 +289,8 @@ if (!isset($_SESSION['user_id'])) {
                                 </label>
 
                                 <input type="radio" name="metodo_pago" value="mercado_pago" id="mp_mercadopago" class="payment-method" hidden>
-                                <label for="mp_mercadopago" class="pm-btn" data-value="mercado_pago" style="grid-column: span 2;">
-                                    <i class="fas fa-qrcode"></i> Mercado Pago / QR
+                                <label for="mp_mercadopago" class="pm-btn" data-value="mercado_pago">
+                                    <i class="fas fa-qrcode"></i> MP / QR
                                 </label>
 
                             </div>
@@ -478,10 +484,10 @@ if (!isset($_SESSION['user_id'])) {
             puntoVentaModule = new PuntoVentaModule();
         });
     </script>
-    
-    <script src="../../public/js/ventas.js?v=<?= filemtime(__DIR__ . '/../../public/js/ventas.js') ?>"></script>
+
     <script>
-    window.APP_BASE = '<?php echo rtrim(str_replace($_SERVER['DOCUMENT_ROOT'], '', dirname(dirname(dirname(realpath(__FILE__))))), '/'); ?>';
+    window.APP_BASE = '<?php echo rtrim(str_replace(str_replace(chr(92), chr(47), $_SERVER['DOCUMENT_ROOT']), '', str_replace(chr(92), chr(47), dirname(dirname(dirname(realpath(__FILE__)))))), '/'); ?>';
     </script>
+    <script src="../../public/js/ventas.js?v=<?= filemtime(__DIR__ . '/../../public/js/ventas.js') ?>"></script>
 </body>
 </html>

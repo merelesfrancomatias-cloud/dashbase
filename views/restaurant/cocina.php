@@ -1,10 +1,10 @@
-<?php
+﻿<?php
 // La cocina es una pantalla independiente — no requiere sidebar ni header normal
 session_start();
 if (!isset($_SESSION['user_id']) && !isset($_SESSION['usuario_id'])) {
     header('Location: ../../index.php'); exit;
 }
-$base = rtrim(str_replace($_SERVER['DOCUMENT_ROOT'], '', dirname(dirname(dirname(realpath(__FILE__))))), '/');
+$base = rtrim(str_replace(str_replace(chr(92), chr(47), $_SERVER['DOCUMENT_ROOT']), '', str_replace(chr(92), chr(47), dirname(dirname(dirname(realpath(__FILE__)))))), '/');
 ?>
 <!DOCTYPE html>
 <html lang="es">

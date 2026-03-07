@@ -1,7 +1,7 @@
-<?php
+﻿<?php
 session_start();
 
-$base = rtrim(str_replace($_SERVER['DOCUMENT_ROOT'], '', dirname(dirname(dirname(realpath(__FILE__))))), '/');
+$base = rtrim(str_replace(str_replace(chr(92), chr(47), $_SERVER['DOCUMENT_ROOT']), '', str_replace(chr(92), chr(47), dirname(dirname(dirname(realpath(__FILE__)))))), '/');
 
 if (!isset($_SESSION['user_id'])) {
     header('Location: ' . $base . '/index.php');

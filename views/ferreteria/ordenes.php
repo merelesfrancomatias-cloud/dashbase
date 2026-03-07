@@ -1,9 +1,9 @@
-<?php
+﻿<?php
 session_start();
 if (!isset($_SESSION['user_id']) && !isset($_SESSION['usuario_id'])) {
     header('Location: ../../index.php'); exit;
 }
-$base = rtrim(str_replace($_SERVER['DOCUMENT_ROOT'], '', dirname(dirname(dirname(realpath(__FILE__))))), '/');
+$base = rtrim(str_replace(str_replace(chr(92), chr(47), $_SERVER['DOCUMENT_ROOT']), '', str_replace(chr(92), chr(47), dirname(dirname(dirname(realpath(__FILE__)))))), '/');
 $filtroProvId   = (int)($_GET['proveedor_id'] ?? 0);
 $filtroProvNombre = htmlspecialchars($_GET['proveedor'] ?? '');
 ?>

@@ -408,7 +408,7 @@ if (!isset($_SESSION['user_id'])) {
     </main>
 
     <script>
-        window.APP_BASE = '<?php echo rtrim(str_replace($_SERVER['DOCUMENT_ROOT'], '', dirname(dirname(dirname(realpath(__FILE__))))), '/'); ?>';
+        window.APP_BASE = '<?php echo rtrim(str_replace(str_replace(chr(92), chr(47), $_SERVER['DOCUMENT_ROOT']), '', str_replace(chr(92), chr(47), dirname(dirname(dirname(realpath(__FILE__)))))), '/'); ?>';
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="../../public/js/reportes.js?v=<?php echo time(); ?>"></script>

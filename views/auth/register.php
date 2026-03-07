@@ -320,7 +320,7 @@
         <div class="left-content">
             <div class="brand-logo">
                 <div class="brand-logo-box">
-                    <img src="../../public/img/DASHLOGOSF.png" alt="DASH" class="brand-logo-img">
+                    <img src="public/img/DASHLOGOSF.png" alt="DASH" class="brand-logo-img">
                 </div>
                 <div class="brand-logo-name">
                     DASH
@@ -483,7 +483,7 @@
         </div>
 
         <div class="login-link" id="loginLinkRow">
-            ¿Ya tenés cuenta? <a href="../../index.php">Ingresar</a>
+            ¿Ya tenés cuenta? <a href="javascript:void(0)" onclick="irAlLogin()">Ingresar</a>
         </div>
     </div>
 </div>

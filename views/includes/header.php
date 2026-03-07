@@ -277,16 +277,26 @@ function toggleSidebar(force) {
 }
 
 // ── Service Worker ─────────────────────────────────────────────────────────
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js', { scope: '/' })
+<?php
+$_hBase = rtrim(str_replace(
+    str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']),
+    '',
+    str_replace('\\', '/', dirname(dirname(dirname(__FILE__))))
+), '/');
+?>
+(function() {
+    if (!('serviceWorker' in navigator)) return;
+    const swBase = '<?= $_hBase ?>';
+    navigator.serviceWorker.register(swBase + '/sw.js', { scope: swBase + '/' })
         .catch(() => {});
-}
+})();
 
 // ── PWA: inyectar manifest + theme-color en <head> si no están ─────────────
 (function() {
+    const pwaBase = '<?= $_hBase ?>';
     if (!document.querySelector('link[rel="manifest"]')) {
         const l = document.createElement('link');
-        l.rel = 'manifest'; l.href = '/manifest.json';
+        l.rel = 'manifest'; l.href = pwaBase + '/manifest.json';
         document.head.appendChild(l);
     }
     if (!document.querySelector('meta[name="theme-color"]')) {
