@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DASH — El sistema de gestión para tu negocio</title>
+    <meta name="description" content="DASH es el sistema de gestión todo-en-uno para negocios de Argentina. Ventas, caja, inventario, reportes y más. Funciona en cualquier dispositivo.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --green:     #0FD186;
+            --green-d:   #0AB871;
+            --green-dd:  #088a54;
+            --dark:      #0A0F1E;
+            --dark2:     #111827;
+            --card-bg:   #141B2D;
+            --card-bd:   rgba(255,255,255,.07);
+            --text:      #F1F5F9;
+            --muted:     #94A3B8;
+            --radius:    20px;
+        }
+
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--dark);
+            color: var(--text);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* UTILS */
+        .container { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
+        .badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(15,209,134,.12); border: 1px solid rgba(15,209,134,.3);
+            color: var(--green); border-radius: 20px;
+            padding: 5px 14px; font-size: 12px; font-weight: 700;
+            letter-spacing: .4px; text-transform: uppercase;
+        }
+        .btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 14px 28px; border-radius: 12px;
+            font-size: 15px; font-weight: 700; cursor: pointer;
+            border: none; text-decoration: none; transition: all .2s;
+            white-space: nowrap;
+        }
+        .btn-primary {
+            background: var(--green); color: #fff;
+            box-shadow: 0 0 30px rgba(15,209,134,.35);
+        }
+        .btn-primary:hover {
+            background: var(--green-d); transform: translateY(-2px);
+            box-shadow: 0 0 40px rgba(15,209,134,.5);
+        }
+        .btn-ghost {
+            background: rgba(255,255,255,.06); color: var(--text);
+            border: 1px solid rgba(255,255,255,.1);
+        }
+        .btn-ghost:hover { background: rgba(255,255,255,.1); }
+
+        /* NAV */
+        nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            padding: 16px 0;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            background: rgba(10,15,30,.8);
+            border-bottom: 1px solid rgba(255,255,255,.06);
+            transition: all .3s;
+        }
+        .nav-inner {
+            display: flex; align-items: center;
+            justify-content: space-between; gap: 24px;
+        }
+        .nav-logo {
+            display: flex; align-items: center; gap: 10px;
+            font-size: 22px; font-weight: 900; color: #fff;
+            text-decoration: none;
+        }
+        .nav-logo-dot {
+            width: 40px; height: 40px;
+            background: linear-gradient(135deg, rgba(15,209,134,.15), rgba(8,138,84,.2));
+            border: 1px solid rgba(15,209,134,.3);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 20px rgba(15,209,134,.3);
+            overflow: hidden;
+            padding: 4px;
+        }
+        .nav-logo-dot img {
+            width: 100%; height: 100%; object-fit: contain;
+            filter: brightness(1.1);
+        }
+        .nav-links {
+            display: flex; align-items: center; gap: 8px; list-style: none;
+        }
+        .nav-links a {
+            color: var(--muted); text-decoration: none;
+            font-size: 14px; font-weight: 500;
+            padding: 7px 14px; border-radius: 8px; transition: all .15s;
+        }
+        .nav-links a:hover { color: var(--text); background: rgba(255,255,255,.06); }
+        .nav-cta { display: flex; gap: 10px; align-items: center; }
+        .nav-mobile-btn {
+            display: none; background: none; border: none;
+            color: var(--text); font-size: 22px; cursor: pointer;
+        }
+
+        /* HERO */
+        .hero {
+            min-height: 100vh; display: flex; align-items: center;
+            padding: 120px 0 80px; position: relative; overflow: hidden;
+        }
+        .hero-bg { position: absolute; inset: 0; pointer-events: none; }
+        .hero-glow {
+            position: absolute; width: 700px; height: 700px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(15,209,134,.15) 0%, transparent 70%);
+            top: -200px; left: -200px;
+        }
+        .hero-glow2 {
+            position: absolute; width: 500px; height: 500px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(99,102,241,.1) 0%, transparent 70%);
+            bottom: 0; right: -100px;
+        }
+        .grid-lines {
+            position: absolute; inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,.02) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+        .hero-inner {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 60px; align-items: center; position: relative; z-index: 1;
+        }
+        .hero-content { max-width: 560px; }
+        .hero-logo-wrap {
+            margin-bottom: 20px;
+        }
+        .hero-logo-img {
+            height: 64px;
+            width: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 0 18px rgba(15,209,134,.45));
+        }
+        .hero-badge { margin-bottom: 24px; }
+        .hero-title {
+            font-size: clamp(36px, 5vw, 62px);
+            font-weight: 900; line-height: 1.1;
+            margin-bottom: 20px; letter-spacing: -.5px;
+        }
+        .hero-title .hl {
+            background: linear-gradient(135deg, var(--green), #5eead4);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero-sub { font-size: 18px; color: var(--muted); margin-bottom: 36px; line-height: 1.7; }
+        .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 48px; }
+        .hero-stats { display: flex; gap: 32px; flex-wrap: wrap; }
+        .hero-stat-num { font-size: 28px; font-weight: 800; color: #fff; line-height: 1; }
+        .hero-stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; font-weight: 500; }
+        .stat-divider { width: 1px; background: rgba(255,255,255,.08); }
+
+        /* MOCKUP */
+        .hero-visual { position: relative; }
+        .mockup-wrap {
+            background: var(--card-bg); border: 1px solid var(--card-bd);
+            border-radius: 20px; overflow: hidden;
+            box-shadow: 0 40px 100px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.05);
+        }
+        .mockup-bar {
+            background: #0d1626; padding: 12px 16px;
+            display: flex; align-items: center; gap: 8px;
+            border-bottom: 1px solid rgba(255,255,255,.06);
+        }
+        .mock-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .mock-url {
+            flex: 1; margin: 0 12px;
+            background: rgba(255,255,255,.05); border-radius: 6px;
+            padding: 5px 12px; font-size: 11px; color: var(--muted);
+        }
+        .mockup-body { padding: 20px; }
+        .mock-stat-grid {
+            display: grid; grid-template-columns: repeat(4,1fr);
+            gap: 10px; margin-bottom: 14px;
+        }
+        .mock-stat-card {
+            background: rgba(255,255,255,.04);
+            border: 1px solid rgba(255,255,255,.06);
+            border-radius: 12px; padding: 12px 14px;
+        }
+        .mock-stat-val { font-size: 18px; font-weight: 800; }
+        .mock-stat-lbl { font-size: 9px; color: var(--muted); margin-top: 2px; }
+        .mock-chart-area {
+            background: rgba(255,255,255,.03);
+            border: 1px solid rgba(255,255,255,.06);
+            border-radius: 12px; padding: 16px;
+            height: 120px; display: flex; align-items: flex-end; gap: 6px;
+        }
+        .mock-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .mock-bar {
+            width: 100%; border-radius: 4px 4px 0 0;
+            background: linear-gradient(180deg, var(--green), var(--green-dd));
+        }
+        .mock-bar-lbl { font-size: 7px; color: var(--muted); }
+        .floating-card {
+            position: absolute; background: var(--card-bg);
+            border: 1px solid rgba(15,209,134,.25); border-radius: 14px;
+            padding: 12px 16px; box-shadow: 0 16px 40px rgba(0,0,0,.4);
+            min-width: 160px;
+        }
+        .fc-top { font-size: 10px; color: var(--muted); margin-bottom: 4px; }
+        .fc-val { font-size: 20px; font-weight: 800; color: var(--green); }
+        .fc-sub { font-size: 10px; color: #64f7b8; display: flex; align-items: center; gap: 3px; margin-top: 2px; }
+        .fc1 { bottom: -30px; left: -40px; animation: float1 4s ease-in-out infinite; }
+        .fc2 { top: -20px; right: -30px; animation: float2 5s ease-in-out infinite; }
+        @keyframes float1 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+        @keyframes float2 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(8px)} }
+
+        /* SECTION COMMONS */
+        .section-header { text-align: center; margin-bottom: 56px; }
+        .section-title {
+            font-size: clamp(28px, 4vw, 44px); font-weight: 800;
+            margin: 12px 0 16px; letter-spacing: -.3px;
+        }
+        .section-sub { font-size: 17px; color: var(--muted); max-width: 560px; margin: 0 auto; }
+
+        /* RUBROS */
+        .rubros { padding: 100px 0; }
+        .rubros-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 14px;
+        }
+        .rubro-card {
+            background: var(--card-bg); border: 1px solid var(--card-bd);
+            border-radius: 16px; padding: 20px 14px; text-align: center;
+            transition: all .2s;
+        }
+        .rubro-card:hover {
+            border-color: rgba(15,209,134,.3); transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0,0,0,.3);
+        }
+        .rubro-icon {
+            width: 48px; height: 48px; border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 12px; font-size: 22px;
+        }
+        .rubro-name { font-size: 13px; font-weight: 600; }
+
+        /* FEATURES */
+        .features { padding: 100px 0; background: linear-gradient(180deg, transparent, var(--dark2), transparent); }
+        .features-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
+        .feat-card {
+            background: var(--card-bg); border: 1px solid var(--card-bd);
+            border-radius: var(--radius); padding: 28px;
+            transition: all .2s; position: relative; overflow: hidden;
+        }
+        .feat-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--green), transparent);
+            opacity: 0; transition: opacity .3s;
+        }
+        .feat-card:hover { border-color: rgba(15,209,134,.2); transform: translateY(-4px); }
+        .feat-card:hover::before { opacity: 1; }
+        .feat-icon {
+            width: 52px; height: 52px; border-radius: 14px;
+            background: rgba(15,209,134,.12); border: 1px solid rgba(15,209,134,.2);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; color: var(--green); margin-bottom: 18px;
+        }
+        .feat-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+        .feat-desc { font-size: 14px; color: var(--muted); line-height: 1.7; }
+
+        /* MODULES */
+        .modules { padding: 100px 0; }
+        .modules-list { display: flex; flex-direction: column; gap: 80px; }
+        .module-row {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 60px; align-items: center;
+        }
+        .module-row.reverse { direction: rtl; }
+        .module-row.reverse > * { direction: ltr; }
+        .module-tag {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 11px; font-weight: 800; text-transform: uppercase;
+            letter-spacing: .6px; color: var(--muted);
+            background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08);
+            border-radius: 20px; padding: 4px 12px; margin-bottom: 16px;
+        }
+        .module-title { font-size: clamp(24px,3vw,36px); font-weight: 800; margin-bottom: 14px; letter-spacing: -.2px; }
+        .module-desc { font-size: 15px; color: var(--muted); margin-bottom: 24px; line-height: 1.8; }
+        .module-points { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+        .module-points li { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; color: var(--muted); }
+        .module-points li i { color: var(--green); margin-top: 3px; flex-shrink: 0; }
+        .module-visual {
+            background: var(--card-bg); border: 1px solid var(--card-bd);
+            border-radius: 20px; padding: 24px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.4);
+        }
+        .mv-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .mv-title { font-size: 13px; font-weight: 700; }
+        .mv-badge { font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 20px; background: rgba(15,209,134,.15); color: var(--green); }
+        .table-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,.04); font-size: 12px;
+        }
+        .table-row:last-child { border-bottom: none; }
+        .tr-name { color: var(--text); font-weight: 500; display: flex; align-items: center; gap: 8px; }
+        .tr-avatar {
+            width: 26px; height: 26px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: 700; flex-shrink: 0;
+        }
+        .tr-val { color: var(--green); font-weight: 700; }
+        .tr-status { font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+        .bar-chart { display: flex; flex-direction: column; gap: 10px; }
+        .bc-row { display: flex; align-items: center; gap: 10px; }
+        .bc-label { font-size: 11px; color: var(--muted); width: 80px; flex-shrink: 0; }
+        .bc-track { flex: 1; height: 8px; background: rgba(255,255,255,.06); border-radius: 4px; overflow: hidden; }
+        .bc-fill { height: 100%; border-radius: 4px; }
+        .bc-num { font-size: 11px; font-weight: 700; width: 40px; text-align: right; }
+
+        /* PRICING */
+        .pricing { padding: 100px 0; }
+        .pricing-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; max-width: 900px; margin: 0 auto; }
+        .plan-card {
+            background: var(--card-bg); border: 1px solid var(--card-bd);
+            border-radius: var(--radius); padding: 32px; position: relative; transition: all .2s;
+        }
+        .plan-card:hover { transform: translateY(-4px); }
+        .plan-card.popular { border-color: var(--green); box-shadow: 0 0 40px rgba(15,209,134,.15); }
+        .popular-badge {
+            position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+            background: var(--green); color: #fff; font-size: 11px; font-weight: 700;
+            padding: 4px 14px; border-radius: 20px; white-space: nowrap;
+        }
+        .plan-name { font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 16px; }
+        .plan-price { font-size: 42px; font-weight: 900; line-height: 1; margin-bottom: 4px; }
+        .plan-price span { font-size: 18px; font-weight: 600; color: var(--muted); }
+        .plan-period { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+        .plan-features { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+        .plan-features li { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
+        .plan-features li i { color: var(--green); font-size: 11px; }
+        .plan-features li.off i { color: #475569; }
+        .plan-features li.off { opacity: .5; }
+        .plan-btn {
+            width: 100%; padding: 12px; border-radius: 10px; font-weight: 700;
+            font-size: 14px; border: none; cursor: pointer; transition: all .2s;
+            text-align: center; display: block; text-decoration: none;
+        }
+        .plan-btn-primary { background: var(--green); color: #fff; }
+        .plan-btn-primary:hover { background: var(--green-d); }
+        .plan-btn-ghost { background: rgba(255,255,255,.06); color: var(--text); border: 1px solid rgba(255,255,255,.1); }
+        .plan-btn-ghost:hover { background: rgba(255,255,255,.1); }
+
+        /* TESTIMONIALS */
+        .testimonials { padding: 100px 0; }
+        .testi-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
+        .testi-card {
+            background: var(--card-bg); border: 1px solid var(--card-bd);
+            border-radius: var(--radius); padding: 28px; transition: all .2s;
+        }
+        .testi-card:hover { border-color: rgba(15,209,134,.2); transform: translateY(-3px); }
+        .testi-stars { color: #f59e0b; font-size: 13px; margin-bottom: 14px; }
+        .testi-text { font-size: 14px; color: var(--muted); line-height: 1.8; margin-bottom: 20px; font-style: italic; }
+        .testi-author { display: flex; align-items: center; gap: 12px; }
+        .testi-avatar {
+            width: 40px; height: 40px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 16px; flex-shrink: 0;
+        }
+        .testi-name { font-size: 13px; font-weight: 700; }
+        .testi-biz { font-size: 11px; color: var(--muted); }
+
+        /* FAQ */
+        .faq { padding: 100px 0; background: linear-gradient(180deg, transparent, var(--dark2), transparent); }
+        .faq-list { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+        .faq-item { background: var(--card-bg); border: 1px solid var(--card-bd); border-radius: 14px; overflow: hidden; }
+        .faq-q {
+            width: 100%; background: none; border: none; color: var(--text);
+            padding: 20px 24px; text-align: left; cursor: pointer;
+            font-size: 15px; font-weight: 600; font-family: 'Inter', sans-serif;
+            display: flex; justify-content: space-between; align-items: center; gap: 12px;
+        }
+        .faq-q i { color: var(--muted); transition: transform .2s; flex-shrink: 0; }
+        .faq-item.open .faq-q i { transform: rotate(180deg); color: var(--green); }
+        .faq-a {
+            padding: 0 24px; max-height: 0; overflow: hidden;
+            transition: all .3s; color: var(--muted); font-size: 14px; line-height: 1.8;
+        }
+        .faq-item.open .faq-a { max-height: 200px; padding: 0 24px 20px; }
+
+        /* CTA FINAL */
+        .cta-final { padding: 100px 0; text-align: center; }
+        .cta-box {
+            background: linear-gradient(135deg, rgba(15,209,134,.12), rgba(99,102,241,.08));
+            border: 1px solid rgba(15,209,134,.2);
+            border-radius: 28px; padding: 64px 40px;
+            max-width: 720px; margin: 0 auto;
+            position: relative; overflow: hidden;
+        }
+        .cta-box::before {
+            content: ''; position: absolute;
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(15,209,134,.12) 0%, transparent 70%);
+            top: -150px; left: 50%; transform: translateX(-50%);
+            pointer-events: none;
+        }
+        .cta-title { font-size: clamp(28px,4vw,44px); font-weight: 900; margin-bottom: 16px; letter-spacing: -.3px; }
+        .cta-sub { font-size: 17px; color: var(--muted); margin-bottom: 36px; }
+        .cta-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+        /* FOOTER */
+        footer { border-top: 1px solid rgba(255,255,255,.06); padding: 40px 0; }
+        .footer-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+        .footer-logo { font-size: 18px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+        .footer-copy { font-size: 13px; color: var(--muted); }
+        .footer-links { display: flex; gap: 20px; }
+        .footer-links a { font-size: 13px; color: var(--muted); text-decoration: none; transition: color .15s; }
+        .footer-links a:hover { color: var(--green); }
+
+        /* RESPONSIVE */
+        @media (max-width: 900px) {
+            .hero-inner { grid-template-columns: 1fr; }
+            .hero-visual { display: none; }
+            .features-grid { grid-template-columns: repeat(2,1fr); }
+            .module-row, .module-row.reverse { grid-template-columns: 1fr; direction: ltr; }
+            .pricing-grid { grid-template-columns: 1fr; max-width: 380px; }
+            .testi-grid { grid-template-columns: 1fr; }
+            .nav-links { display: none; }
+            .nav-mobile-btn { display: block; }
+        }
+        @media (max-width: 600px) {
+            .features-grid { grid-template-columns: 1fr; }
+            .rubros-grid { grid-template-columns: repeat(3,1fr); }
+            .cta-box { padding: 40px 24px; }
+        }
+
+        /* ANIMATIONS */
+        .fade-in {
+            opacity: 0; transform: translateY(24px);
+            transition: opacity .6s ease, transform .6s ease;
+        }
+        .fade-in.visible { opacity: 1; transform: translateY(0); }
+    </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="navbar">
+    <div class="container nav-inner">
+        <a href="#" class="nav-logo">
+            <div class="nav-logo-dot"><img src="img/DASHLOGOSF.png" alt="DASH Logo"></div>
+            DASH
+        </a>
+        <ul class="nav-links">
+            <li><a href="#caracteristicas">Características</a></li>
+            <li><a href="#modulos">Módulos</a></li>
+            <li><a href="#precios">Precios</a></li>
+            <li><a href="#faq">FAQ</a></li>
+        </ul>
+        <div class="nav-cta">
+            <a href="#" class="btn btn-ghost" style="padding:10px 20px;font-size:14px;">Iniciar sesión</a>
+            <a href="#precios" class="btn btn-primary" style="padding:10px 20px;font-size:14px;">Empezar gratis</a>
+        </div>
+        <button class="nav-mobile-btn" onclick="toggleNav()"><i class="fas fa-bars"></i></button>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-bg">
+        <div class="hero-glow"></div>
+        <div class="hero-glow2"></div>
+        <div class="grid-lines"></div>
+    </div>
+    <div class="container">
+        <div class="hero-inner">
+            <div class="hero-content fade-in">
+                <div class="hero-logo-wrap">
+                    <img src="img/DASHLOGOSF.png" alt="DASH" class="hero-logo-img">
+                </div>
+                <div class="hero-badge">
+                    <span class="badge"><i class="fas fa-bolt"></i> Todo en uno · Argentina</span>
+                </div>
+                <h1 class="hero-title">
+                    El sistema que tu negocio<br>
+                    <span class="hl">necesitaba</span>
+                </h1>
+                <p class="hero-sub">
+                    Vendé, controlá tu caja, gestioná stock y tomá decisiones con datos reales.
+                    Funciona en cualquier dispositivo, sin complicaciones.
+                </p>
+                <div class="hero-btns">
+                    <a href="#precios" class="btn btn-primary">
+                        <i class="fas fa-rocket"></i> Probar gratis 14 días
+                    </a>
+                    <a href="#modulos" class="btn btn-ghost">
+                        <i class="fas fa-play-circle"></i> Ver cómo funciona
+                    </a>
+                </div>
+                <div class="hero-stats">
+                    <div>
+                        <div class="hero-stat-num">+20</div>
+                        <div class="hero-stat-label">Tipos de negocio</div>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div>
+                        <div class="hero-stat-num">100%</div>
+                        <div class="hero-stat-label">En la nube</div>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div>
+                        <div class="hero-stat-num">APK</div>
+                        <div class="hero-stat-label">App Android nativa</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Mockup -->
+            <div class="hero-visual fade-in" style="transition-delay:.2s;">
+                <div class="mockup-wrap">
+                    <div class="mockup-bar">
+                        <div class="mock-dot" style="background:#ff5f57;"></div>
+                        <div class="mock-dot" style="background:#febc2e;"></div>
+                        <div class="mock-dot" style="background:#28c840;"></div>
+                        <div class="mock-url">dash.app/dashboard</div>
+                    </div>
+                    <div class="mockup-body">
+                        <div class="mock-stat-grid">
+                            <div class="mock-stat-card">
+                                <div class="mock-stat-val" style="color:#0FD186;">$284K</div>
+                                <div class="mock-stat-lbl">Ventas hoy</div>
+                            </div>
+                            <div class="mock-stat-card">
+                                <div class="mock-stat-val" style="color:#6366f1;">147</div>
+                                <div class="mock-stat-lbl">Tickets</div>
+                            </div>
+                            <div class="mock-stat-card">
+                                <div class="mock-stat-val" style="color:#f59e0b;">$8.2K</div>
+                                <div class="mock-stat-lbl">En caja</div>
+                            </div>
+                            <div class="mock-stat-card">
+                                <div class="mock-stat-val" style="color:#ef4444;">12</div>
+                                <div class="mock-stat-lbl">Stock bajo</div>
+                            </div>
+                        </div>
+                        <div class="mock-chart-area" id="mockChart"></div>
+                    </div>
+                </div>
+                <div class="floating-card fc1">
+                    <div class="fc-top">Ingreso del día</div>
+                    <div class="fc-val">$284.500</div>
+                    <div class="fc-sub"><i class="fas fa-arrow-up"></i> +18% vs ayer</div>
+                </div>
+                <div class="floating-card fc2">
+                    <div class="fc-top">Órdenes activas</div>
+                    <div class="fc-val" style="color:#6366f1;">23</div>
+                    <div class="fc-sub" style="color:#a78bfa;"><i class="fas fa-circle" style="font-size:6px;"></i> En tiempo real</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- RUBROS -->
+<section class="rubros">
+    <div class="container">
+        <div class="section-header fade-in">
+            <span class="badge">Rubros</span>
+            <h2 class="section-title">Para cualquier tipo de negocio</h2>
+            <p class="section-sub">DASH se adapta automáticamente a tu rubro con módulos específicos para cada industria.</p>
+        </div>
+        <div class="rubros-grid fade-in">
+            <div class="rubro-card"><div class="rubro-icon" style="background:rgba(249,115,22,.12);color:#f97316;">🍕</div><div class="rubro-name">Gastronomía</div></div>
+            <div class="rubro-card"><div class="rubro-icon" style="background:rgba(239,68,68,.12);color:#ef4444;">🍺</div><div class="rubro-name">Bar / Resto</div></div>
+            <div class="rubro-card"><div class="rubro-icon" style="background:rgba(251,191,36,.12);color:#fbbf24;">☕</div><div class="rubro-name">Cafetería</div></div>
+            <div class="rubro-card"><div class="rubro-icon" style="background:rgba(245,158,11,.12);color:#f59e0b;">🔧</div><div class="rubro-name">Ferretería</div></div>
+            <div class="rubro-card"><div class="rubro-icon" style="background:rgba(16,185,129,.12);color:#10b981;">💊</div><div class="rubro-name">Farmacia</div></div>
+            <div class="rubro-card"><div class="rubro-icon" style="background:rgba(99,102,241,.12);color:#6366f1;">💻</div><div class="rubro-name">Tecnología</div></div>
+            <div class="rubro-card"><div class="rubro-icon" style="background:rgba(14,165,233,.12);color:#0ea5e9;">👓</div><div class="rubro-name">Óptica</div></div>
+            <div class="rubro-card"><div class="rubro-icon" style="background:rgba(139,92,246,.12);color:#8b5cf6;">🏨</div><div class="rubro-name">Hospedaje</div></div>
+            <div class="rubro-card"><div class="rubro-icon" style="background:rgba(236,72,153,.12);color:#ec4899;">✂️</div><div class="rubro-name">Peluquería</div></div>
+            <div class="rubro-card"><div class="rubro-icon" style="background:rgba(20,184,166,.12);color:#14b8a6;">🏋️</div><div class="rubro-name">Gimnasio</div></div>
+            <div class="rubro-card"><div class="rubro-icon" style="background:rgba(34,197,94,.12);color:#22c55e;">⚽</div><div class="rubro-name">Canchas</div></div>
+            <div class="rubro-card"><div class="rubro-icon" style="background:rgba(234,179,8,.12);color:#eab308;">🐾</div><div class="rubro-name">Veterinaria</div></div>
+            <div class="rubro-card"><div class="rubro-icon" style="background:rgba(15,209,134,.12);color:#0FD186;">🛒</div><div class="rubro-name">Supermercado</div></div>
+            <div class="rubro-card"><div class="rubro-icon" style="background:rgba(248,113,113,.12);color:#f87171;">👗</div><div class="rubro-name">Indumentaria</div></div>
+        </div>
+    </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features" id="caracteristicas">
+    <div class="container">
+        <div class="section-header fade-in">
+            <span class="badge">Características</span>
+            <h2 class="section-title">Todo lo que necesitás, en un solo lugar</h2>
+            <p class="section-sub">Sin instalar nada, sin complicaciones. Entrás y empezás a gestionar.</p>
+        </div>
+        <div class="features-grid fade-in">
+            <div class="feat-card">
+                <div class="feat-icon"><i class="fas fa-cash-register"></i></div>
+                <div class="feat-title">Punto de Venta</div>
+                <div class="feat-desc">Vendé rápido con búsqueda por código o nombre, aplicá descuentos, aceptá múltiples métodos de pago y emitís ticket en segundos.</div>
+            </div>
+            <div class="feat-card">
+                <div class="feat-icon" style="background:rgba(99,102,241,.12);border-color:rgba(99,102,241,.2);color:#6366f1;"><i class="fas fa-chart-line"></i></div>
+                <div class="feat-title">Reportes en tiempo real</div>
+                <div class="feat-desc">Ventas por día, semana o mes. Comparativas, productos más vendidos y rentabilidad de cada operación.</div>
+            </div>
+            <div class="feat-card">
+                <div class="feat-icon" style="background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.2);color:#f59e0b;"><i class="fas fa-boxes"></i></div>
+                <div class="feat-title">Inventario inteligente</div>
+                <div class="feat-desc">Control de stock con alertas de quiebre, carga por foto y gestión de categorías. Nunca más te quedás sin producto sin saberlo.</div>
+            </div>
+            <div class="feat-card">
+                <div class="feat-icon" style="background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.2);color:#ef4444;"><i class="fas fa-coins"></i></div>
+                <div class="feat-title">Control de Caja</div>
+                <div class="feat-desc">Apertura y cierre de caja, registro de gastos, retiros e ingresos. Sabés exactamente cuánto hay en cada momento.</div>
+            </div>
+            <div class="feat-card">
+                <div class="feat-icon" style="background:rgba(14,165,233,.12);border-color:rgba(14,165,233,.2);color:#0ea5e9;"><i class="fas fa-store"></i></div>
+                <div class="feat-title">Tienda / Carta Digital</div>
+                <div class="feat-desc">Mostrá tus productos o menú con un QR. Tus clientes ven precios actualizados desde su celular sin descargar nada.</div>
+            </div>
+            <div class="feat-card">
+                <div class="feat-icon" style="background:rgba(236,72,153,.12);border-color:rgba(236,72,153,.2);color:#ec4899;"><i class="fas fa-users"></i></div>
+                <div class="feat-title">Gestión de empleados</div>
+                <div class="feat-desc">Creá usuarios con roles y permisos distintos. El gerente ve todo, el cajero solo vende. Control total de accesos.</div>
+            </div>
+            <div class="feat-card">
+                <div class="feat-icon" style="background:rgba(20,184,166,.12);border-color:rgba(20,184,166,.2);color:#14b8a6;"><i class="fas fa-mobile-alt"></i></div>
+                <div class="feat-title">APK para Android</div>
+                <div class="feat-desc">Instalá DASH como app nativa en cualquier tablet o celular Android. Experiencia de aplicación real, sin abrir el navegador.</div>
+            </div>
+            <div class="feat-card">
+                <div class="feat-icon" style="background:rgba(139,92,246,.12);border-color:rgba(139,92,246,.2);color:#8b5cf6;"><i class="fas fa-receipt"></i></div>
+                <div class="feat-title">Impresora térmica</div>
+                <div class="feat-desc">Compatible con impresoras térmicas estándar (58mm y 80mm). Configurá el ticket con tu logo y datos del negocio.</div>
+            </div>
+            <div class="feat-card">
+                <div class="feat-icon" style="background:rgba(15,209,134,.12);border-color:rgba(15,209,134,.2);color:#0FD186;"><i class="fas fa-cloud"></i></div>
+                <div class="feat-title">100% en la nube</div>
+                <div class="feat-desc">Tus datos siempre seguros y accesibles desde cualquier dispositivo. Sin backups manuales, sin pérdidas de información.</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- MODULES -->
+<section class="modules" id="modulos">
+    <div class="container">
+        <div class="section-header fade-in">
+            <span class="badge">Módulos especializados</span>
+            <h2 class="section-title">Funciones pensadas para cada industria</h2>
+            <p class="section-sub">Cada rubro tiene su lógica. DASH la entiende.</p>
+        </div>
+        <div class="modules-list">
+
+            <!-- Ventas -->
+            <div class="module-row fade-in">
+                <div>
+                    <div class="module-tag"><i class="fas fa-cash-register"></i> Ventas & Caja</div>
+                    <h3 class="module-title">Vendé más rápido,<br>controlá cada peso</h3>
+                    <p class="module-desc">Un punto de venta diseñado para velocidad. Buscá productos, aplicá descuentos y cobrá en segundos. El cierre de caja te da el resumen exacto del día.</p>
+                    <ul class="module-points">
+                        <li><i class="fas fa-check-circle"></i>Búsqueda instantánea por nombre o código de barras</li>
+                        <li><i class="fas fa-check-circle"></i>Múltiples métodos de pago en una sola venta</li>
+                        <li><i class="fas fa-check-circle"></i>Apertura y cierre de caja con arqueo detallado</li>
+                        <li><i class="fas fa-check-circle"></i>Historial completo de ventas y devoluciones</li>
+                    </ul>
+                </div>
+                <div class="module-visual">
+                    <div class="mv-header">
+                        <span class="mv-title">Últimas ventas</span>
+                        <span class="mv-badge">En vivo</span>
+                    </div>
+                    <div class="table-row">
+                        <div class="tr-name"><div class="tr-avatar" style="background:rgba(15,209,134,.15);color:#0FD186;">M</div>Mesa 4</div>
+                        <div class="tr-val">$4.800</div>
+                        <div class="tr-status" style="background:rgba(15,209,134,.12);color:#0FD186;">Pagado</div>
+                    </div>
+                    <div class="table-row">
+                        <div class="tr-name"><div class="tr-avatar" style="background:rgba(99,102,241,.15);color:#6366f1;">V</div>Venta #1082</div>
+                        <div class="tr-val">$12.500</div>
+                        <div class="tr-status" style="background:rgba(15,209,134,.12);color:#0FD186;">Pagado</div>
+                    </div>
+                    <div class="table-row">
+                        <div class="tr-name"><div class="tr-avatar" style="background:rgba(245,158,11,.15);color:#f59e0b;">P</div>Pedido #847</div>
+                        <div class="tr-val">$7.200</div>
+                        <div class="tr-status" style="background:rgba(245,158,11,.12);color:#f59e0b;">Pendiente</div>
+                    </div>
+                    <div class="table-row">
+                        <div class="tr-name"><div class="tr-avatar" style="background:rgba(239,68,68,.15);color:#ef4444;">E</div>Envío #92</div>
+                        <div class="tr-val">$3.100</div>
+                        <div class="tr-status" style="background:rgba(15,209,134,.12);color:#0FD186;">Pagado</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Servicio técnico -->
+            <div class="module-row reverse fade-in">
+                <div>
+                    <div class="module-tag"><i class="fas fa-tools"></i> Servicio técnico</div>
+                    <h3 class="module-title">Órdenes de servicio para Tecnología, Óptica y más</h3>
+                    <p class="module-desc">Registrá cada equipo con su historial completo, diagnóstico, presupuesto y estado. Tus clientes saben en qué punto está su trabajo.</p>
+                    <ul class="module-points">
+                        <li><i class="fas fa-check-circle"></i>Estados: ingresado, diagnosticando, listo, entregado</li>
+                        <li><i class="fas fa-check-circle"></i>Registro de seña y saldo pendiente</li>
+                        <li><i class="fas fa-check-circle"></i>Prioridad urgente y etiqueta VIP</li>
+                        <li><i class="fas fa-check-circle"></i>Historial completo por cliente</li>
+                    </ul>
+                </div>
+                <div class="module-visual">
+                    <div class="mv-header">
+                        <span class="mv-title">Órdenes activas</span>
+                        <span class="mv-badge" style="background:rgba(245,158,11,.15);color:#f59e0b;">5 hoy</span>
+                    </div>
+                    <div class="table-row">
+                        <div class="tr-name"><div class="tr-avatar" style="background:rgba(99,102,241,.15);color:#6366f1;">📱</div>iPhone 13 — García</div>
+                        <div class="tr-status" style="background:rgba(245,158,11,.12);color:#f59e0b;">Reparando</div>
+                    </div>
+                    <div class="table-row">
+                        <div class="tr-name"><div class="tr-avatar" style="background:rgba(15,209,134,.15);color:#0FD186;">💻</div>Notebook — López</div>
+                        <div class="tr-status" style="background:rgba(15,209,134,.12);color:#0FD186;">Listo ✓</div>
+                    </div>
+                    <div class="table-row">
+                        <div class="tr-name"><div class="tr-avatar" style="background:rgba(239,68,68,.15);color:#ef4444;">🔴</div>PS5 — Martínez</div>
+                        <div class="tr-status" style="background:rgba(239,68,68,.12);color:#ef4444;">Urgente</div>
+                    </div>
+                    <div class="table-row">
+                        <div class="tr-name"><div class="tr-avatar" style="background:rgba(148,163,184,.15);color:#94a3b8;">🖥️</div>PC — Fernández</div>
+                        <div class="tr-status" style="background:rgba(99,102,241,.12);color:#6366f1;">Diagnosticando</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reportes -->
+            <div class="module-row fade-in">
+                <div>
+                    <div class="module-tag"><i class="fas fa-chart-bar"></i> Reportes</div>
+                    <h3 class="module-title">Datos que te ayudan a crecer</h3>
+                    <p class="module-desc">No es solo ver números. DASH te muestra qué productos generan más ganancia, en qué horarios vendés más y cómo evolucionó tu negocio mes a mes.</p>
+                    <ul class="module-points">
+                        <li><i class="fas fa-check-circle"></i>Ventas por día, semana, mes y año</li>
+                        <li><i class="fas fa-check-circle"></i>Productos más vendidos y más rentables</li>
+                        <li><i class="fas fa-check-circle"></i>Comparativa de períodos anteriores</li>
+                        <li><i class="fas fa-check-circle"></i>Control de gastos y rentabilidad neta</li>
+                    </ul>
+                </div>
+                <div class="module-visual">
+                    <div class="mv-header">
+                        <span class="mv-title">Ventas por producto</span>
+                        <span class="mv-badge">Este mes</span>
+                    </div>
+                    <div class="bar-chart" style="margin-top:8px;">
+                        <div class="bc-row"><span class="bc-label">Hamburguesa</span><div class="bc-track"><div class="bc-fill" style="width:92%;background:linear-gradient(90deg,#0FD186,#0AB871);"></div></div><span class="bc-num" style="color:#0FD186;">$92K</span></div>
+                        <div class="bc-row"><span class="bc-label">Pizza</span><div class="bc-track"><div class="bc-fill" style="width:78%;background:linear-gradient(90deg,#6366f1,#4f46e5);"></div></div><span class="bc-num" style="color:#6366f1;">$78K</span></div>
+                        <div class="bc-row"><span class="bc-label">Bebidas</span><div class="bc-track"><div class="bc-fill" style="width:65%;background:linear-gradient(90deg,#f59e0b,#d97706);"></div></div><span class="bc-num" style="color:#f59e0b;">$65K</span></div>
+                        <div class="bc-row"><span class="bc-label">Postres</span><div class="bc-track"><div class="bc-fill" style="width:44%;background:linear-gradient(90deg,#ec4899,#db2777);"></div></div><span class="bc-num" style="color:#ec4899;">$44K</span></div>
+                        <div class="bc-row"><span class="bc-label">Empanadas</span><div class="bc-track"><div class="bc-fill" style="width:31%;background:linear-gradient(90deg,#14b8a6,#0d9488);"></div></div><span class="bc-num" style="color:#14b8a6;">$31K</span></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing" id="precios">
+    <div class="container">
+        <div class="section-header fade-in">
+            <span class="badge">Precios</span>
+            <h2 class="section-title">Simple y transparente</h2>
+            <p class="section-sub">Sin sorpresas. Empezá gratis y crecé con tu negocio.</p>
+        </div>
+        <div class="pricing-grid fade-in">
+            <div class="plan-card">
+                <div class="plan-name">Básico</div>
+                <div class="plan-price">Gratis</div>
+                <div class="plan-period">Para empezar</div>
+                <ul class="plan-features">
+                    <li><i class="fas fa-check"></i>1 usuario</li>
+                    <li><i class="fas fa-check"></i>Ventas y caja</li>
+                    <li><i class="fas fa-check"></i>Hasta 50 productos</li>
+                    <li><i class="fas fa-check"></i>Reportes básicos</li>
+                    <li class="off"><i class="fas fa-times"></i>Múltiples usuarios</li>
+                    <li class="off"><i class="fas fa-times"></i>Módulos especiales</li>
+                </ul>
+                <a href="#" class="plan-btn plan-btn-ghost">Empezar gratis</a>
+            </div>
+            <div class="plan-card popular">
+                <div class="popular-badge">⭐ Más popular</div>
+                <div class="plan-name">Pro</div>
+                <div class="plan-price">$8.990<span>/mes</span></div>
+                <div class="plan-period">ARS · Por negocio</div>
+                <ul class="plan-features">
+                    <li><i class="fas fa-check"></i>Usuarios ilimitados</li>
+                    <li><i class="fas fa-check"></i>Productos ilimitados</li>
+                    <li><i class="fas fa-check"></i>Todos los módulos</li>
+                    <li><i class="fas fa-check"></i>Reportes avanzados</li>
+                    <li><i class="fas fa-check"></i>Tienda / Carta digital</li>
+                    <li><i class="fas fa-check"></i>APK Android</li>
+                </ul>
+                <a href="#" class="plan-btn plan-btn-primary">Empezar ahora</a>
+            </div>
+            <div class="plan-card">
+                <div class="plan-name">Enterprise</div>
+                <div class="plan-price">A<span> consultar</span></div>
+                <div class="plan-period">Cadenas y franquicias</div>
+                <ul class="plan-features">
+                    <li><i class="fas fa-check"></i>Multi-sucursal</li>
+                    <li><i class="fas fa-check"></i>Reportes consolidados</li>
+                    <li><i class="fas fa-check"></i>Integración contable</li>
+                    <li><i class="fas fa-check"></i>Soporte prioritario 24/7</li>
+                    <li><i class="fas fa-check"></i>Capacitación incluida</li>
+                    <li><i class="fas fa-check"></i>Personalización total</li>
+                </ul>
+                <a href="#" class="plan-btn plan-btn-ghost">Contactar</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials">
+    <div class="container">
+        <div class="section-header fade-in">
+            <span class="badge">Testimonios</span>
+            <h2 class="section-title">Lo que dicen nuestros clientes</h2>
+        </div>
+        <div class="testi-grid fade-in">
+            <div class="testi-card">
+                <div class="testi-stars">★★★★★</div>
+                <p class="testi-text">"Antes llevaba todo en papel. Con DASH empecé a saber exactamente cuánto ganaba cada día. En un mes recuperé la inversión."</p>
+                <div class="testi-author">
+                    <div class="testi-avatar" style="background:rgba(249,115,22,.15);color:#f97316;">M</div>
+                    <div>
+                        <div class="testi-name">Marcelo R.</div>
+                        <div class="testi-biz">🍕 Pizzería La Familia</div>
+                    </div>
+                </div>
+            </div>
+            <div class="testi-card">
+                <div class="testi-stars">★★★★★</div>
+                <p class="testi-text">"El módulo de órdenes de servicio es exactamente lo que necesitaba. Mis clientes me preguntan menos porque ya saben el estado de su equipo."</p>
+                <div class="testi-author">
+                    <div class="testi-avatar" style="background:rgba(99,102,241,.15);color:#6366f1;">D</div>
+                    <div>
+                        <div class="testi-name">Diego S.</div>
+                        <div class="testi-biz">💻 Servicio técnico DS</div>
+                    </div>
+                </div>
+            </div>
+            <div class="testi-card">
+                <div class="testi-stars">★★★★★</div>
+                <p class="testi-text">"La carta digital con QR fue un cambio total. Mis meseros ya no tienen que explicar el menú, los clientes lo ven directo desde el celu."</p>
+                <div class="testi-author">
+                    <div class="testi-avatar" style="background:rgba(15,209,134,.15);color:#0FD186;">V</div>
+                    <div>
+                        <div class="testi-name">Valeria M.</div>
+                        <div class="testi-biz">☕ Café Almendra</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq" id="faq">
+    <div class="container">
+        <div class="section-header fade-in">
+            <span class="badge">FAQ</span>
+            <h2 class="section-title">Preguntas frecuentes</h2>
+        </div>
+        <div class="faq-list fade-in">
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">¿Necesito instalar algo para usar DASH? <i class="fas fa-chevron-down"></i></button>
+                <div class="faq-a">No. DASH funciona 100% en el navegador desde cualquier dispositivo. Si querés la experiencia de app nativa, podés descargar la APK para Android.</div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">¿Puedo usar DASH con una impresora térmica? <i class="fas fa-chevron-down"></i></button>
+                <div class="faq-a">Sí. DASH es compatible con impresoras térmicas estándar (58mm y 80mm). Podés configurar el ticket con el logo de tu negocio, datos fiscales y un mensaje personalizado.</div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">¿Cuántos usuarios puedo tener? <i class="fas fa-chevron-down"></i></button>
+                <div class="faq-a">En el plan Pro, podés crear usuarios ilimitados con roles diferenciados: dueño, administrador y empleado. Cada rol tiene permisos distintos para garantizar el control de tu negocio.</div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">¿Mis datos están seguros en la nube? <i class="fas fa-chevron-down"></i></button>
+                <div class="faq-a">Sí. Todos los datos se almacenan en servidores con SSL, backups automáticos diarios y acceso protegido por contraseña. Nunca perdés información.</div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">¿Puedo cambiar de rubro después de registrarme? <i class="fas fa-chevron-down"></i></button>
+                <div class="faq-a">Sí. Podés cambiar el rubro de tu negocio desde el perfil en cualquier momento. Los módulos se adaptan automáticamente al nuevo rubro seleccionado.</div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">¿Tiene soporte en español argentino? <i class="fas fa-chevron-down"></i></button>
+                <div class="faq-a">Sí. DASH está desarrollado íntegramente en Argentina, con soporte en español rioplatense, precios en pesos y adaptado a la realidad del comercio local.</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA FINAL -->
+<section class="cta-final">
+    <div class="container">
+        <div class="cta-box fade-in">
+            <div class="badge" style="margin-bottom:20px;">🚀 Empezá hoy</div>
+            <h2 class="cta-title">Tu negocio merece<br>un sistema así</h2>
+            <p class="cta-sub">14 días gratis, sin tarjeta de crédito.<br>En 5 minutos ya estás vendiendo.</p>
+            <div class="cta-btns">
+                <a href="#" class="btn btn-primary" style="font-size:16px;padding:16px 32px;">
+                    <i class="fas fa-rocket"></i> Crear cuenta gratis
+                </a>
+                <a href="#" class="btn btn-ghost" style="font-size:16px;padding:16px 32px;">
+                    <i class="fab fa-whatsapp" style="color:#25d366;"></i> Consultar por WhatsApp
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+    <div class="container footer-inner">
+        <div class="footer-logo">
+            <div class="nav-logo-dot" style="width:32px;height:32px;"><img src="img/DASHLOGOSF.png" alt="DASH"></div>
+            DASH
+        </div>
+        <div class="footer-copy">© 2026 DASH. Hecho con ❤️ en Argentina.</div>
+        <div class="footer-links">
+            <a href="#">Términos</a>
+            <a href="#">Privacidad</a>
+            <a href="#">Contacto</a>
+        </div>
+    </div>
+</footer>
+
+<script>
+    // Mock chart bars
+    const days = ['L','M','X','J','V','S','D'];
+    const vals = [55, 72, 48, 85, 91, 78, 63];
+    const chart = document.getElementById('mockChart');
+    if (chart) {
+        chart.innerHTML = days.map((d, i) => `
+            <div class="mock-bar-wrap">
+                <div class="mock-bar" style="height:${vals[i]}%;opacity:${i === 4 ? 1 : 0.45 + i * 0.08};"></div>
+                <span class="mock-bar-lbl">${d}</span>
+            </div>
+        `).join('');
+    }
+
+    // Scroll reveal animations
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+    // Navbar scroll effect
+    window.addEventListener('scroll', () => {
+        const nav = document.getElementById('navbar');
+        if (window.scrollY > 40) {
+            nav.style.background = 'rgba(10,15,30,.97)';
+            nav.style.boxShadow = '0 4px 30px rgba(0,0,0,.3)';
+        } else {
+            nav.style.background = 'rgba(10,15,30,.8)';
+            nav.style.boxShadow = 'none';
+        }
+    });
+
+    // FAQ accordion
+    function toggleFaq(btn) {
+        const item = btn.closest('.faq-item');
+        const isOpen = item.classList.contains('open');
+        document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+        if (!isOpen) item.classList.add('open');
+    }
+
+    // Mobile nav toggle
+    function toggleNav() {
+        const links = document.querySelector('.nav-links');
+        if (links.style.display === 'flex') {
+            links.style.display = 'none';
+        } else {
+            links.style.cssText = 'display:flex;flex-direction:column;position:absolute;top:70px;left:0;right:0;background:rgba(10,15,30,.97);padding:16px 24px;gap:4px;border-bottom:1px solid rgba(255,255,255,.06);z-index:99;';
+        }
+    }
+</script>
+</body>
+</html>

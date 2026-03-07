@@ -1,0 +1,40 @@
+{
+    "name": "DASH CRM",
+    "short_name": "DASH",
+    "description": "Sistema de gestión para negocios",
+    "start_url": "/DASHBASE/index.php",
+    "scope": "/DASHBASE/",
+    "display": "standalone",
+    "orientation": "portrait",
+    "background_color": "#F8F9FC",
+    "theme_color": "#0FD186",
+    "lang": "es",
+    "icons": [
+        {
+            "src": "/DASHBASE/public/img/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/DASHBASE/public/img/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "/DASHBASE/public/img/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/DASHBASE/public/img/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ],
+    "categories": ["business", "productivity"],
+    "prefer_related_applications": false
+}

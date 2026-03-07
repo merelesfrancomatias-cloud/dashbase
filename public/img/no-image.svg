@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+  <!-- Fondo degradado suave -->
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f8f9fa;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e9ecef;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <rect width="400" height="400" fill="url(#bg)"/>
+  
+  <!-- Icono de imagen -->
+  <g transform="translate(200,200)">
+    <!-- Marco de imagen -->
+    <rect x="-80" y="-80" width="160" height="160" rx="12" fill="none" stroke="#dee2e6" stroke-width="3"/>
+    
+    <!-- Montañas/imagen -->
+    <path d="M -60,-20 L -30,-50 L 0,-30 L 30,-60 L 60,-20 L 60,40 L -60,40 Z" fill="#dee2e6"/>
+    <path d="M -60,10 L -20,-30 L 20,0 L 60,-20 L 60,40 L -60,40 Z" fill="#ced4da"/>
+    
+    <!-- Sol/círculo -->
+    <circle cx="-35" cy="-45" r="12" fill="#adb5bd"/>
+  </g>
+  
+  <!-- Texto -->
+  <text x="200" y="330" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="#adb5bd" text-anchor="middle" font-weight="500">Sin imagen</text>
+</svg>

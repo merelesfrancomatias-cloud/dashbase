@@ -1,0 +1,24 @@
+{
+    "name": "dashbase/dashbase",
+    "description": "DASH CRM - Sistema de gestión para negocios",
+    "type": "project",
+    "require": {
+        "php": ">=7.4",
+        "vlucas/phpdotenv": "^5.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/",
+            "App\\Models\\": "app/Models/",
+            "App\\Controllers\\": "app/Controllers/"
+        },
+        "files": [
+            "config/helpers.php"
+        ]
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    },
+    "minimum-stability": "stable"
+}

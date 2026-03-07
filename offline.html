@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sin conexión — DASH</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;background:#F8F9FC;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px;}
+        .card{background:#fff;border-radius:20px;padding:48px 40px;max-width:380px;width:100%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.08);}
+        .icon{font-size:56px;margin-bottom:20px;}
+        h1{font-size:20px;font-weight:700;color:#1A202C;margin-bottom:10px;}
+        p{font-size:14px;color:#64748B;line-height:1.6;margin-bottom:24px;}
+        button{background:#0FD186;color:#fff;border:none;padding:12px 28px;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;}
+        button:hover{background:#0bb874;}
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="icon">📡</div>
+    <h1>Sin conexión</h1>
+    <p>No hay conexión al servidor. Revisá tu conexión a internet o la red local.</p>
+    <button onclick="window.location.reload()">Reintentar</button>
+</div>
+</body>
+</html>

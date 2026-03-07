@@ -1,0 +1,42 @@
+# ============================================================
+# DASH CRM - .gitignore
+# ============================================================
+
+# Variables de entorno (NUNCA subir a Git)
+.env
+.env.local
+.env.production
+
+# Dependencias de Composer
+/vendor/
+# El composer.phar local (usar el global en CI/CD)
+composer.phar
+
+# Uploads de usuarios
+/public/uploads/logos/*
+/public/uploads/productos/*
+# Conservar la carpeta pero no su contenido
+!/public/uploads/logos/.gitkeep
+!/public/uploads/productos/.gitkeep
+
+# Backups de base de datos
+*.sql.bak
+dash4_backup.sql
+
+# Logs
+*.log
+/logs/*
+!/logs/.gitkeep
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Cache de PHP
+*.cache

@@ -1,0 +1,13 @@
+ALTER TABLE negocios ADD COLUMN IF NOT EXISTS bloqueado TINYINT(1) NOT NULL DEFAULT 0 AFTER fecha_vencimiento;
+ALTER TABLE negocios ADD COLUMN IF NOT EXISTS bloqueado_motivo VARCHAR(255) DEFAULT NULL AFTER bloqueado;
+ALTER TABLE negocios ADD COLUMN IF NOT EXISTS notas_admin TEXT DEFAULT NULL AFTER bloqueado_motivo;
+ALTER TABLE negocios ADD COLUMN IF NOT EXISTS fecha_alta DATE DEFAULT NULL AFTER fecha_registro;
+ALTER TABLE planes ADD COLUMN IF NOT EXISTS dias_gratis INT NOT NULL DEFAULT 0;
+ALTER TABLE planes ADD COLUMN IF NOT EXISTS color VARCHAR(20) DEFAULT '#0FD186';
+ALTER TABLE planes ADD COLUMN IF NOT EXISTS icono VARCHAR(50) DEFAULT 'fa-star';
+ALTER TABLE planes ADD COLUMN IF NOT EXISTS orden INT DEFAULT 0;
+INSERT IGNORE INTO planes (nombre, nombre_display, descripcion, precio_mensual, precio_anual, dias_gratis, activo, color, icono, orden) VALUES ('gratis', 'Gratis 15 dias', 'Prueba gratuita con acceso completo', 0.00, 0.00, 15, 1, '#64748b', 'fa-gift', 1);
+CREATE TABLE IF NOT EXISTS superadmin_users (id INT AUTO_INCREMENT PRIMARY KEY, nombre VARCHAR(120) NOT NULL, email VARCHAR(180) NOT NULL UNIQUE, password VARCHAR(255) NOT NULL, activo TINYINT(1) NOT NULL DEFAULT 1, ultimo_login DATETIME DEFAULT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+INSERT IGNORE INTO superadmin_users (nombre, email, password) VALUES ('Super Admin', 'admin@dashbase.com', '$2y$12$Kk7vzrOEjPO0WLfKT8OMaOQY1c.GF.MFuAVQ4hVF3Y6FkJJjJg2DS');
+CREATE TABLE IF NOT EXISTS pagos (id INT AUTO_INCREMENT PRIMARY KEY, negocio_id INT NOT NULL, plan_id INT NOT NULL, monto DECIMAL(10,2) NOT NULL DEFAULT 0.00, moneda VARCHAR(10) DEFAULT 'ARS', metodo_pago ENUM('efectivo','transferencia','mercadopago','otro') DEFAULT 'transferencia', referencia VARCHAR(255) DEFAULT NULL, fecha_pago DATE NOT NULL, fecha_desde DATE NOT NULL, fecha_hasta DATE NOT NULL, notas TEXT, registrado_por INT DEFAULT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, INDEX idx_negocio (negocio_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE IF NOT EXISTS logs_actividad (id BIGINT AUTO_INCREMENT PRIMARY KEY, negocio_id INT DEFAULT NULL, usuario_id INT DEFAULT NULL, accion VARCHAR(120) NOT NULL, detalle TEXT DEFAULT NULL, ip VARCHAR(45) DEFAULT NULL, user_agent VARCHAR(255) DEFAULT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, INDEX idx_negocio (negocio_id), INDEX idx_usuario (usuario_id), INDEX idx_fecha (created_at)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
