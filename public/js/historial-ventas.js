@@ -260,7 +260,7 @@ class HistorialVentasModule {
         });
 
         const modalContent = `
-            <div class="modal-overlay" id="detalleModal" onclick="if(event.target === this) this.remove()">
+            <div class="modal-overlay show" id="detalleModal" onclick="if(event.target === this) this.remove()">
                 <div class="modal-content" style="max-width: 600px;" onclick="event.stopPropagation()">
                     <div class="modal-header">
                         <h2><i class="fas fa-receipt"></i> Detalle de Venta #${venta.id}
@@ -348,7 +348,7 @@ class HistorialVentasModule {
                 .join('');
 
             const modal = `
-                <div class="modal-overlay" id="editarVentaModal" onclick="if(event.target===this)this.remove()">
+                <div class="modal-overlay show" id="editarVentaModal" onclick="if(event.target===this)this.remove()">
                     <div class="modal-content" style="max-width:480px;" onclick="event.stopPropagation()">
                         <div class="modal-header">
                             <h2><i class="fas fa-edit"></i> Editar Venta #${venta.id}</h2>
@@ -435,7 +435,7 @@ class HistorialVentasModule {
         const nombreRef = venta ? `#${venta.id} — ${formatCurrency(venta.total)}` : `#${ventaId}`;
 
         const modal = `
-            <div class="modal-overlay" id="anularVentaModal" onclick="if(event.target===this)this.remove()">
+            <div class="modal-overlay show" id="anularVentaModal" onclick="if(event.target===this)this.remove()">
                 <div class="modal-content" style="max-width:420px;" onclick="event.stopPropagation()">
                     <div class="modal-header" style="border-bottom:2px solid #fee2e2;">
                         <h2 style="color:#ef4444;"><i class="fas fa-ban"></i> Anular Venta ${nombreRef}</h2>

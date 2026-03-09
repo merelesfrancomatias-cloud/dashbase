@@ -173,6 +173,31 @@ if (!isset($_SESSION['user_id']) && !isset($_SESSION['usuario_id'])) {
         .add-servicio-row select { flex: 1; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border-color,#e5e7eb); font-size: 13px; background: var(--card-bg,#fff); color: var(--text-color,#1e293b); outline: none; }
         .add-servicio-row select:focus { border-color: #8b5cf6; }
         .btn-add-serv { padding: 8px 14px; background: #8b5cf6; color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+
+        /* ── Autocomplete Cliente ── */
+        .ac-wrap { position: relative; }
+        .ac-dropdown {
+            position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+            background: var(--card-bg,#fff); border: 1px solid #8b5cf6;
+            border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.12);
+            z-index: 9999; max-height: 220px; overflow-y: auto; display: none;
+        }
+        .ac-dropdown.show { display: block; }
+        .ac-item {
+            padding: 10px 14px; cursor: pointer; border-bottom: 1px solid var(--border-color,#f1f5f9);
+            transition: background .12s;
+        }
+        .ac-item:last-child { border-bottom: none; }
+        .ac-item:hover, .ac-item.sel { background: rgba(139,92,246,.08); }
+        .ac-item-nombre { font-size: 14px; font-weight: 600; color: var(--text-color,#1e293b); }
+        .ac-item-tel { font-size: 12px; color: var(--muted-color,#64748b); margin-top: 1px; }
+        .cliente-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(139,92,246,.1); border: 1px solid rgba(139,92,246,.3);
+            border-radius: 6px; padding: 3px 8px; font-size: 12px; color: #7c3aed;
+            margin-top: 4px; font-weight: 600;
+        }
+        .cliente-badge button { background: none; border: none; cursor: pointer; color: #ef4444; font-size: 12px; padding: 0 2px; line-height: 1; }
         .btn-add-serv:hover { background: #7c3aed; }
         .totales-servicios {
             background: var(--hover-bg,#f8fafc); border-radius: 8px; padding: 8px 12px;
@@ -243,9 +268,14 @@ if (!isset($_SESSION['user_id']) && !isset($_SESSION['usuario_id'])) {
         </div>
         <div class="modal-body">
             <input type="hidden" id="tId">
+            <input type="hidden" id="tClienteId">
             <div class="form-group">
                 <label>Cliente *</label>
-                <input type="text" id="tCliente" placeholder="Nombre del cliente">
+                <div class="ac-wrap">
+                    <input type="text" id="tCliente" placeholder="Buscar o escribir nombre del cliente…" autocomplete="off">
+                    <div class="ac-dropdown" id="acDropdown"></div>
+                </div>
+                <div id="clienteSelBadge" style="display:none;"></div>
             </div>
             <div class="form-group">
                 <label>Teléfono</label>
@@ -464,6 +494,7 @@ function setFecha(f) { if (f) { fechaActual = f; cargarDia(); } }
 
 function abrirNuevo() {
     document.getElementById('tId').value         = '';
+    document.getElementById('tClienteId').value  = '';
     document.getElementById('tCliente').value    = '';
     document.getElementById('tTelefono').value   = '';
     document.getElementById('tServicio').value   = '';
@@ -473,6 +504,7 @@ function abrirNuevo() {
     document.getElementById('tNotas').value      = '';
     serviciosSeleccionados = [];
     renderServiciosSeleccionados();
+    ocultarBadgeCliente();
     document.getElementById('modalTituloTurno').innerHTML = '<i class="fas fa-calendar-plus" style="color:#8b5cf6;margin-right:8px;"></i> Nuevo Turno';
     document.getElementById('modalTurno').classList.add('open');
     setTimeout(() => document.getElementById('tCliente').focus(), 100);
@@ -484,8 +516,11 @@ async function editarTurno(id) {
     if (!d.success) return;
     const t = d.data;
     document.getElementById('tId').value         = t.id;
+    document.getElementById('tClienteId').value  = t.cliente_id || '';
     document.getElementById('tCliente').value    = t.cliente_nombre || '';
     document.getElementById('tTelefono').value   = t.cliente_telefono || '';
+    if (t.cliente_id) mostrarBadgeCliente(t.cliente_nombre, t.cliente_id);
+    else ocultarBadgeCliente();
     document.getElementById('tServicio').value   = '';
     document.getElementById('tFecha').value      = t.fecha;
     document.getElementById('tHoraInicio').value = (t.hora_inicio||'').substring(0,5);
@@ -526,6 +561,7 @@ async function guardarTurno() {
 
     const body = {
         id:               id || undefined,
+        cliente_id:       parseInt(document.getElementById('tClienteId').value) || null,
         cliente_nombre:   cliente,
         cliente_telefono: document.getElementById('tTelefono').value,
         fecha,
@@ -612,6 +648,62 @@ function cerrarModal(id) { document.getElementById(id).classList.remove('open');
 function hoy() { return new Date().toISOString().split('T')[0]; }
 function fmtFecha(f) { if (!f) return '—'; const p = f.split(' ')[0].split('-'); return `${p[2]}/${p[1]}/${p[0]}`; }
 function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ── Autocomplete Cliente ──────────────────────────────────────────────────────
+const API_C = '../../api/peluqueria/clientes.php';
+let acTimer = null;
+
+function mostrarBadgeCliente(nombre, id) {
+    const badge = document.getElementById('clienteSelBadge');
+    badge.style.display = 'block';
+    badge.innerHTML = `<span class="cliente-badge"><i class="fas fa-user-check"></i> ${esc(nombre)} <button onclick="desvincularCliente()" title="Quitar">×</button></span>`;
+}
+function ocultarBadgeCliente() {
+    document.getElementById('clienteSelBadge').style.display = 'none';
+    document.getElementById('clienteSelBadge').innerHTML = '';
+}
+function desvincularCliente() {
+    document.getElementById('tClienteId').value = '';
+    ocultarBadgeCliente();
+}
+function cerrarDropdown() {
+    document.getElementById('acDropdown').classList.remove('show');
+    document.getElementById('acDropdown').innerHTML = '';
+}
+function seleccionarCliente(c) {
+    document.getElementById('tClienteId').value  = c.id;
+    document.getElementById('tCliente').value    = c.nombre;
+    document.getElementById('tTelefono').value   = c.telefono || '';
+    mostrarBadgeCliente(c.nombre, c.id);
+    cerrarDropdown();
+}
+
+async function buscarClientesAC(q) {
+    if (!q || q.length < 2) { cerrarDropdown(); return; }
+    try {
+        const r = await fetch(`${API_C}?search=${encodeURIComponent(q)}`, { credentials: 'include' });
+        const d = await r.json();
+        const drop = document.getElementById('acDropdown');
+        const lista = d.data || [];
+        if (!lista.length) { cerrarDropdown(); return; }
+        drop.innerHTML = lista.slice(0, 8).map(c => `
+            <div class="ac-item" onclick='seleccionarCliente(${JSON.stringify({id:c.id,nombre:c.nombre,telefono:c.telefono||''})})'>
+                <div class="ac-item-nombre">${esc(c.nombre)}</div>
+                ${c.telefono ? `<div class="ac-item-tel"><i class="fas fa-phone" style="font-size:10px;margin-right:3px;"></i>${esc(c.telefono)}</div>` : ''}
+            </div>`).join('');
+        drop.classList.add('show');
+    } catch(e) { cerrarDropdown(); }
+}
+
+document.getElementById('tCliente').addEventListener('input', function() {
+    document.getElementById('tClienteId').value = '';
+    ocultarBadgeCliente();
+    clearTimeout(acTimer);
+    acTimer = setTimeout(() => buscarClientesAC(this.value.trim()), 250);
+});
+document.getElementById('tCliente').addEventListener('blur', function() {
+    setTimeout(cerrarDropdown, 200);
+});
 
 document.querySelectorAll('.modal-overlay').forEach(m => {
     m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });

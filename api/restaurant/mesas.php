@@ -17,7 +17,8 @@ if ($method === 'GET') {
         $stmt = $pdo->prepare("
             SELECT m.*, s.nombre AS sector_nombre, s.color AS sector_color,
                    c.id AS comanda_id, c.numero AS comanda_numero, c.estado AS comanda_estado,
-                   c.total AS comanda_total, c.personas AS comanda_personas
+                   c.personas AS comanda_personas,
+                   COALESCE((SELECT SUM(ci.subtotal) FROM restaurant_comanda_items ci WHERE ci.comanda_id = c.id AND ci.estado_cocina != 'cancelado'), 0) AS comanda_total
             FROM restaurant_mesas m
             LEFT JOIN restaurant_sectores s ON s.id = m.sector_id
             LEFT JOIN restaurant_comandas c ON c.mesa_id = m.id AND c.estado IN ('abierta','en_cocina','lista')
@@ -43,9 +44,9 @@ if ($method === 'GET') {
                c.id     AS comanda_id,
                c.numero AS comanda_numero,
                c.estado AS comanda_estado,
-               c.total  AS comanda_total,
                c.personas AS comanda_personas,
-               c.abierta_at AS comanda_desde
+               c.abierta_at AS comanda_desde,
+               COALESCE((SELECT SUM(ci.subtotal) FROM restaurant_comanda_items ci WHERE ci.comanda_id = c.id AND ci.estado_cocina != 'cancelado'), 0) AS comanda_total
         FROM restaurant_mesas m
         LEFT JOIN restaurant_sectores s ON s.id = m.sector_id
         LEFT JOIN restaurant_comandas c

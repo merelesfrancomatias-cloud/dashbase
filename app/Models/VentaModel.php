@@ -139,11 +139,12 @@ class VentaModel extends Model
 
                 $this->execute("
                     INSERT INTO detalle_ventas
-                        (venta_id, producto_id, cantidad, precio_unitario, subtotal)
+                        (venta_id, negocio_id, producto_id, cantidad, precio_unitario, subtotal)
                     VALUES
-                        (:venta_id, :producto_id, :cantidad, :precio_unitario, :subtotal)
+                        (:venta_id, :negocio_id, :producto_id, :cantidad, :precio_unitario, :subtotal)
                 ", [
                     ':venta_id'        => $ventaId,
+                    ':negocio_id'      => $this->negocioId,
                     ':producto_id'     => $item['producto_id'],
                     ':cantidad'        => $item['cantidad'],
                     ':precio_unitario' => $item['precio_unitario'],

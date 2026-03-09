@@ -97,7 +97,7 @@ if ($method === 'POST') {
         ':estado'  => $d['estado'] ?? 'pendiente',
         ':obs'     => trim($d['observaciones'] ?? ''),
         ':origen'  => $d['origen'] ?? 'telefono',
-        ':uid'     => $_SESSION['usuario_id'],
+        ':uid'     => $_SESSION['user_id'] ?? $_SESSION['usuario_id'] ?? null,
     ]);
     $newId = $pdo->lastInsertId();
 

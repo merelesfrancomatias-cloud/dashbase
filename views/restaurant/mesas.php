@@ -559,6 +559,14 @@ async function cargarComanda(id) {
     document.getElementById('cpSubtitulo').textContent = `Comanda #${d.data.numero} · ${d.data.personas} personas`;
     renderItems(d.data.items);
     actualizarTotalPanel();
+
+    // Actualizar el total en la tarjeta de la mesa sin recargar todo
+    const nuevoTotal = calcularSubtotalItems();
+    const mesaEnArray = mesas.find(m => m.comanda_id == id);
+    if (mesaEnArray) {
+        mesaEnArray.comanda_total = nuevoTotal;
+        renderMesas();
+    }
 }
 
 /* ── RENDERIZAR ÍTEMS ─────────────────────────────────── */
@@ -670,7 +678,17 @@ async function agregarItem(prodId, nombre, precio) {
     document.getElementById('prodLista').classList.remove('show');
     document.getElementById('buscadorProd').value = '';
 
-    const obs = '';  // se podría abrir un mini popup
+    // Actualización optimista: mostrar el ítem y total antes de esperar al servidor
+    if (!comandaActual.items) comandaActual.items = [];
+    comandaActual.items.push({
+        id: 'tmp_' + Date.now(), producto_id: prodId,
+        nombre_item: nombre, precio_unit: precio,
+        cantidad: 1, subtotal: parseFloat(precio),
+        estado_cocina: 'pendiente', observaciones: ''
+    });
+    renderItems(comandaActual.items);
+    actualizarTotalPanel();
+
     await fetch(`${BASE}/api/restaurant/comandas.php`, {
         method: 'POST',
         headers: {'Content-Type':'application/json'},
@@ -681,9 +699,10 @@ async function agregarItem(prodId, nombre, precio) {
             nombre_item: nombre,
             precio_unit: precio,
             cantidad:    1,
-            observaciones: obs,
+            observaciones: '',
         })
     });
+    // Sincronizar con el servidor para obtener IDs reales
     await cargarComanda(comandaActual.id);
 }
 
@@ -691,7 +710,13 @@ async function cambiarCantidad(itemId, nuevaCant) {
     if (nuevaCant < 1) { cancelarItem(itemId); return; }
     const item = comandaActual.items.find(i => i.id == itemId);
     if (!item) return;
-    // Re-agregar con nueva cantidad → simplificado: DELETE + POST
+
+    // Actualización optimista
+    item.cantidad = nuevaCant;
+    item.subtotal = parseFloat(item.precio_unit) * nuevaCant;
+    renderItems(comandaActual.items);
+    actualizarTotalPanel();
+
     await fetch(`${BASE}/api/restaurant/comandas.php?item_id=${itemId}&comanda_id=${comandaActual.id}`, { method: 'DELETE' });
     await fetch(`${BASE}/api/restaurant/comandas.php`, {
         method: 'POST',
@@ -707,14 +732,28 @@ async function cambiarCantidad(itemId, nuevaCant) {
 }
 
 async function cancelarItem(itemId) {
+    // Actualización optimista
+    if (comandaActual && comandaActual.items) {
+        const idx = comandaActual.items.findIndex(i => i.id == itemId);
+        if (idx !== -1) comandaActual.items.splice(idx, 1);
+        renderItems(comandaActual.items);
+        actualizarTotalPanel();
+    }
     await fetch(`${BASE}/api/restaurant/comandas.php?item_id=${itemId}&comanda_id=${comandaActual.id}`, { method: 'DELETE' });
     await cargarComanda(comandaActual.id);
 }
 
 /* ── TOTAL ────────────────────────────────────────────── */
+function calcularSubtotalItems() {
+    if (!comandaActual || !comandaActual.items) return 0;
+    return comandaActual.items
+        .filter(i => i.estado_cocina !== 'cancelado')
+        .reduce((acc, i) => acc + parseFloat(i.subtotal || 0), 0);
+}
+
 function actualizarTotalPanel() {
     if (!comandaActual) return;
-    const sub  = parseFloat(comandaActual.subtotal) || 0;
+    const sub  = calcularSubtotalItems();
     const desc = parseFloat(document.getElementById('cpDescuento').value) || 0;
     document.getElementById('cpSubtotal').textContent = fmtMoney(sub);
     document.getElementById('cpTotal').textContent    = fmtMoney(sub - desc);
@@ -740,7 +779,7 @@ async function enviarCocina() {
 /* ── COBRAR ───────────────────────────────────────────── */
 function abrirCobro() {
     if (!comandaActual || !mesaActual) return;
-    const sub  = parseFloat(comandaActual.subtotal) || 0;
+    const sub  = calcularSubtotalItems();
     const desc = parseFloat(document.getElementById('cpDescuento').value) || 0;
     document.getElementById('mc_mesa').textContent  = `Mesa ${mesaActual.numero}`;
     document.getElementById('mc_num').textContent   = `#${comandaActual.numero}`;

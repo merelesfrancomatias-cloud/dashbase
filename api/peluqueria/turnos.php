@@ -111,7 +111,7 @@ if ($method === 'POST') {
         $duracion = $tot['duracion']; $precioTotal = $tot['precio']; $servicioNombre = $tot['nombres']; $servicioId = null;
     } else {
         $duracion = (int)($d['duracion_min'] ?? 30); $precioTotal = (float)($d['precio'] ?? 0);
-        $servicioNombre = $d['servicio_nombre'] ?? null; $servicioId = $d['servicio_id'] ?: null;
+        $servicioNombre = $d['servicio_nombre'] ?? null; $servicioId = $d['servicio_id'] ?? null;
     }
     $horaFin = $d['hora_fin'] ?? date('H:i', strtotime($d['hora_inicio']) + $duracion * 60);
 
@@ -119,8 +119,8 @@ if ($method === 'POST') {
         (negocio_id,cliente_id,cliente_nombre,cliente_telefono,empleado_id,servicio_id,servicio_nombre,fecha,hora_inicio,hora_fin,duracion_min,precio,estado,notas)
         VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
     $st->execute([
-        $negocioId, $d['cliente_id'] ?: null, $d['cliente_nombre'], $d['cliente_telefono'] ?? null,
-        $d['empleado_id'] ?: null, $servicioId, $servicioNombre,
+        $negocioId, $d['cliente_id'] ?? null, $d['cliente_nombre'], $d['cliente_telefono'] ?? null,
+        $d['empleado_id'] ?? null, $servicioId, $servicioNombre,
         $d['fecha'], $d['hora_inicio'], $horaFin, $duracion,
         $precioTotal, $d['estado'] ?? 'pendiente', $d['notas'] ?? null,
     ]);

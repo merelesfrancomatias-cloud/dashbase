@@ -6,18 +6,30 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 /* ─── helpers ──────────────────────────────────────────────── */
 function recalcularComanda(PDO $pdo, int $comandaId): void {
+    // Sumar subtotales de ítems no cancelados
+    $stmt = $pdo->prepare("
+        SELECT COALESCE(SUM(subtotal), 0)
+        FROM restaurant_comanda_items
+        WHERE comanda_id = :cid AND estado_cocina != 'cancelado'
+    ");
+    $stmt->execute([':cid' => $comandaId]);
+    $subtotal = (float)$stmt->fetchColumn();
+
+    // Obtener descuento actual
+    $stmt2 = $pdo->prepare("SELECT descuento FROM restaurant_comandas WHERE id = :cid");
+    $stmt2->execute([':cid' => $comandaId]);
+    $descuento = (float)$stmt2->fetchColumn();
+
+    // Actualizar comanda
     $pdo->prepare("
-        UPDATE restaurant_comandas c SET
-            subtotal = (SELECT COALESCE(SUM(subtotal),0) FROM restaurant_comanda_items WHERE comanda_id=:cid AND estado_cocina != 'cancelado'),
-            total    = subtotal - descuento
+        UPDATE restaurant_comandas
+        SET subtotal = :sub, total = :tot
         WHERE id = :cid
-    ")->execute([':cid' => $comandaId]);
-    // recalcular total correctamente
-    $pdo->prepare("
-        UPDATE restaurant_comandas SET
-            total = subtotal - descuento
-        WHERE id = :cid
-    ")->execute([':cid' => $comandaId]);
+    ")->execute([
+        ':sub' => $subtotal,
+        ':tot' => $subtotal - $descuento,
+        ':cid' => $comandaId,
+    ]);
 }
 
 function siguienteNumeroComanda(PDO $pdo, int $negocioId): int {
@@ -106,7 +118,7 @@ if ($method === 'POST') {
             ':mid' => $mesaId,
             ':rid' => !empty($d['reserva_id']) ? (int)$d['reserva_id'] : null,
             ':num' => $numero,
-            ':uid' => $_SESSION['usuario_id'],
+            ':uid' => $_SESSION['user_id'] ?? $_SESSION['usuario_id'] ?? null,
             ':per' => (int)($d['personas'] ?? 1),
         ]);
         $comandaId = $pdo->lastInsertId();
@@ -179,6 +191,10 @@ if ($method === 'POST') {
         $comanda = $pdo->query("SELECT * FROM restaurant_comandas WHERE id={$cid} AND negocio_id={$negocioId}")->fetch(PDO::FETCH_ASSOC);
         if (!$comanda) Response::error('Comanda no encontrada', 404);
 
+        // Recalcular subtotal antes de cobrar (por si quedó desactualizado)
+        recalcularComanda($pdo, $cid);
+        $comanda = $pdo->query("SELECT * FROM restaurant_comandas WHERE id={$cid}")->fetch(PDO::FETCH_ASSOC);
+
         $metodoPago = $d['metodo_pago'] ?? 'efectivo';
         $descuento  = (float)($d['descuento'] ?? 0);
         $total      = $comanda['subtotal'] - $descuento;
@@ -189,7 +205,7 @@ if ($method === 'POST') {
             VALUES (:nid, :uid, :caj, :cn, :sub, :desc, :tot, :mp, :obs)
         ")->execute([
             ':nid'  => $negocioId,
-            ':uid'  => $_SESSION['usuario_id'],
+            ':uid'  => $_SESSION['user_id'] ?? $_SESSION['usuario_id'] ?? null,
             ':caj'  => $d['caja_id'] ?? null,
             ':cn'   => $d['cliente_nombre'] ?? null,
             ':sub'  => $comanda['subtotal'],
@@ -202,12 +218,12 @@ if ($method === 'POST') {
 
         // Copiar ítems a detalle_ventas
         $items = $pdo->query("SELECT * FROM restaurant_comanda_items WHERE comanda_id={$cid} AND estado_cocina != 'cancelado'")->fetchAll(PDO::FETCH_ASSOC);
-        $stmtDV = $pdo->prepare("INSERT INTO detalle_ventas (venta_id, producto_id, negocio_id, cantidad, precio_unitario, subtotal) VALUES (:vid, :pid, :nid, :cant, :precio, :sub)");
+        $stmtDV = $pdo->prepare("INSERT INTO detalle_ventas (venta_id, negocio_id, producto_id, cantidad, precio_unitario, subtotal) VALUES (:vid, :nid, :pid, :cant, :precio, :sub)");
         foreach ($items as $item) {
             $stmtDV->execute([
                 ':vid'    => $ventaId,
-                ':pid'    => $item['producto_id'],
                 ':nid'    => $negocioId,
+                ':pid'    => $item['producto_id'],
                 ':cant'   => $item['cantidad'],
                 ':precio' => $item['precio_unit'],
                 ':sub'    => $item['subtotal'],
