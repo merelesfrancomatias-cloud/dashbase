@@ -24,6 +24,23 @@ if ($method === 'GET') {
         Response::success('ok', $stmt->fetchAll(PDO::FETCH_ASSOC));
     }
 
+    // Rango de fechas (para estadísticas semanales)
+    if (isset($_GET['desde'], $_GET['hasta'])) {
+        $desde = $_GET['desde'];
+        $hasta = $_GET['hasta'];
+        $stmt = $db->prepare("
+            SELECT a.id, a.socio_id, a.fecha, a.hora,
+                   CONCAT(s.nombre,' ',s.apellido) AS socio_nombre
+            FROM gym_asistencias a
+            LEFT JOIN gym_socios s ON s.id = a.socio_id
+            WHERE a.negocio_id=? AND a.fecha BETWEEN ? AND ?
+            ORDER BY a.fecha ASC, a.hora ASC
+        ");
+        $stmt->execute([$negocio_id, $desde, $hasta]);
+        $asistencias = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        Response::success('ok', ['asistencias' => $asistencias, 'total' => count($asistencias)]);
+    }
+
     // Asistencias del día
     $stmt = $db->prepare("
         SELECT a.id, a.socio_id, a.fecha, a.hora,
@@ -77,7 +94,8 @@ if ($method === 'POST') {
 }
 
 if ($method === 'DELETE') {
-    $id = (int)($_GET['id'] ?? 0);
+    $body = json_decode(file_get_contents('php://input'), true) ?? [];
+    $id = (int)($body['id'] ?? $_GET['id'] ?? 0);
     if (!$id) Response::error('ID requerido', 400);
     $db->prepare("DELETE FROM gym_asistencias WHERE id=? AND negocio_id=?")->execute([$id, $negocio_id]);
     Response::success('Asistencia eliminada');

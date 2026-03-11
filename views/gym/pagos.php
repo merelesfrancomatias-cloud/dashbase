@@ -288,7 +288,7 @@ async function cargarPagos() {
 async function cargarStatsVencidos() {
     const r = await fetch(`${API_SOCIOS}`, {credentials:'include'});
     const j = await r.json();
-    const todos = j.success ? (j.data || []) : [];
+    const todos = j.success ? (j.data.socios || []) : [];
     const activos = todos.filter(s => s.estado === 'activo');
     document.getElementById('st-socios-activos').textContent = activos.length;
 
@@ -439,7 +439,7 @@ async function cargarSociosYPlanes() {
     ]);
     const js = await rs.json();
     const jp = await rp.json();
-    socios = js.success ? (js.data || []) : [];
+    socios = js.success ? (js.data.socios || []) : [];
     planes = jp.success ? (jp.data || []) : [];
 
     const selS = document.getElementById('pSocio');

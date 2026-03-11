@@ -161,7 +161,7 @@ async function cargarAsistencias() {
         const d = await r.json();
         document.getElementById('loadingState').style.display = 'none';
         if (d.success) {
-            asistencias = d.data || [];
+            asistencias = d.data.asistencias || [];
             actualizarStats();
             renderTabla();
         }
@@ -246,7 +246,7 @@ async function cargarSemana() {
         const r = await fetch(`../../api/gym/asistencias.php?desde=${desde}&hasta=${hasta}`);
         const d = await r.json();
         if (d.success) {
-            document.getElementById('statSemana').textContent = Array.isArray(d.data) ? d.data.length : '—';
+            document.getElementById('statSemana').textContent = d.data.total ?? (Array.isArray(d.data.asistencias) ? d.data.asistencias.length : '—');
         }
     } catch(e) {}
 }
