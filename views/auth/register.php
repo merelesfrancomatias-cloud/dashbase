@@ -29,14 +29,60 @@
             --transition:   all 0.25s cubic-bezier(.4,0,.2,1);
         }
         [data-theme="light"] {
-            --bg:         #F0F4F8;
-            --surface:    #FFFFFF;
-            --surface-2:  #F8FAFC;
-            --surface-3:  #EDF2F7;
-            --text:       #1A202C;
-            --muted:      #718096;
-            --border:     #E2E8F0;
-            --shadow-card:0 20px 60px rgba(0,0,0,.12);
+            --bg:           linear-gradient(135deg, #e0f2fe 0%, #f0fdf4 50%, #fef9c3 100%);
+            --surface:      #FFFFFF;
+            --surface-2:    #F8FAFC;
+            --surface-3:    #EFF6FF;
+            --text:         #0F172A;
+            --muted:        #64748B;
+            --border:       #CBD5E1;
+            --shadow-card:  0 32px 80px rgba(15,23,42,.13), 0 2px 8px rgba(15,209,134,.08);
+            --primary-glow: rgba(15,209,134,.18);
+        }
+        [data-theme="light"] body {
+            background: linear-gradient(135deg, #dbeafe 0%, #f0fdf4 45%, #fef9c3 100%);
+        }
+        [data-theme="light"] .register-wrap {
+            box-shadow: 0 32px 80px rgba(15,23,42,.13), 0 0 0 1px rgba(203,213,225,.6);
+        }
+        [data-theme="light"] .register-right {
+            background: #FFFFFF;
+        }
+        [data-theme="light"] .fg .fi {
+            background: #F8FAFC;
+            border-color: #CBD5E1;
+            color: #0F172A;
+        }
+        [data-theme="light"] .fg .fi:focus {
+            background: #FFFFFF;
+            border-color: var(--primary);
+        }
+        [data-theme="light"] .rubro-card {
+            border-color: rgba(203,213,225,.7);
+        }
+        [data-theme="light"] .rubro-card:hover {
+            border-color: var(--primary);
+        }
+        [data-theme="light"] .resumen-box {
+            background: #F8FAFC;
+            border-color: #CBD5E1;
+        }
+        [data-theme="light"] .btn-ghost {
+            background: #F1F5F9;
+            border-color: #CBD5E1;
+            color: #475569;
+        }
+        [data-theme="light"] .btn-ghost:hover {
+            background: #E2E8F0;
+            color: #0F172A;
+        }
+        [data-theme="light"] .steps .step-num {
+            background: #F1F5F9;
+            border-color: #CBD5E1;
+        }
+        [data-theme="light"] .theme-toggle {
+            background: #FFFFFF;
+            box-shadow: 0 2px 12px rgba(15,23,42,.1);
         }
 
         html { scroll-behavior: smooth; }
@@ -70,8 +116,8 @@
 
         /* ── Layout ── */
         .register-wrap {
-            width: 100%; max-width: 980px;
-            display: grid; grid-template-columns: 340px 1fr;
+            width: 100%; max-width: 1020px;
+            display: grid; grid-template-columns: 380px 1fr;
             background: var(--surface);
             border-radius: 24px;
             box-shadow: var(--shadow-card);
@@ -87,21 +133,21 @@
 
         /* ── Panel izquierdo ── */
         .register-left {
-            background: linear-gradient(160deg, #0d1e16 0%, #0A0F1E 60%, #0d1326 100%);
-            padding: 44px 32px;
+            background: linear-gradient(160deg, #071a11 0%, #0A0F1E 55%, #0d1326 100%);
+            padding: 36px 28px;
             display: flex; flex-direction: column;
             justify-content: space-between;
             color: white; position: relative; overflow: hidden;
         }
         .register-left::before {
-            content:''; position:absolute; width:350px; height:350px; border-radius:50%;
-            background:radial-gradient(circle, rgba(15,209,134,.18) 0%, transparent 65%);
-            top:-100px; right:-100px; pointer-events:none;
+            content:''; position:absolute; width:320px; height:320px; border-radius:50%;
+            background:radial-gradient(circle, rgba(15,209,134,.22) 0%, transparent 65%);
+            top:-80px; right:-80px; pointer-events:none;
         }
         .register-left::after {
-            content:''; position:absolute; width:280px; height:280px; border-radius:50%;
-            background:radial-gradient(circle, rgba(99,102,241,.12) 0%, transparent 65%);
-            bottom:-80px; left:-80px; pointer-events:none;
+            content:''; position:absolute; width:260px; height:260px; border-radius:50%;
+            background:radial-gradient(circle, rgba(99,102,241,.15) 0%, transparent 65%);
+            bottom:-60px; left:-60px; pointer-events:none;
         }
         .left-grid {
             position:absolute; inset:0;
@@ -116,49 +162,75 @@
             background:linear-gradient(90deg, transparent, var(--primary), transparent);
         }
         .left-content { position:relative; z-index:1; }
-        .brand-logo { display:flex; align-items:center; gap:12px; margin-bottom:36px; }
-        .brand-logo-box {
-            width:44px; height:44px; border-radius:12px; overflow:hidden;
-            background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12);
-            display:flex; align-items:center; justify-content:center; flex-shrink:0;
-        }
-        .brand-logo-img { height:32px; width:auto; object-fit:contain; display:block; }
-        .brand-logo-name {
-            font-size:24px; font-weight:900; color:#fff; letter-spacing:-.5px;
-            line-height:1;
-        }
-        .brand-logo-name span {
-            display:block; font-size:10px; font-weight:500; color:rgba(255,255,255,.45);
-            letter-spacing:.5px; text-transform:uppercase; margin-top:2px;
-        }
-        .brand-tagline { font-size:26px; font-weight:900; line-height:1.2; margin-bottom:12px; letter-spacing:-.5px; }
+        .brand-logo { display:flex; align-items:center; gap:10px; margin-bottom:20px; }
+        .brand-logo-img { height:52px; width:auto; object-fit:contain; display:block; }
+        .brand-tagline { font-size:22px; font-weight:900; line-height:1.25; margin-bottom:8px; letter-spacing:-.5px; }
         .brand-tagline .hl {
             background:linear-gradient(135deg, var(--primary), #5eead4);
             -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
         }
-        .brand-desc { font-size:13px; color:rgba(255,255,255,.6); line-height:1.7; margin-bottom:28px; }
-        .brand-features { list-style:none; display:flex; flex-direction:column; gap:12px; }
-        .brand-features li { display:flex; align-items:center; gap:12px; font-size:13px; color:rgba(255,255,255,.75); }
-        .feat-icon {
-            width:32px; height:32px; border-radius:9px;
-            background:rgba(15,209,134,.12); border:1px solid rgba(15,209,134,.2);
-            display:flex; align-items:center; justify-content:center;
-            font-size:13px; color:var(--primary); flex-shrink:0;
+        .brand-desc { font-size:12px; color:rgba(255,255,255,.55); line-height:1.65; margin-bottom:18px; }
+
+        /* ── Mockup de pantalla ── */
+        .app-mockup {
+            position:relative; z-index:1;
+            background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1);
+            border-radius:14px; overflow:hidden; margin-bottom:16px;
+            box-shadow:0 12px 40px rgba(0,0,0,.5), 0 0 0 1px rgba(15,209,134,.08);
         }
+        .mock-topbar {
+            background:rgba(255,255,255,.06); padding:7px 12px;
+            display:flex; align-items:center; gap:6px; border-bottom:1px solid rgba(255,255,255,.07);
+        }
+        .mock-dot { width:7px; height:7px; border-radius:50%; }
+        .mock-tab {
+            margin-left:8px; background:rgba(15,209,134,.18); border-radius:5px;
+            padding:2px 10px; font-size:9px; font-weight:700; color:var(--primary);
+        }
+        .mock-body { padding:12px; }
+        .mock-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin-bottom:10px; }
+        .mock-stat {
+            background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.07);
+            border-radius:9px; padding:8px 8px 7px;
+        }
+        .mock-stat-label { font-size:8px; color:rgba(255,255,255,.4); margin-bottom:3px; }
+        .mock-stat-val { font-size:13px; font-weight:800; color:#fff; }
+        .mock-stat-val.green { color:var(--primary); }
+        .mock-stat-badge { font-size:7px; color:var(--primary); background:rgba(15,209,134,.12); border-radius:4px; padding:1px 4px; display:inline-block; margin-top:2px; }
+        .mock-chart { background:rgba(255,255,255,.03); border-radius:8px; padding:8px 10px; border:1px solid rgba(255,255,255,.06); margin-bottom:8px; }
+        .mock-chart-title { font-size:8px; color:rgba(255,255,255,.4); margin-bottom:6px; font-weight:600; }
+        .mock-bars { display:flex; align-items:flex-end; gap:4px; height:36px; }
+        .mock-bar { flex:1; border-radius:3px 3px 0 0; opacity:.85; }
+        .mock-list { display:flex; flex-direction:column; gap:5px; }
+        .mock-list-item {
+            display:flex; align-items:center; justify-content:space-between;
+            background:rgba(255,255,255,.04); border-radius:7px; padding:5px 8px;
+            border:1px solid rgba(255,255,255,.05);
+        }
+        .mock-list-left { display:flex; align-items:center; gap:7px; }
+        .mock-list-avatar { width:20px; height:20px; border-radius:6px; flex-shrink:0; }
+        .mock-list-name { font-size:9px; font-weight:600; color:rgba(255,255,255,.8); }
+        .mock-list-sub { font-size:8px; color:rgba(255,255,255,.35); }
+        .mock-list-amount { font-size:10px; font-weight:700; color:var(--primary); }
+        .mock-pill {
+            font-size:7px; padding:2px 6px; border-radius:20px; font-weight:700;
+            background:rgba(15,209,134,.15); color:var(--primary); border:1px solid rgba(15,209,134,.2);
+        }
+
         .trial-badge {
             position:relative; z-index:1;
-            background:rgba(15,209,134,.1); border:1px solid rgba(15,209,134,.25);
-            border-radius:14px; padding:14px 18px;
-            font-size:13px; color:rgba(255,255,255,.85);
-            display:flex; align-items:center; gap:12px; margin-top:32px;
+            background:rgba(15,209,134,.08); border:1px solid rgba(15,209,134,.2);
+            border-radius:12px; padding:12px 16px;
+            font-size:12px; color:rgba(255,255,255,.8);
+            display:flex; align-items:center; gap:10px;
         }
         .badge-icon {
-            width:42px; height:42px; border-radius:10px;
+            width:38px; height:38px; border-radius:9px;
             background:rgba(15,209,134,.15); border:1px solid rgba(15,209,134,.2);
             display:flex; align-items:center; justify-content:center;
-            font-size:18px; color:var(--primary); flex-shrink:0;
+            font-size:17px; color:var(--primary); flex-shrink:0;
         }
-        .trial-badge strong { font-size:15px; font-weight:800; display:block; margin-bottom:2px; color:#fff; }
+        .trial-badge strong { font-size:14px; font-weight:800; display:block; margin-bottom:1px; color:#fff; }
 
         /* ── Panel derecho ── */
         .register-right {
@@ -192,27 +264,60 @@
 
         /* ── Rubros grid ── */
         .rubros-grid {
-            display:grid; grid-template-columns:repeat(4,1fr); gap:8px;
-            max-height:300px; overflow-y:auto; padding:2px;
+            display:grid; grid-template-columns:repeat(3,1fr); gap:10px;
+            max-height:380px; overflow-y:auto; padding:2px;
         }
         .rubros-grid::-webkit-scrollbar { width:4px; }
         .rubros-grid::-webkit-scrollbar-track { background:transparent; }
         .rubros-grid::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
         .rubro-card {
-            border:1.5px solid var(--border); border-radius:12px;
-            padding:14px 8px 12px; text-align:center; cursor:pointer;
+            border:1.5px solid var(--border); border-radius:14px;
+            padding:0; text-align:center; cursor:pointer;
             transition:var(--transition); background:var(--surface-2); user-select:none;
-            display:flex; flex-direction:column; align-items:center; gap:8px;
+            display:flex; flex-direction:column; align-items:center;
+            overflow:hidden; position:relative;
+            height: 130px;
         }
-        .rubro-card:hover { border-color:var(--primary); background:rgba(15,209,134,.06); transform:translateY(-2px); box-shadow:0 4px 16px rgba(0,0,0,.2); }
-        .rubro-card.selected { border-color:var(--primary); background:rgba(15,209,134,.08); box-shadow:0 0 0 3px var(--primary-glow); }
-        .rubro-icon-wrap {
-            width:40px; height:40px; border-radius:10px;
-            display:flex; align-items:center; justify-content:center;
-            font-size:17px; flex-shrink:0;
+        .rubro-card-bg {
+            position:absolute; inset:0;
+            background-size:cover; background-position:center;
+            transition: transform .45s cubic-bezier(.4,0,.2,1), opacity .3s;
+            opacity:.9;
         }
-        .rubro-card .rc-name { font-size:10.5px; font-weight:700; color:var(--text); line-height:1.3; }
-        .rubro-card .rc-cats { font-size:9px; color:var(--muted); }
+        .rubro-card:hover .rubro-card-bg    { transform:scale(1.07); opacity:1; }
+        .rubro-card.selected .rubro-card-bg { opacity:1; }
+        .rubro-card-overlay {
+            position:absolute; inset:0;
+            background:linear-gradient(to top, rgba(0,0,0,.88) 0%, rgba(0,0,0,.5) 45%, rgba(0,0,0,.05) 100%);
+            transition: background .3s;
+        }
+        .rubro-card:hover .rubro-card-overlay    { background:linear-gradient(to top, rgba(0,0,0,.92) 0%, rgba(0,0,0,.55) 45%, rgba(0,0,0,.05) 100%); }
+        .rubro-card.selected .rubro-card-overlay { background:linear-gradient(to top, rgba(5,100,65,.92) 0%, rgba(10,140,90,.5) 50%, rgba(0,0,0,.05) 100%); }
+        .rubro-card-body {
+            position:relative; z-index:1;
+            padding:10px 10px 12px;
+            display:flex; flex-direction:column; align-items:center;
+            justify-content:flex-end; gap:4px;
+            width:100%; height:100%;
+        }
+        /* texto en la parte inferior */
+        .rubro-card-text { display:flex; flex-direction:column; align-items:center; gap:2px; }
+        .rubro-card .rc-name  { font-size:12px; font-weight:900; color:#fff; line-height:1.25; text-shadow:0 1px 8px rgba(0,0,0,1); letter-spacing:.1px; }
+        .rubro-card .rc-desc  { font-size:9.5px; color:rgba(255,255,255,.85); line-height:1.35; text-shadow:0 1px 6px rgba(0,0,0,1); }
+        .rubro-card .rc-cats  { font-size:8.5px; color:rgba(255,255,255,.6); text-shadow:0 1px 4px rgba(0,0,0,1); margin-top:1px; }
+
+        .rubro-card:hover   { border-color:var(--primary); transform:translateY(-3px); box-shadow:0 10px 28px rgba(0,0,0,.5); }
+        .rubro-card.selected{ border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-glow), 0 10px 28px rgba(0,0,0,.5); }
+
+        /* checkmark de selección */
+        .rubro-check {
+            position:absolute; top:8px; right:8px; z-index:3;
+            width:20px; height:20px; border-radius:50%;
+            background:var(--primary); border:2px solid #fff;
+            display:none; align-items:center; justify-content:center;
+            font-size:9px; color:#0A0F1E; font-weight:900;
+        }
+        .rubro-card.selected .rubro-check { display:flex; }
 
         /* ── Campos ── */
         .form-row { display:grid; grid-template-columns:1fr 1fr; gap:13px; }
@@ -299,8 +404,12 @@
             .register-wrap { grid-template-columns:1fr; border-radius:20px; }
             .register-left { display:none; }
             .register-right { padding:28px 20px; }
-            .rubros-grid { grid-template-columns:repeat(3,1fr); max-height:260px; }
+            .rubros-grid { grid-template-columns:repeat(2,1fr); max-height:360px; }
             .form-row { grid-template-columns:1fr; }
+        }
+        @media (max-width: 440px) {
+            .rubros-grid { grid-template-columns:repeat(2,1fr); }
+            .rubro-card  { height: 118px; }
         }
     </style>
 </head>
@@ -319,24 +428,81 @@
         <div class="left-grid"></div>
         <div class="left-content">
             <div class="brand-logo">
-                <div class="brand-logo-box">
-                    <img src="public/img/DASHLOGOSF.png" alt="DASH" class="brand-logo-img">
-                </div>
-                <div class="brand-logo-name">
-                    DASH
-                    <span>Sistema de gestión</span>
-                </div>
+                <img src="public/img/DASHLOGOSF.png" alt="DASH" class="brand-logo-img">
             </div>
             <div class="brand-tagline">Tu negocio,<br><span class="hl">bajo control.</span></div>
-            <div class="brand-desc">Sistema de gestión para cualquier rubro. Ventas, stock, gastos, caja y reportes desde un solo lugar.</div>
-            <ul class="brand-features">
-                <li><div class="feat-icon"><i class="fas fa-bolt"></i></div> Listo para usar en minutos</li>
-                <li><div class="feat-icon"><i class="fas fa-layer-group"></i></div> Multi-rubro con configuración automática</li>
-                <li><div class="feat-icon"><i class="fas fa-chart-line"></i></div> Reportes en tiempo real</li>
-                <li><div class="feat-icon"><i class="fas fa-user-shield"></i></div> Gestión de empleados y permisos</li>
-                <li><div class="feat-icon"><i class="fas fa-server"></i></div> Datos 100% seguros en la nube</li>
-            </ul>
+            <div class="brand-desc">Ventas, stock, caja, reportes y más — desde un solo lugar.</div>
+
+            <!-- Mockup: Mini Dashboard -->
+            <div class="app-mockup">
+                <div class="mock-topbar">
+                    <div class="mock-dot" style="background:#ff6b6b;"></div>
+                    <div class="mock-dot" style="background:#f59e0b;"></div>
+                    <div class="mock-dot" style="background:#0FD186;"></div>
+                    <div class="mock-tab">Dashboard</div>
+                </div>
+                <div class="mock-body">
+                    <div class="mock-stats">
+                        <div class="mock-stat">
+                            <div class="mock-stat-label">Ventas hoy</div>
+                            <div class="mock-stat-val green">$84.200</div>
+                            <div class="mock-stat-badge">↑ +12%</div>
+                        </div>
+                        <div class="mock-stat">
+                            <div class="mock-stat-label">Productos</div>
+                            <div class="mock-stat-val">247</div>
+                            <div class="mock-stat-badge" style="background:rgba(99,102,241,.15);color:#818cf8;border-color:rgba(99,102,241,.2);">activos</div>
+                        </div>
+                        <div class="mock-stat">
+                            <div class="mock-stat-label">Clientes</div>
+                            <div class="mock-stat-val">1.380</div>
+                            <div class="mock-stat-badge" style="background:rgba(245,158,11,.12);color:#f59e0b;border-color:rgba(245,158,11,.2);">↑ 8 nuevos</div>
+                        </div>
+                    </div>
+                    <div class="mock-chart">
+                        <div class="mock-chart-title">VENTAS ESTA SEMANA</div>
+                        <div class="mock-bars">
+                            <div class="mock-bar" style="height:40%;background:rgba(15,209,134,.35);"></div>
+                            <div class="mock-bar" style="height:60%;background:rgba(15,209,134,.45);"></div>
+                            <div class="mock-bar" style="height:45%;background:rgba(15,209,134,.35);"></div>
+                            <div class="mock-bar" style="height:80%;background:rgba(15,209,134,.6);"></div>
+                            <div class="mock-bar" style="height:55%;background:rgba(15,209,134,.45);"></div>
+                            <div class="mock-bar" style="height:70%;background:rgba(15,209,134,.55);"></div>
+                            <div class="mock-bar" style="height:100%;background:var(--primary);box-shadow:0 0 8px rgba(15,209,134,.5);"></div>
+                        </div>
+                    </div>
+                    <div class="mock-list">
+                        <div class="mock-list-item">
+                            <div class="mock-list-left">
+                                <div class="mock-list-avatar" style="background:linear-gradient(135deg,#0FD186,#0AB871);"></div>
+                                <div>
+                                    <div class="mock-list-name">Coca Cola 2.25L</div>
+                                    <div class="mock-list-sub">Bebidas · x12 vendidas</div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="mock-list-amount">$2.800</div>
+                                <div class="mock-pill">+18%</div>
+                            </div>
+                        </div>
+                        <div class="mock-list-item">
+                            <div class="mock-list-left">
+                                <div class="mock-list-avatar" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);"></div>
+                                <div>
+                                    <div class="mock-list-name">Corte de cabello</div>
+                                    <div class="mock-list-sub">Servicios · x8 hoy</div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="mock-list-amount">$6.400</div>
+                                <div class="mock-pill" style="background:rgba(99,102,241,.15);color:#818cf8;border-color:rgba(99,102,241,.2);">Top</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
+
         <div class="trial-badge">
             <div class="badge-icon"><i class="fas fa-rocket"></i></div>
             <div>
@@ -524,18 +690,67 @@ async function cargarRubros() {
 }
 
 function renderRubros() {
+    const RUBRO_IMGS = {
+        1:  'https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=400&q=75', // kiosco
+        2:  'https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?w=400&q=75', // indumentaria
+        3:  'https://images.unsplash.com/photo-1581783342308-f792dbdd27c5?w=400&q=75', // ferreteria
+        4:  'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&q=75', // restaurant
+        5:  'https://images.unsplash.com/photo-1471864190281-a93a3070b6de?w=400&q=75', // farmacia
+        6:  'https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=400&q=75', // tecnologia
+        7:  'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=400&q=75', // libreria
+        8:  'https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=400&q=75', // peluqueria
+        9:  'https://images.unsplash.com/photo-1453227588063-bb302b62f50b?w=400&q=75', // veterinaria
+        10: 'https://images.unsplash.com/photo-1509281373149-e957c6296406?w=400&q=75', // optica
+        11: 'https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=400&q=75', // jugueteria
+        12: 'https://images.unsplash.com/photo-1490750967868-88df5691cc27?w=400&q=75', // floreria
+        13: 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=400&q=75', // panaderia
+        14: 'https://images.unsplash.com/photo-1584568694244-14fbdf83bd30?w=400&q=75', // electrodomesticos
+        15: 'https://images.unsplash.com/photo-1483721310020-03333e577078?w=400&q=75', // deportes
+        16: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&q=75', // otro
+        17: 'https://images.unsplash.com/photo-1529900748604-07564a03e7a6?w=400&q=75', // canchas
+        18: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&q=75', // supermercado
+        19: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400&q=75', // gym
+        20: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&q=75', // hospedaje
+    };
+    const RUBRO_DESC = {
+        1:  'Ventas al por menor, bebidas y snacks',
+        2:  'Moda, calzado y accesorios',
+        3:  'Herramientas, materiales y construcción',
+        4:  'Restaurantes, bares y delivery',
+        5:  'Medicamentos, cosmética y salud',
+        6:  'Computadoras, celulares y electrónica',
+        7:  'Útiles, libros y artículos de oficina',
+        8:  'Cortes, tinturas y tratamientos',
+        9:  'Consultas, vacunas y accesorios',
+        10: 'Lentes, armazones y exámenes visuales',
+        11: 'Juguetes y artículos infantiles',
+        12: 'Flores, plantas y arreglos florales',
+        13: 'Pan artesanal, tortas y repostería',
+        14: 'Heladeras, lavarropas y pequeños electrodomésticos',
+        15: 'Ropa, equipos y suplementos deportivos',
+        16: 'Cualquier tipo de negocio o servicio',
+        17: 'Reservas, turnos y gestión de canchas',
+        18: 'Almacén grande con gran variedad de productos',
+        19: 'Membresías, clases y rutinas de fitness',
+        20: 'Habitaciones, reservas y servicios hoteleros',
+    };
+
     const grid = document.getElementById('rubrosGrid');
     grid.innerHTML = rubros.map(r => {
-        // Build a semi-transparent background color from r.color
-        const hex = r.color || '#0FD186';
-        const bg  = hex + '22';  // ~13% opacity trick for hex
+        const img  = RUBRO_IMGS[r.id] || RUBRO_IMGS[16];
+        const desc = RUBRO_DESC[r.id] || 'Gestión integral de tu negocio';
         return `
         <div class="rubro-card" id="rubro_${r.id}" onclick="seleccionarRubro(${r.id})">
-            <div class="rubro-icon-wrap" style="background:${bg};border:1px solid ${hex}44;">
-                <i class="${r.icono}" style="color:${hex};"></i>
+            <div class="rubro-card-bg" style="background-image:url('${img}');"></div>
+            <div class="rubro-card-overlay"></div>
+            <div class="rubro-check"><i class="fas fa-check"></i></div>
+            <div class="rubro-card-body">
+                <div class="rubro-card-text">
+                    <div class="rc-name">${r.nombre}</div>
+                    <div class="rc-desc">${desc}</div>
+                    <div class="rc-cats"><i class="fas fa-tag" style="font-size:7px;margin-right:3px;"></i>${r.total_categorias} categorías incluidas</div>
+                </div>
             </div>
-            <div class="rc-name">${r.nombre}</div>
-            <div class="rc-cats">${r.total_categorias} categorías</div>
         </div>`;
     }).join('');
 }
