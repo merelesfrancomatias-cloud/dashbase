@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 11-03-2026 a las 01:21:45
+-- Tiempo de generación: 17-03-2026 a las 13:54:38
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -194,7 +194,12 @@ INSERT INTO `audit_logs` (`id`, `negocio_id`, `usuario_id`, `accion`, `tabla`, `
 (146, 8, 8, 'login', 'usuarios', 8, NULL, NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 12:47:40'),
 (147, 8, 8, 'logout', 'usuarios', 8, NULL, NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 13:00:45'),
 (148, 11, 11, 'login', 'usuarios', 11, NULL, NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 13:00:57'),
-(149, 11, 11, 'logout', 'usuarios', 11, NULL, NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 13:02:18');
+(149, 11, 11, 'logout', 'usuarios', 11, NULL, NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 13:02:18'),
+(150, 4, 5, 'login', 'usuarios', 5, NULL, NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-12 01:08:05'),
+(151, 4, 5, 'logout', 'usuarios', 5, NULL, NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-12 01:08:19'),
+(152, 19, 19, 'login', 'usuarios', 19, NULL, NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-12 01:27:46'),
+(153, 19, 19, 'logout', 'usuarios', 19, NULL, NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-12 01:27:52'),
+(154, 3, 4, 'login', 'usuarios', 4, NULL, NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-16 20:50:36');
 
 -- --------------------------------------------------------
 
@@ -345,7 +350,10 @@ INSERT INTO `categorias` (`id`, `negocio_id`, `nombre`, `descripcion`, `color`, 
 (109, 18, 'General', NULL, '#667eea', 1, '2026-03-07 02:49:24'),
 (110, 18, 'Servicios', NULL, '#10b981', 1, '2026-03-07 02:49:24'),
 (111, 18, 'Productos', NULL, '#3b82f6', 1, '2026-03-07 02:49:24'),
-(113, 7, 'corte hombre', '', '#FF5252', 1, '2026-03-09 21:56:14');
+(113, 7, 'corte hombre', '', '#FF5252', 1, '2026-03-09 21:56:14'),
+(114, 19, 'General', NULL, '#667eea', 1, '2026-03-12 01:08:57'),
+(115, 19, 'Servicios', NULL, '#10b981', 1, '2026-03-12 01:08:57'),
+(116, 19, 'Productos', NULL, '#3b82f6', 1, '2026-03-12 01:08:57');
 
 -- --------------------------------------------------------
 
@@ -639,7 +647,20 @@ INSERT INTO `config_enum` (`id`, `negocio_id`, `grupo`, `valor`, `etiqueta`, `or
 (193, 18, 'unidades_medida', 'ml', 'Mililitro', 5, 1, 1, '2026-03-07 02:49:24', '2026-03-07 02:49:24'),
 (194, 18, 'unidades_medida', 'caja', 'Caja', 6, 1, 1, '2026-03-07 02:49:24', '2026-03-07 02:49:24'),
 (195, 18, 'unidades_medida', 'par', 'Par', 7, 1, 0, '2026-03-07 02:49:24', '2026-03-07 02:49:24'),
-(196, 18, 'unidades_medida', 'metro', 'Metro', 8, 1, 0, '2026-03-07 02:49:24', '2026-03-07 02:49:24');
+(196, 18, 'unidades_medida', 'metro', 'Metro', 8, 1, 0, '2026-03-07 02:49:24', '2026-03-07 02:49:24'),
+(197, 19, 'metodos_pago', 'efectivo', 'Efectivo', 1, 1, 1, '2026-03-12 01:08:57', '2026-03-12 01:08:57'),
+(198, 19, 'metodos_pago', 'tarjeta_debito', 'Tarjeta Débito', 2, 1, 1, '2026-03-12 01:08:57', '2026-03-12 01:08:57'),
+(199, 19, 'metodos_pago', 'tarjeta_credito', 'Tarjeta Crédito', 3, 1, 1, '2026-03-12 01:08:57', '2026-03-12 01:08:57'),
+(200, 19, 'metodos_pago', 'transferencia', 'Transferencia', 4, 1, 1, '2026-03-12 01:08:57', '2026-03-12 01:08:57'),
+(201, 19, 'metodos_pago', 'mercado_pago', 'Mercado Pago', 5, 1, 0, '2026-03-12 01:08:57', '2026-03-12 01:08:57'),
+(202, 19, 'unidades_medida', 'unidad', 'Unidad', 1, 1, 1, '2026-03-12 01:08:57', '2026-03-12 01:08:57'),
+(203, 19, 'unidades_medida', 'kg', 'Kilogramo', 2, 1, 1, '2026-03-12 01:08:57', '2026-03-12 01:08:57'),
+(204, 19, 'unidades_medida', 'g', 'Gramo', 3, 1, 1, '2026-03-12 01:08:57', '2026-03-12 01:08:57'),
+(205, 19, 'unidades_medida', 'lt', 'Litro', 4, 1, 1, '2026-03-12 01:08:57', '2026-03-12 01:08:57'),
+(206, 19, 'unidades_medida', 'ml', 'Mililitro', 5, 1, 1, '2026-03-12 01:08:57', '2026-03-12 01:08:57'),
+(207, 19, 'unidades_medida', 'caja', 'Caja', 6, 1, 1, '2026-03-12 01:08:57', '2026-03-12 01:08:57'),
+(208, 19, 'unidades_medida', 'par', 'Par', 7, 1, 0, '2026-03-12 01:08:57', '2026-03-12 01:08:57'),
+(209, 19, 'unidades_medida', 'metro', 'Metro', 8, 1, 0, '2026-03-12 01:08:57', '2026-03-12 01:08:57');
 
 -- --------------------------------------------------------
 
@@ -674,7 +695,21 @@ INSERT INTO `detalle_ventas` (`id`, `venta_id`, `negocio_id`, `producto_id`, `ca
 (10, 14, 6, 42, 1.00, 620.00, 620.00),
 (11, 14, 6, 67, 1.00, 2000.00, 2000.00),
 (12, 14, 6, 51, 1.00, 820.00, 820.00),
-(13, 14, 6, 43, 1.00, 480.00, 480.00);
+(13, 14, 6, 43, 1.00, 480.00, 480.00),
+(14, 15, 3, 3, 1.00, 2800.00, 2800.00),
+(15, 16, 3, 3, 1.00, 2800.00, 2800.00),
+(16, 16, 3, 6, 1.00, 750.00, 750.00),
+(17, 16, 3, 6, 1.00, 750.00, 750.00),
+(18, 17, 3, 6, 1.00, 750.00, 750.00),
+(19, 17, 3, 7, 1.00, 350.00, 350.00),
+(20, 17, 3, 3, 1.00, 2800.00, 2800.00),
+(21, 20, 3, 3, 1.00, 2800.00, 2800.00),
+(22, 20, 3, 6, 1.00, 750.00, 750.00),
+(23, 20, 3, 6, 1.00, 750.00, 750.00),
+(24, 21, 3, 6, 1.00, 750.00, 750.00),
+(25, 21, 3, 7, 1.00, 350.00, 350.00),
+(26, 21, 3, 3, 1.00, 2800.00, 2800.00),
+(27, 21, 3, 3, 1.00, 2800.00, 2800.00);
 
 -- --------------------------------------------------------
 
@@ -1146,7 +1181,8 @@ INSERT INTO `negocios` (`id`, `nombre`, `razon_social`, `cuit`, `condicion_iva`,
 (15, 'OjosSanos', NULL, NULL, NULL, 'Óptica', 10, NULL, NULL, NULL, NULL, NULL, 'ea@gmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, NULL, 1, 1, 1, NULL, 1, 1, NULL, 0, NULL, NULL, 'trial', '2026-03-16', '2026-03-02 14:55:35', NULL, '2026-03-02 14:55:35'),
 (16, 'neotec', NULL, NULL, NULL, 'Tecnología / Electrónica', 6, NULL, NULL, NULL, NULL, NULL, 'neo@gmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, NULL, 1, 1, 1, NULL, 1, 1, NULL, 0, NULL, NULL, 'trial', '2026-03-16', '2026-03-02 15:21:34', NULL, '2026-03-02 15:21:34'),
 (17, 'RODRIGOREST', NULL, NULL, NULL, 'Gastronomía / Restaurant', 4, NULL, NULL, NULL, NULL, NULL, 'moqndow@gmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, NULL, 1, 1, 1, NULL, 1, 1, NULL, 0, NULL, NULL, 'trial', '2026-03-17', '2026-03-03 22:54:52', NULL, '2026-03-03 22:54:52'),
-(18, 'OscarGym', NULL, NULL, NULL, 'Gimnasio / Fitness', 19, NULL, NULL, NULL, NULL, NULL, 'wlnw@gmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, NULL, 1, 1, 1, NULL, 1, 1, NULL, 0, NULL, NULL, 'trial', '2026-03-20', '2026-03-07 02:49:23', NULL, '2026-03-07 02:49:23');
+(18, 'OscarGym', NULL, NULL, NULL, 'Gimnasio / Fitness', 19, NULL, NULL, NULL, NULL, NULL, 'wlnw@gmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, NULL, 1, 1, 1, NULL, 1, 1, NULL, 0, NULL, NULL, 'trial', '2026-03-20', '2026-03-07 02:49:23', NULL, '2026-03-07 02:49:23'),
+(19, 'panchoto', NULL, NULL, NULL, 'Hospedaje / Hotel', 20, NULL, NULL, NULL, NULL, NULL, 'frankapo42@gmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, NULL, 1, 1, 1, NULL, 1, 1, NULL, 0, NULL, NULL, 'trial', '2026-03-25', '2026-03-12 01:08:57', NULL, '2026-03-12 01:08:57');
 
 -- --------------------------------------------------------
 
@@ -1398,7 +1434,8 @@ INSERT INTO `permisos` (`id`, `usuario_id`, `ver_productos`, `crear_productos`, 
 (11, 15, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0),
 (12, 16, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0),
 (13, 17, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0),
-(14, 18, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0);
+(14, 18, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0),
+(15, 19, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -1690,14 +1727,15 @@ CREATE TABLE `restaurant_comandas` (
 
 INSERT INTO `restaurant_comandas` (`id`, `negocio_id`, `mesa_id`, `reserva_id`, `numero`, `mozo_id`, `estado`, `personas`, `observaciones`, `venta_id`, `subtotal`, `descuento`, `total`, `abierta_at`, `cerrada_at`, `updated_at`) VALUES
 (1, 3, 1, NULL, 1, NULL, 'cerrada', 1, NULL, 13, 3150.00, 0.00, 3150.00, '2026-02-27 13:22:05', '2026-03-08 20:21:38', '2026-03-08 20:21:38'),
-(2, 3, 2, NULL, 2, NULL, 'lista', 1, NULL, NULL, 0.00, 0.00, 0.00, '2026-02-27 13:30:23', NULL, '2026-03-08 20:01:38'),
-(3, 3, 3, NULL, 3, NULL, 'abierta', 1, NULL, NULL, 4300.00, 0.00, 4300.00, '2026-02-27 13:33:47', NULL, '2026-03-08 20:12:35'),
-(4, 3, 4, NULL, 4, NULL, 'en_cocina', 1, NULL, NULL, 3900.00, 0.00, 3900.00, '2026-02-27 17:03:33', NULL, '2026-03-08 20:12:29'),
-(5, 3, 5, NULL, 5, NULL, 'en_cocina', 1, NULL, NULL, 0.00, 0.00, 0.00, '2026-02-27 17:06:04', NULL, '2026-02-27 17:06:14'),
-(6, 3, 6, NULL, 6, NULL, 'en_cocina', 1, NULL, NULL, 0.00, 0.00, 0.00, '2026-02-27 17:19:37', NULL, '2026-03-08 20:07:27'),
+(2, 3, 2, NULL, 2, NULL, 'cerrada', 1, NULL, 15, 2800.00, 0.00, 2800.00, '2026-02-27 13:30:23', '2026-03-16 20:51:06', '2026-03-16 20:51:06'),
+(3, 3, 3, NULL, 3, NULL, 'cerrada', 1, NULL, 20, 4300.00, 0.00, 4300.00, '2026-02-27 13:33:47', '2026-03-16 20:53:36', '2026-03-16 20:53:36'),
+(4, 3, 4, NULL, 4, NULL, 'cerrada', 1, NULL, 21, 6700.00, 0.00, 6700.00, '2026-02-27 17:03:33', '2026-03-16 20:53:39', '2026-03-16 20:53:39'),
+(5, 3, 5, NULL, 5, NULL, 'cerrada', 1, NULL, 18, 0.00, 0.00, 0.00, '2026-02-27 17:06:04', '2026-03-16 20:53:10', '2026-03-16 20:53:10'),
+(6, 3, 6, NULL, 6, NULL, 'cerrada', 1, NULL, 19, 0.00, 0.00, 0.00, '2026-02-27 17:19:37', '2026-03-16 20:53:13', '2026-03-16 20:53:13'),
 (7, 3, 7, NULL, 7, NULL, 'abierta', 1, NULL, NULL, 0.00, 0.00, 0.00, '2026-02-27 17:19:53', NULL, '2026-02-27 17:19:53'),
 (8, 3, 8, NULL, 8, NULL, 'abierta', 1, NULL, NULL, 0.00, 0.00, 0.00, '2026-02-27 17:29:19', NULL, '2026-02-27 17:29:19'),
-(9, 3, 9, NULL, 9, NULL, 'abierta', 1, NULL, NULL, 0.00, 0.00, 0.00, '2026-02-27 23:09:14', NULL, '2026-02-27 23:09:14');
+(9, 3, 9, NULL, 9, NULL, 'abierta', 1, NULL, NULL, 0.00, 0.00, 0.00, '2026-02-27 23:09:14', NULL, '2026-02-27 23:09:14'),
+(10, 3, 2, NULL, 10, 4, 'cerrada', 1, NULL, 22, 0.00, 0.00, 0.00, '2026-03-16 20:53:32', '2026-03-16 20:53:44', '2026-03-16 20:53:44');
 
 -- --------------------------------------------------------
 
@@ -1733,14 +1771,15 @@ INSERT INTO `restaurant_comanda_items` (`id`, `comanda_id`, `negocio_id`, `produ
 (2, 1, 3, 11, 'Menú del Día', 1400.00, 1, 1400.00, 'cancelado', '', 'principal', NULL, NULL, NULL, '2026-03-08 19:33:13', '2026-03-08 19:33:44'),
 (3, 1, 3, 7, 'Coca-Cola 500ml', 350.00, 1, 350.00, 'listo', '', 'principal', NULL, '2026-03-08 20:01:38', NULL, '2026-03-08 19:33:18', '2026-03-08 20:01:38'),
 (4, 1, 3, 11, 'Menú del Día', 1400.00, 2, 2800.00, 'listo', '', 'principal', NULL, '2026-03-08 20:01:39', NULL, '2026-03-08 19:33:44', '2026-03-08 20:01:39'),
-(5, 3, 3, 3, 'Bife de Chorizo 300g', 2800.00, 1, 2800.00, 'pendiente', '', 'principal', NULL, NULL, NULL, '2026-03-08 20:01:56', '2026-03-08 20:01:56'),
+(5, 3, 3, 3, 'Bife de Chorizo 300g', 2800.00, 1, 2800.00, 'listo', '', 'principal', NULL, '2026-03-16 20:53:21', NULL, '2026-03-08 20:01:56', '2026-03-16 20:53:21'),
 (6, 3, 3, 6, 'Brownie con helado', 750.00, 1, 750.00, 'listo', '', 'principal', NULL, '2026-03-08 20:08:31', NULL, '2026-03-08 20:02:02', '2026-03-08 20:08:31'),
 (7, 4, 3, 3, 'Bife de Chorizo 300g', 2800.00, 1, 2800.00, 'cancelado', '', 'principal', '2026-03-08 20:06:11', NULL, NULL, '2026-03-08 20:06:04', '2026-03-08 20:08:15'),
 (8, 4, 3, 7, 'Coca-Cola 500ml', 350.00, 1, 350.00, 'cancelado', '', 'principal', '2026-03-08 20:07:45', NULL, NULL, '2026-03-08 20:06:38', '2026-03-08 20:08:17'),
 (9, 4, 3, 6, 'Brownie con helado', 750.00, 1, 750.00, 'listo', '', 'principal', '2026-03-08 20:07:45', '2026-03-08 20:08:29', NULL, '2026-03-08 20:07:43', '2026-03-08 20:08:29'),
 (10, 4, 3, 7, 'Coca-Cola 500ml', 350.00, 1, 350.00, 'listo', '', 'principal', '2026-03-08 20:08:50', '2026-03-08 20:09:04', NULL, '2026-03-08 20:08:47', '2026-03-08 20:09:04'),
-(11, 4, 3, 3, 'Bife de Chorizo 300g', 2800.00, 1, 2800.00, 'pendiente', '', 'principal', '2026-03-08 20:12:29', NULL, NULL, '2026-03-08 20:12:27', '2026-03-08 20:12:29'),
-(12, 3, 3, 6, 'Brownie con helado', 750.00, 1, 750.00, 'pendiente', '', 'principal', NULL, NULL, NULL, '2026-03-08 20:12:35', '2026-03-08 20:12:35');
+(11, 4, 3, 3, 'Bife de Chorizo 300g', 2800.00, 1, 2800.00, 'listo', '', 'principal', '2026-03-08 20:12:29', '2026-03-16 20:53:24', NULL, '2026-03-08 20:12:27', '2026-03-16 20:53:24'),
+(12, 3, 3, 6, 'Brownie con helado', 750.00, 1, 750.00, 'listo', '', 'principal', NULL, '2026-03-16 20:53:21', NULL, '2026-03-08 20:12:35', '2026-03-16 20:53:21'),
+(13, 4, 3, 3, 'Bife de Chorizo 300g', 2800.00, 1, 2800.00, 'pendiente', '', 'principal', NULL, NULL, NULL, '2026-03-16 20:53:31', '2026-03-16 20:53:31');
 
 -- --------------------------------------------------------
 
@@ -1769,11 +1808,11 @@ CREATE TABLE `restaurant_mesas` (
 
 INSERT INTO `restaurant_mesas` (`id`, `negocio_id`, `sector_id`, `numero`, `nombre`, `capacidad`, `estado`, `pos_x`, `pos_y`, `activo`, `created_at`, `updated_at`) VALUES
 (1, 3, 1, '1', NULL, 4, 'libre', 0, 0, 1, '2026-02-27 13:03:00', '2026-03-08 20:21:38'),
-(2, 3, 1, '2', NULL, 4, 'ocupada', 0, 0, 1, '2026-02-27 13:03:00', '2026-02-27 13:30:23'),
-(3, 3, 1, '3', NULL, 4, 'ocupada', 0, 0, 1, '2026-02-27 13:03:00', '2026-02-27 13:33:47'),
-(4, 3, 1, '4', NULL, 4, 'ocupada', 0, 0, 1, '2026-02-27 13:03:00', '2026-02-27 17:03:33'),
-(5, 3, 1, '5', NULL, 6, 'ocupada', 0, 0, 1, '2026-02-27 13:03:00', '2026-02-27 17:06:04'),
-(6, 3, 1, '6', NULL, 6, 'ocupada', 0, 0, 1, '2026-02-27 13:03:00', '2026-02-27 17:19:37'),
+(2, 3, 1, '2', NULL, 4, 'libre', 0, 0, 1, '2026-02-27 13:03:00', '2026-03-16 20:53:44'),
+(3, 3, 1, '3', NULL, 4, 'libre', 0, 0, 1, '2026-02-27 13:03:00', '2026-03-16 20:51:20'),
+(4, 3, 1, '4', NULL, 4, 'libre', 0, 0, 1, '2026-02-27 13:03:00', '2026-03-16 20:53:07'),
+(5, 3, 1, '5', NULL, 6, 'libre', 0, 0, 1, '2026-02-27 13:03:00', '2026-03-16 20:53:10'),
+(6, 3, 1, '6', NULL, 6, 'libre', 0, 0, 1, '2026-02-27 13:03:00', '2026-03-16 20:53:13'),
 (7, 3, 1, '7', NULL, 2, 'ocupada', 0, 0, 1, '2026-02-27 13:03:00', '2026-02-27 17:19:53'),
 (8, 3, 1, '8', NULL, 2, 'ocupada', 0, 0, 1, '2026-02-27 13:03:00', '2026-02-27 17:29:19'),
 (9, 3, 1, '9', NULL, 4, 'ocupada', 0, 0, 1, '2026-02-27 13:03:00', '2026-02-27 23:09:14'),
@@ -2188,8 +2227,8 @@ CREATE TABLE `usuarios` (
 INSERT INTO `usuarios` (`id`, `negocio_id`, `nombre`, `apellido`, `usuario`, `email`, `password`, `rol`, `telefono`, `foto`, `activo`, `ultimo_acceso`, `fecha_creacion`, `fecha_actualizacion`) VALUES
 (1, 1, 'Admin', 'Demo', 'admin', NULL, '$2y$10$wT6ZsCWX3oaHZF6pGrA/GO5GyuJ3PqVqJqGKJSdNz04j1wCq1rqlG', 'admin', NULL, NULL, 1, '2026-03-09 22:08:28', '2026-02-27 03:53:59', '2026-03-09 22:08:28'),
 (3, 2, 'Juan', 'García', 'juangarcia', 'juan@test.com', '$2y$10$KzCx1YG0ylXAEyAhlnXzI.l091kO8bbu935OKAd71e0znwUh.oMJy', 'admin', NULL, NULL, 1, NULL, '2026-02-27 12:40:57', '2026-02-27 12:40:57'),
-(4, 3, 'Martin', 'De Oz', 'cicloclub', 'MartinezdeOz@gmail.com', '$2y$10$wT6ZsCWX3oaHZF6pGrA/GO5GyuJ3PqVqJqGKJSdNz04j1wCq1rqlG', 'admin', NULL, NULL, 1, '2026-03-08 19:31:31', '2026-02-27 12:57:40', '2026-03-08 19:31:31'),
-(5, 4, 'San', 'Martin', 'ferretex', 'san@martin.cmo', '$2y$10$9TG9RDJ8gglCrQ0OcszyCOXXjPkSbCYh1.c7wMRPmANDdnxW40B2m', 'admin', NULL, NULL, 1, '2026-03-07 20:13:23', '2026-02-27 17:38:05', '2026-03-07 20:13:23'),
+(4, 3, 'Martin', 'De Oz', 'cicloclub', 'MartinezdeOz@gmail.com', '$2y$10$wT6ZsCWX3oaHZF6pGrA/GO5GyuJ3PqVqJqGKJSdNz04j1wCq1rqlG', 'admin', NULL, NULL, 1, '2026-03-16 20:50:36', '2026-02-27 12:57:40', '2026-03-16 20:50:36'),
+(5, 4, 'San', 'Martin', 'ferretex', 'san@martin.cmo', '$2y$10$9TG9RDJ8gglCrQ0OcszyCOXXjPkSbCYh1.c7wMRPmANDdnxW40B2m', 'admin', NULL, NULL, 1, '2026-03-12 01:08:05', '2026-02-27 17:38:05', '2026-03-12 01:08:05'),
 (6, 6, 'Admin', 'Super', 'superdemo', 'super@demo.com', '$2y$10$LXJYbhJuQfhoeu3x9jBV7eAl.JC1hzF7rRP.Whi/ODa3rfYpBu712', 'admin', NULL, NULL, 1, '2026-03-08 20:39:18', '2026-02-27 18:37:54', '2026-03-08 20:39:18'),
 (7, 7, 'Admin', 'Glam', 'glamdemo', 'glam@demo.com', '$2y$10$ZJ19tUg5VXWsp.tMUe5nzeDs2EkXqEcto2dJhIpJ8DIBlYlfMmqZW', 'admin', NULL, NULL, 1, '2026-03-09 22:08:14', '2026-02-27 19:16:49', '2026-03-09 22:08:14'),
 (8, 8, 'Admin', 'FitZone', 'gymdemo', 'gym@demo.com', '$2y$10$ETr/5x8NscAXu2LzbnGwb.MtEN/ktDVfDVF7qoo4k6yBz7s1cXmpS', 'admin', NULL, NULL, 1, '2026-03-10 12:47:40', '2026-02-27 19:41:56', '2026-03-10 12:47:40'),
@@ -2202,7 +2241,8 @@ INSERT INTO `usuarios` (`id`, `negocio_id`, `nombre`, `apellido`, `usuario`, `em
 (15, 15, 'Castor', 'Lopez', 'optidemo', 'ea@gmail.com', '$2y$10$GcUV.7Rhau5srYP7rOhqI.8UZ3PY.t8KD9tW4S10g.wko9gSrIiPO', 'admin', NULL, NULL, 1, '2026-03-02 15:04:34', '2026-03-02 14:55:35', '2026-03-02 15:04:34'),
 (16, 16, 'Matias', 'Mereles', 'neotec', 'neo@gmail.com', '$2y$10$uiA1/ex0uPcHVUQBOLjPauUmLUDrDaWNcg48ZSLGbdOFNKdrcN8f.', 'admin', NULL, NULL, 1, '2026-03-02 15:21:42', '2026-03-02 15:21:34', '2026-03-02 15:21:42'),
 (17, 17, 'Rodrigo', 'Gomez de la Fuente', 'rodrirestaurant', 'moqndow@gmail.com', '$2y$10$VZKVkn/H57s9OwEWpmJU6uhvIzeJnX0tsXqRmqNg9tje0SSqd8cOq', 'admin', NULL, NULL, 1, '2026-03-03 22:55:02', '2026-03-03 22:54:52', '2026-03-03 22:55:02'),
-(18, 18, 'Oscar', 'Gonza', 'oscargym', 'wlnw@gmail.com', '$2y$10$2e/WvsoC7y8Sh9hPRQMT.exOXckLjhxeeEdJdWP08tqvx3CyhRIeW', 'admin', NULL, NULL, 1, '2026-03-07 02:49:33', '2026-03-07 02:49:24', '2026-03-07 02:49:33');
+(18, 18, 'Oscar', 'Gonza', 'oscargym', 'wlnw@gmail.com', '$2y$10$2e/WvsoC7y8Sh9hPRQMT.exOXckLjhxeeEdJdWP08tqvx3CyhRIeW', 'admin', NULL, NULL, 1, '2026-03-07 02:49:33', '2026-03-07 02:49:24', '2026-03-07 02:49:33'),
+(19, 19, 'Francisco', 'Gonzalez', 'frankapo42gmailcom', 'frankapo42@gmail.com', '$2y$10$OiuWGoz2Abv5X.rbGJi1o.GVBbL/sJRPRfRbKpLozZ4RWiKZW.fnS', 'admin', NULL, NULL, 1, '2026-03-12 01:27:46', '2026-03-12 01:08:57', '2026-03-12 01:27:46');
 
 -- --------------------------------------------------------
 
@@ -2248,7 +2288,15 @@ INSERT INTO `ventas` (`id`, `negocio_id`, `usuario_id`, `caja_id`, `cliente_id`,
 (11, 3, 4, NULL, NULL, NULL, NULL, 3150.00, 0.00, 3150.00, 'efectivo', 'completada', 'Comanda #1 - Mesa 1', '2026-03-08 20:16:00', NULL, NULL, NULL),
 (12, 3, 4, NULL, NULL, NULL, NULL, 3150.00, 0.00, 3150.00, 'efectivo', 'completada', 'Comanda #1 - Mesa 1', '2026-03-08 20:16:00', NULL, NULL, NULL),
 (13, 3, 4, NULL, NULL, NULL, NULL, 3150.00, 0.00, 3150.00, 'efectivo', 'completada', 'Comanda #1 - Mesa 1', '2026-03-08 20:21:38', NULL, NULL, NULL),
-(14, 6, 6, 7, NULL, NULL, NULL, 4270.00, 0.00, 4270.00, 'efectivo', 'completada', NULL, '2026-03-08 20:40:33', NULL, NULL, NULL);
+(14, 6, 6, 7, NULL, NULL, NULL, 4270.00, 0.00, 4270.00, 'efectivo', 'completada', NULL, '2026-03-08 20:40:33', NULL, NULL, NULL),
+(15, 3, 4, NULL, NULL, NULL, NULL, 2800.00, 0.00, 2800.00, 'efectivo', 'completada', 'Comanda #2 - Mesa 2', '2026-03-16 20:51:06', NULL, NULL, NULL),
+(16, 3, 4, NULL, NULL, NULL, NULL, 4300.00, 0.00, 4300.00, 'efectivo', 'completada', 'Comanda #3 - Mesa 3', '2026-03-16 20:51:20', NULL, NULL, NULL),
+(17, 3, 4, NULL, NULL, NULL, NULL, 3900.00, 0.00, 3900.00, 'efectivo', 'completada', 'Comanda #4 - Mesa 4', '2026-03-16 20:53:07', NULL, NULL, NULL),
+(18, 3, 4, NULL, NULL, NULL, NULL, 0.00, 0.00, 0.00, 'efectivo', 'completada', 'Comanda #5 - Mesa 5', '2026-03-16 20:53:10', NULL, NULL, NULL),
+(19, 3, 4, NULL, NULL, NULL, NULL, 0.00, 0.00, 0.00, 'efectivo', 'completada', 'Comanda #6 - Mesa 6', '2026-03-16 20:53:13', NULL, NULL, NULL),
+(20, 3, 4, NULL, NULL, NULL, NULL, 4300.00, 0.00, 4300.00, 'efectivo', 'completada', 'Comanda #3 - Mesa 3', '2026-03-16 20:53:36', NULL, NULL, NULL),
+(21, 3, 4, NULL, NULL, NULL, NULL, 6700.00, 0.00, 6700.00, 'efectivo', 'completada', 'Comanda #4 - Mesa 4', '2026-03-16 20:53:39', NULL, NULL, NULL),
+(22, 3, 4, NULL, NULL, NULL, NULL, 0.00, 0.00, 0.00, 'efectivo', 'completada', 'Comanda #10 - Mesa 2', '2026-03-16 20:53:44', NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -2794,7 +2842,7 @@ ALTER TABLE `vet_vacunas`
 -- AUTO_INCREMENT de la tabla `audit_logs`
 --
 ALTER TABLE `audit_logs`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=150;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=155;
 
 --
 -- AUTO_INCREMENT de la tabla `cajas`
@@ -2806,7 +2854,7 @@ ALTER TABLE `cajas`
 -- AUTO_INCREMENT de la tabla `categorias`
 --
 ALTER TABLE `categorias`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=114;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=117;
 
 --
 -- AUTO_INCREMENT de la tabla `clientes`
@@ -2830,13 +2878,13 @@ ALTER TABLE `clientes_peluqueria`
 -- AUTO_INCREMENT de la tabla `config_enum`
 --
 ALTER TABLE `config_enum`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=197;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=210;
 
 --
 -- AUTO_INCREMENT de la tabla `detalle_ventas`
 --
 ALTER TABLE `detalle_ventas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT de la tabla `empleados`
@@ -2926,7 +2974,7 @@ ALTER TABLE `migrations`
 -- AUTO_INCREMENT de la tabla `negocios`
 --
 ALTER TABLE `negocios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT de la tabla `optica_clientes`
@@ -2974,7 +3022,7 @@ ALTER TABLE `perfil_negocio`
 -- AUTO_INCREMENT de la tabla `permisos`
 --
 ALTER TABLE `permisos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT de la tabla `planes`
@@ -3016,13 +3064,13 @@ ALTER TABLE `restaurant_cocina_sectores`
 -- AUTO_INCREMENT de la tabla `restaurant_comandas`
 --
 ALTER TABLE `restaurant_comandas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT de la tabla `restaurant_comanda_items`
 --
 ALTER TABLE `restaurant_comanda_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT de la tabla `restaurant_mesas`
@@ -3094,13 +3142,13 @@ ALTER TABLE `turno_servicios`
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT de la tabla `ventas`
 --
 ALTER TABLE `ventas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT de la tabla `vet_consultas`
