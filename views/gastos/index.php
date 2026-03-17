@@ -18,8 +18,43 @@ if (!isset($_SESSION['user_id'])) {
     <link rel="stylesheet" href="<?= $base ?>/public/css/components.css?v=<?= filemtime(dirname(__DIR__, 2) . '/public/css/components.css') ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        .page-header-gastos {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border: 1px solid #e5e7eb;
+        }
+
+        .page-header-icon-bg {
+            background: #f3f4f6;
+            padding: 10px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #667eea;
+        }
+
+        .td-categoria {
+            white-space: normal !important;
+        }
+
+        .gasto-categoria-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            max-width: 100%;
+            white-space: normal;
+            line-height: 1.2;
+            text-align: left;
+            word-break: break-word;
+        }
+
         /* Modo oscuro para page-header */
-        body.dark-mode .page-header {
+        body.dark-mode .page-header,
+        body.dark-mode .page-header-gastos {
             background: var(--surface) !important;
             border-color: var(--border) !important;
             box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
@@ -33,8 +68,9 @@ if (!isset($_SESSION['user_id'])) {
             color: var(--text-secondary) !important;
         }
 
-        body.dark-mode .page-header div[style*="background: #f3f4f6"] {
-            background: var(--border) !important;
+        body.dark-mode .page-header-icon-bg {
+            background: rgba(255,255,255,.08) !important;
+            color: var(--primary) !important;
         }
     </style>
 </head>
@@ -44,10 +80,10 @@ if (!isset($_SESSION['user_id'])) {
 
     <main class="main-content">
         <div class="container">
-            <div class="page-header" style="background: white; padding: 25px; border-radius: 12px; margin-bottom: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border: 1px solid #e5e7eb;">
+            <div class="page-header page-header-gastos">
                 <div>
                     <h2 style="margin: 0; color: var(--text-primary); display: flex; align-items: center; gap: 12px; font-size: 24px; font-weight: 600;">
-                        <div style="background: #f3f4f6; padding: 10px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #667eea;">
+                        <div class="page-header-icon-bg">
                             <i class="fas fa-money-bill-wave" style="font-size: 20px;"></i>
                         </div>
                         Gestión de Gastos
@@ -169,7 +205,7 @@ if (!isset($_SESSION['user_id'])) {
                                 <th style="width: 80px; text-align: center; padding: 15px 10px;"># Gasto</th>
                                 <th style="width: 130px; padding: 15px 10px;">Fecha</th>
                                 <th style="padding: 15px 10px;">Descripción</th>
-                                <th style="width: 150px; padding: 15px 10px;">Categoría</th>
+                                <th style="width: 190px; padding: 15px 10px;">Categoría</th>
                                 <th style="width: 130px; text-align: right; padding: 15px 10px;">Monto</th>
                                 <th style="width: 120px; text-align: center; padding: 15px 10px;">Método Pago</th>
                                 <th style="width: 120px; text-align: center; padding: 15px 10px;">Comprobante</th>

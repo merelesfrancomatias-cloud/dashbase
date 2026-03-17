@@ -261,7 +261,7 @@ class PuntoVentaModule {
         
         if (productos.length === 0) {
             container.innerHTML = `
-                <div style="grid-column:1/-1;text-align:center;padding:40px;color:#888;">
+                <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-secondary);">
                     <i class="fas fa-search" style="font-size:48px;margin-bottom:15px;opacity:0.5;display:block;"></i>
                     <p>No se encontraron productos</p>
                 </div>
@@ -284,21 +284,21 @@ class PuntoVentaModule {
             html += `
                 <div onclick="puntoVentaModule.agregarAlCarrito(${JSON.stringify(producto).replace(/"/g, '&quot;')})"
                      title="${nombre}"
-                     style="background:#fff;border-radius:10px;border:2px solid #e2e8f0;cursor:pointer;position:relative;display:flex;flex-direction:column;${sinStock ? 'opacity:.65;' : ''}"
-                     onmouseover="this.style.borderColor='#0fd186';this.style.boxShadow='0 4px 12px rgba(15,209,134,.25)'"
-                     onmouseout="this.style.borderColor='#e2e8f0';this.style.boxShadow='none'">
+                     style="background:var(--background);border-radius:10px;border:2px solid var(--border);cursor:pointer;position:relative;display:flex;flex-direction:column;${sinStock ? 'opacity:.65;' : ''}"
+                     onmouseover="this.style.borderColor='var(--primary)';this.style.boxShadow='0 4px 12px rgba(15,209,134,.25)'"
+                     onmouseout="this.style.borderColor='var(--border)';this.style.boxShadow='none'">
                     ${sinStock ? '<span style="position:absolute;top:4px;right:4px;background:#ef4444;color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:6px;z-index:2;">Sin stock</span>' : ''}
                     ${producto._esTop && producto.total_vendido > 0 ? `<span style="position:absolute;top:4px;left:4px;background:#f59e0b;color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:6px;z-index:2;">🔥${producto.total_vendido}</span>` : ''}
-                    <div style="width:100%;padding-top:75%;position:relative;background:#f1f5f9;flex-shrink:0;border-radius:8px 8px 0 0;overflow:hidden;">
+                    <div style="width:100%;padding-top:75%;position:relative;background:var(--surface);flex-shrink:0;border-radius:8px 8px 0 0;overflow:hidden;">
                         <img src="${fotoUrl}" alt="${nombre}"
                              onerror="this.src='${base}/public/img/no-image.svg'"
                              loading="lazy"
                              style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block;">
                     </div>
                     <div style="padding:6px 8px 8px;display:flex;flex-direction:column;gap:2px;min-width:0;">
-                        <span style="font-size:12px;font-weight:700;color:#1e293b;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.3;">${nombre}</span>
-                        <span style="font-size:13px;font-weight:800;color:#059669;display:block;line-height:1.3;">${precio(producto.precio_venta)}</span>
-                        <span style="font-size:10px;color:#94a3b8;display:block;"><i class="fas fa-cubes" style="font-size:9px;margin-right:2px;"></i>${producto.stock}</span>
+                        <span style="font-size:12px;font-weight:700;color:var(--text-primary);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.3;">${nombre}</span>
+                        <span style="font-size:13px;font-weight:800;color:var(--primary);display:block;line-height:1.3;">${precio(producto.precio_venta)}</span>
+                        <span style="font-size:10px;color:var(--text-secondary);display:block;"><i class="fas fa-cubes" style="font-size:9px;margin-right:2px;"></i>${producto.stock}</span>
                     </div>
                 </div>
             `;
@@ -308,13 +308,15 @@ class PuntoVentaModule {
     }
 
     agregarAlCarrito(producto) {
-        const itemExistente = this.carrito.find(item => item.producto_id === producto.id);
-        
-        if (itemExistente) {
-            // Permitir agregar más productos sin validar stock
+        const indexExistente = this.carrito.findIndex(item => item.producto_id === producto.id);
+
+        if (indexExistente !== -1) {
+            const itemExistente = this.carrito[indexExistente];
             itemExistente.cantidad++;
+            this.carrito.splice(indexExistente, 1);
+            this.carrito.unshift(itemExistente);
         } else {
-            this.carrito.push({
+            this.carrito.unshift({
                 producto_id: producto.id,
                 nombre: producto.nombre,
                 precio_unitario: parseFloat(producto.precio_venta),
@@ -356,25 +358,25 @@ class PuntoVentaModule {
                     <div class="carrito-item-header">
                         <div class="carrito-item-info">
                             <h5>${item.nombre}</h5>
-                            <p>${formatCurrency(item.precio_unitario)} x ${item.cantidad}</p>
+                            <div class="carrito-item-meta">
+                                <span class="carrito-item-price">${formatCurrency(item.precio_unitario)} x</span>
+                                <div class="carrito-item-controls-inline">
+                                    <button class="btn-icon-sm" onclick="puntoVentaModule.cambiarCantidad(${index}, -1)">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                    <span class="cantidad-display">${item.cantidad}</span>
+                                    <button class="btn-icon-sm" onclick="puntoVentaModule.cambiarCantidad(${index}, 1)">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                                <button class="btn-icon-sm btn-delete" onclick="puntoVentaModule.eliminarItem(${index})" title="Eliminar">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
                         </div>
                         <div class="carrito-item-total">
                             ${formatCurrency(item.precio_unitario * item.cantidad)}
                         </div>
-                    </div>
-                    <div class="carrito-item-actions">
-                        <div class="carrito-item-controls">
-                            <button class="btn-icon-sm" onclick="puntoVentaModule.cambiarCantidad(${index}, -1)">
-                                <i class="fas fa-minus"></i>
-                            </button>
-                            <span class="cantidad-display">${item.cantidad}</span>
-                            <button class="btn-icon-sm" onclick="puntoVentaModule.cambiarCantidad(${index}, 1)">
-                                <i class="fas fa-plus"></i>
-                            </button>
-                        </div>
-                        <button class="btn-icon-sm btn-delete" onclick="puntoVentaModule.eliminarItem(${index})">
-                            <i class="fas fa-trash"></i>
-                        </button>
                     </div>
                 </div>
             `;

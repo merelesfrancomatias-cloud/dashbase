@@ -102,6 +102,42 @@ $_esCanchas      = $_esCanchas      ?? false;
         body.dark-mode .page-header div[style*="background: #f3f4f6"] {
             background: var(--border) !important;
         }
+
+        /* Dark mode específico para modal de Empleados */
+        body.dark-mode #empleadoModal .modal {
+            background: var(--surface) !important;
+            border: 1px solid var(--border);
+        }
+
+        body.dark-mode #empleadoModal .modal-header,
+        body.dark-mode #empleadoModal .modal-footer {
+            border-color: var(--border) !important;
+            background: rgba(0,0,0,.18) !important;
+        }
+
+        body.dark-mode #empleadoModal [style*="background: #f8f9fa"] {
+            background: rgba(255,255,255,.04) !important;
+            border: 1px solid var(--border);
+        }
+
+        body.dark-mode #empleadoModal [style*="background: white"] {
+            background: rgba(255,255,255,.03) !important;
+            border-color: var(--border) !important;
+        }
+
+        body.dark-mode #empleadoModal [style*="color: #666"],
+        body.dark-mode #empleadoModal [style*="color: #999"] {
+            color: var(--text-secondary) !important;
+        }
+
+        body.dark-mode #empleadoModal label,
+        body.dark-mode #empleadoModal span,
+        body.dark-mode #empleadoModal p,
+        body.dark-mode #empleadoModal h3,
+        body.dark-mode #empleadoModal h4,
+        body.dark-mode #empleadoModal small {
+            color: inherit;
+        }
     </style>
 </head>
 <body data-rubro="<?= htmlspecialchars($_rubroSlug) ?>">

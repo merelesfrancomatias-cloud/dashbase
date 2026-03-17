@@ -1,104 +1,86 @@
-# DASH CRM - Sistema de Gestión para Comercios
+# DASHBASE
 
-Sistema completo de gestión para comercios con inventario, ventas, caja, pedidos y más.
+Sistema de gestión comercial multi-rubro (inventario, ventas, caja, gastos, empleados, reportes y módulos verticales como restaurant, gym, peluquería, hospedaje, etc.).
 
-## 🚀 Características
+## Requisitos
 
-- **Gestión de Inventario**: Control de productos, categorías y stock
-- **Punto de Venta**: Sistema de ventas rápido y eficiente
-- **Control de Caja**: Apertura y cierre de caja por usuario
-- **Pedidos Online**: Catálogo virtual con carrito de compras
-- **Gestión de Empleados**: Control de usuarios y permisos
-- **Reportes y Estadísticas**: Dashboard con métricas del negocio
-- **Responsive Design**: Funciona en computadoras, tablets y móviles
+- PHP 8.x (recomendado 8.1+)
+- MySQL/MariaDB
+- Apache (XAMPP o similar)
 
-## 📋 Requisitos
+## Puesta en marcha (local)
 
-- PHP 7.4 o superior
-- MySQL 5.7 o superior
-- Apache con mod_rewrite habilitado
-- XAMPP, WAMP o similar
+1. Copiar el proyecto en `htdocs` (ej: `C:/xampp/htdocs/dashbase`).
+2. Crear base de datos (ej: `dashbase_local`).
+3. Importar un esquema inicial desde `config/` (según entorno) o usar migraciones.
+4. Ajustar conexión en `config/database.php`.
+5. Abrir en navegador: `http://localhost/dashbase`.
 
-## 🛠️ Instalación
+## Migraciones
 
-1. Clonar o descargar el proyecto en la carpeta `htdocs` de XAMPP
+- Directorio: `database/migrations/`
+- Runner: `database/migrate.php`
 
-2. Importar la base de datos:
-   - Abrir phpMyAdmin (http://localhost/phpmyadmin)
-   - Crear una nueva base de datos llamada `dash_crm`
-   - Importar el archivo `config/database_schema.sql`
+Reglas:
 
-3. Configurar la conexión a la base de datos en `config/Database.php`:
-   ```php
-   private $host = "localhost";
-   private $db_name = "dash_crm";
-   private $username = "root";
-   private $password = "";
-   ```
+1. Ejecutar en orden numérico.
+2. No modificar migraciones ya aplicadas.
+3. Nuevos cambios: crear archivos `00X_nombre.sql`.
 
-4. Acceder a la aplicación:
-   - URL: http://localhost/DASH
-   - Credenciales: Se proporcionarán al momento de la instalación
+## Estructura principal
 
-## 📁 Estructura del Proyecto
+- `api/`: endpoints por módulo
+- `views/`: interfaces por módulo
+- `public/css`, `public/js`: assets frontend
+- `config/`: conexión y SQL base
+- `database/`: migraciones y utilidades
+- `superadmin/`: panel administrativo global
 
-```
-/DASH
-├── /api                    # Backend PHP
-│   ├── /auth              # Autenticación
-│   ├── /utils             # Utilidades
-├── /config                # Configuración
-│   ├── Database.php       # Conexión a BD
-│   ├── config.php         # Configuración general
-│   └── database_schema.sql # Esquema de BD
-├── /public                # Recursos públicos
-│   ├── /css               # Estilos
-│   ├── /js                # JavaScript
-│   └── /uploads           # Archivos subidos
-├── /views                 # Vistas HTML
-│   └── /dashboard         # Panel de control
-├── .htaccess             # Configuración Apache
-└── index.php             # Login
-```
+## Módulos funcionales
 
-## 🎨 Tecnologías
+- Dashboard
+- Productos y categorías
+- Ventas e historial
+- Caja
+- Gastos
+- Empleados y permisos
+- Reportes
+- Restaurant (mesas, cocina, reservas)
+- Módulos verticales: gym, peluquería, hospedaje, farmacia, etc.
 
-- **Frontend**: HTML5, CSS3, JavaScript (Vanilla)
-- **Backend**: PHP 7.4+ con PDO
-- **Base de Datos**: MySQL
-- **Diseño**: Estilo iOS moderno
-- **API**: REST con JSON
+## Permisos y seguridad
 
-## 🔐 Seguridad
+- Roles: `admin` y `empleado`
+- Permisos granulares por módulo (tabla `permisos`)
+- Sesión obligatoria en APIs protegidas
+- Hash de contraseñas
+- Queries preparadas (PDO)
 
-- Contraseñas encriptadas con bcrypt
-- Protección contra SQL Injection con PDO
-- Validación de sesiones
-- Control de permisos por rol
+## Convenciones importantes
 
-## 📱 Próximas Funcionalidades
+- Métodos de pago usan valores normalizados (`efectivo`, `tarjeta_debito`, `tarjeta_credito`, `transferencia`, etc.).
+- En gastos se usa `fecha_gasto` y categoría por enum/código (no `categoria_id` en implementaciones legacy).
+- En ventas/historial se usa `fecha_venta`.
 
-- App móvil con Capacitor
-- Integración con WhatsApp
-- Métodos de pago online
-- Multi-negocios
-- Reportes avanzados
+## Impresión térmica 80mm
 
-## 👤 Acceso al Sistema
+- Compatible con impresoras térmicas estándar ESC/POS.
+- Configurar papel de 80mm en el driver del sistema.
+- Recomendado imprimir desde Chrome/Edge con márgenes mínimos y sin encabezados/pies.
+- Configuración del ticket: `public/js/ticket-config.js`.
 
-Las credenciales de acceso se configuran durante la instalación.
+## UI móvil / dark mode
 
-⚠️ **Importante**: Cambia las credenciales después del primer inicio de sesión.
+- Header y navegación móvil optimizados.
+- Componentes principales preparados para modo oscuro.
+- En restaurant/mesas, el estado ocupada usa paleta adaptada a dark mode.
 
-## 📄 Licencia
+## Mantenimiento
 
-Proyecto privado - Todos los derechos reservados
+- Logs: revisar carpeta `logs/` cuando sea necesario.
+- Archivos de subida: `public/uploads/`.
+- Antes de despliegue, validar conexión DB, sesiones y permisos de escritura.
 
-## 🤝 Soporte
+## Nota
 
-Para soporte y consultas, contactar al equipo de desarrollo.
-
----
-
-**Versión**: 1.0.0  
-**Fecha**: Octubre 2025
+Este archivo es la única documentación activa del proyecto.

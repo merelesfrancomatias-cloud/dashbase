@@ -93,6 +93,23 @@ if (isset($_SESSION['negocio_id'])) {
 </style>
 
 <script>
+// Aplicar tema lo antes posible para evitar parpadeo al entrar de página
+(function initThemeEarly() {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    if (!document.body) return;
+    document.body.classList.add('theme-no-transition');
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+    } else {
+        document.body.classList.remove('dark-mode');
+    }
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            document.body.classList.remove('theme-no-transition');
+        });
+    });
+})();
+
 // Cargar información del usuario
 document.addEventListener('DOMContentLoaded', () => {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -144,12 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // Cargar tema guardado
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    if (savedTheme === 'dark') {
-        document.body.classList.add('dark-mode');
-        updateThemeIcon(true);
-    }
+    updateThemeIcon(document.body.classList.contains('dark-mode'));
 });
 
 // Toggle de tema (Dark Mode)

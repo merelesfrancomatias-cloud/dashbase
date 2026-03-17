@@ -77,6 +77,15 @@ $base = rtrim(str_replace(str_replace(chr(92), chr(47), $_SERVER['DOCUMENT_ROOT'
         .mesa-card.reservada { border-color: var(--reservada); background: #FFFBEB; }
         .mesa-card.inactiva  { border-color: var(--inactiva);  opacity: .5; pointer-events: none; }
 
+        body.dark-mode {
+            --ocupada: #e07a86;
+        }
+
+        body.dark-mode .mesa-card.ocupada {
+            border-color: var(--ocupada);
+            background: #3b2b34;
+        }
+
         .mesa-icon {
             width: 52px; height: 52px; border-radius: 12px;
             display: flex; align-items: center; justify-content: center;
@@ -85,6 +94,11 @@ $base = rtrim(str_replace(str_replace(chr(92), chr(47), $_SERVER['DOCUMENT_ROOT'
         .libre     .mesa-icon { background: #E0F9F4; color: var(--libre); }
         .ocupada   .mesa-icon { background: #FED7D7; color: var(--ocupada); }
         .reservada .mesa-icon { background: #FEEBC8; color: var(--reservada); }
+
+        body.dark-mode .ocupada .mesa-icon {
+            background: #5a3a45;
+            color: #f4b7bf;
+        }
 
         .mesa-numero { font-size: 18px; font-weight: 800; color: var(--text-primary); line-height: 1; }
         .mesa-cap    { font-size: 11px; color: var(--text-secondary); margin-top: 3px; }

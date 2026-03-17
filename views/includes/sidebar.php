@@ -381,46 +381,121 @@ if (isset($_SESSION['negocio_id'])) {
 </nav>
 
 <script>
+// Restaurar scroll del sidebar lo antes posible (antes de DOMContentLoaded)
+(function restoreSidebarScrollEarly() {
+    const nav = document.querySelector('.sidebar-menu');
+    if (!nav) return;
+    const saved = parseInt(sessionStorage.getItem('sidebar_scroll') || '0', 10);
+    if (!Number.isNaN(saved) && saved >= 0) {
+        nav.scrollTop = saved;
+    }
+})();
+
 document.addEventListener('DOMContentLoaded', () => {
     const sidebar = document.querySelector('.sidebar');
     const nav     = document.querySelector('.sidebar-menu');
 
+    // ── Navegación suave entre páginas (evita parpadeo) ───────────────────
+    const prefetched = new Set();
+
+    const isInternalNavigableLink = (anchor) => {
+        if (!anchor) return false;
+        const href = anchor.getAttribute('href') || '';
+        if (!href || href.startsWith('#') || href.startsWith('javascript:')) return false;
+        if (anchor.target && anchor.target !== '_self') return false;
+        if (anchor.hasAttribute('download')) return false;
+        try {
+            const url = new URL(href, window.location.href);
+            return url.origin === window.location.origin;
+        } catch (_) {
+            return false;
+        }
+    };
+
+    const prefetchLink = (anchor) => {
+        if (!isInternalNavigableLink(anchor)) return;
+        const url = new URL(anchor.getAttribute('href'), window.location.href);
+        if (prefetched.has(url.href)) return;
+        const link = document.createElement('link');
+        link.rel = 'prefetch';
+        link.href = url.href;
+        document.head.appendChild(link);
+        prefetched.add(url.href);
+    };
+
+    document.querySelectorAll('a[href]').forEach((a) => {
+        a.addEventListener('mouseenter', () => prefetchLink(a), { passive: true });
+        a.addEventListener('touchstart', () => prefetchLink(a), { passive: true });
+    });
+
+    // Guardar scroll justo al iniciar navegación en links internos
+    document.addEventListener('pointerdown', (event) => {
+        const anchor = event.target.closest('a[href]');
+        if (!isInternalNavigableLink(anchor)) return;
+        if (nav) sessionStorage.setItem('sidebar_scroll', String(nav.scrollTop));
+    }, { capture: true });
+
     // ── Restaurar scroll del sidebar ──────────────────────────────────────
     const SCROLL_KEY = 'sidebar_scroll';
     if (nav) {
-        const saved = parseInt(localStorage.getItem(SCROLL_KEY) || '0', 10);
-        if (saved > 0) nav.scrollTop = saved;
+        const saved = parseInt(sessionStorage.getItem(SCROLL_KEY) || '0', 10);
+        if (!Number.isNaN(saved) && saved >= 0) {
+            nav.scrollTop = saved;
+        }
 
-        // Guardar scroll antes de salir de la página
-        window.addEventListener('beforeunload', () => {
-            localStorage.setItem(SCROLL_KEY, nav.scrollTop);
+        const persistSidebarScroll = () => {
+            sessionStorage.setItem(SCROLL_KEY, String(nav.scrollTop));
+        };
+
+        window.addEventListener('pagehide', persistSidebarScroll);
+        window.addEventListener('beforeunload', persistSidebarScroll);
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden') persistSidebarScroll();
         });
     }
 
-    // ── Marcar ítem activo y hacer scroll para que quede visible ──────────
-    const currentPath = window.location.pathname;
-    document.querySelectorAll('.menu-item, .bottom-nav-item').forEach(item => {
-        const href = item.getAttribute('href');
-        if (href && href !== 'javascript:void(0)') {
+    // ── Marcar ítem activo sin provocar saltos de scroll ──────────────────
+    const normalizePath = (pathname) => {
+        if (!pathname) return '/';
+        let p = pathname.replace(/\/+$/, '');
+        if (p === '') p = '/';
+        return p;
+    };
+
+    const currentPath = normalizePath(window.location.pathname);
+
+    const markActive = (selector) => {
+        const items = Array.from(document.querySelectorAll(selector));
+        let bestItem = null;
+        let bestScore = -1;
+
+        items.forEach((item) => {
+            const href = item.getAttribute('href');
+            if (!href || href === 'javascript:void(0)') return;
             try {
-                const resolved = new URL(href, window.location.href).pathname;
-                if (currentPath === resolved || currentPath.endsWith(resolved)) {
-                    item.classList.add('active');
+                const resolved = normalizePath(new URL(href, window.location.href).pathname);
+                let score = -1;
+                if (resolved === currentPath) {
+                    score = resolved.length + 1000;
+                } else if (currentPath.startsWith(resolved + '/')) {
+                    score = resolved.length;
                 }
-            } catch(e) {}
-        }
-        if (item.classList.contains('active')) {
-            // Si el ítem activo no es visible en el nav, hacer scroll suave hacia él
-            if (nav) {
-                const itemTop    = item.offsetTop;
-                const navHeight  = nav.clientHeight;
-                const scrollTop  = nav.scrollTop;
-                if (itemTop < scrollTop || itemTop > scrollTop + navHeight - 60) {
-                    nav.scrollTop = itemTop - navHeight / 2 + item.clientHeight / 2;
+
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestItem = item;
                 }
-            }
-        }
-    });
+            } catch (e) {}
+        });
+
+        if (bestItem) bestItem.classList.add('active');
+        return bestItem;
+    };
+
+    const activeSidebarItem = markActive('.menu-item');
+    markActive('.bottom-nav-item');
+
+    // No auto-scroll al item activo para evitar saltos visuales entre páginas.
 
     // ── Permisos de rol ───────────────────────────────────────────────────
     const user = JSON.parse(localStorage.getItem('user') || '{}');

@@ -147,21 +147,21 @@ if (!isset($_SESSION['user_id'])) {
         #paymentMethodsContainer {
             display: flex;
             flex-wrap: wrap;
-            gap: 5px;
+            gap: 4px;
         }
         .pm-btn {
             display: inline-flex;
             align-items: center;
-            gap: 4px;
-            padding: 5px 10px;
-            border: 2px solid var(--border-color);
-            border-radius: 20px;
+            gap: 3px;
+            padding: 4px 8px;
+            border: 1.5px solid var(--border);
+            border-radius: 16px;
             cursor: pointer;
             font-size: 11px;
             font-weight: 600;
             color: var(--text-secondary);
-            background: var(--bg-secondary);
-            transition: all .18s;
+            background: var(--surface);
+            transition: all .15s;
             user-select: none;
             white-space: nowrap;
             flex: 1;
@@ -262,11 +262,8 @@ if (!isset($_SESSION['user_id'])) {
                         </div>
 
                         <!-- Método de pago — siempre visible -->
-                        <div style="margin-bottom: 10px;">
-                            <p style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px;">
-                                <i class="fas fa-wallet"></i> Método de pago
-                            </p>
-                            <div id="paymentMethodsContainer">
+                        <div style="margin-bottom: 7px;">
+                            <div id="paymentMethodsContainer" style="display:flex;flex-wrap:wrap;gap:4px;">
 
                                 <input type="radio" name="metodo_pago" value="efectivo" id="mp_efectivo" class="payment-method" checked hidden>
                                 <label for="mp_efectivo" class="pm-btn pm-btn--active" data-value="efectivo">
@@ -297,9 +294,9 @@ if (!isset($_SESSION['user_id'])) {
                         </div>
 
                         <!-- Descuento -->
-                        <div style="margin-bottom: 12px; display:flex; align-items:center; gap:8px;">
-                            <label for="descuento" style="font-weight: 600; font-size: 13px; white-space:nowrap; color:var(--text-secondary);">
-                                <i class="fas fa-percentage"></i> Descuento ($)
+                        <div style="margin-bottom: 8px; display:flex; align-items:center; gap:6px;">
+                            <label for="descuento" style="font-weight: 600; font-size: 11px; white-space:nowrap; color:var(--text-secondary);">
+                                <i class="fas fa-percentage"></i> Desc. ($)
                             </label>
                             <input 
                                 type="number" 
@@ -308,23 +305,19 @@ if (!isset($_SESSION['user_id'])) {
                                 placeholder="0.00"
                                 min="0"
                                 step="0.01"
-                                style="padding: 8px 12px; flex:1;"
+                                style="padding: 5px 10px; flex:1; font-size:13px;"
                             >
                         </div>
 
                         <!-- Totales -->
                         <div class="totales-section">
-                            <div class="total-row">
-                                <span>Subtotal:</span>
-                                <strong id="subtotalAmount">$0.00</strong>
-                            </div>
-                            <div class="total-row">
-                                <span>Descuento:</span>
-                                <strong id="descuentoAmount" style="color: var(--error);">$0.00</strong>
+                            <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-secondary);margin-bottom:3px;">
+                                <span>Subtotal: <strong id="subtotalAmount" style="color:var(--text-primary);">$0.00</strong></span>
+                                <span>Desc: <strong id="descuentoAmount" style="color:var(--error);">$0.00</strong></span>
                             </div>
                             <div class="total-row total-final">
-                                <span style="font-size: 18px;">Total:</span>
-                                <strong id="totalAmount" style="font-size: 24px; color: var(--primary);">$0.00</strong>
+                                <span>Total:</span>
+                                <strong id="totalAmount" style="color:var(--primary);">$0.00</strong>
                             </div>
                         </div>
 

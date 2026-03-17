@@ -287,11 +287,11 @@
 
 select.form-control {
     cursor: pointer;
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-    padding-right: 36px;
+    appearance: auto;
+    -webkit-appearance: menulist;
+    -moz-appearance: menulist;
+    background-image: none !important;
+    padding-right: 12px;
 }
 
 .form-input:focus,
@@ -938,7 +938,7 @@ body.dark-mode .form-select,
 body.dark-mode .form-textarea,
 body.dark-mode .form-control,
 body.dark-mode .search-input {
-    background: var(--surface);
+    background-color: var(--surface);
     border-color: var(--border);
     color: var(--text-primary);
 }
@@ -948,7 +948,7 @@ body.dark-mode .form-select:focus,
 body.dark-mode .form-textarea:focus,
 body.dark-mode .form-control:focus,
 body.dark-mode .search-input:focus {
-    background: var(--surface);
+    background-color: var(--surface);
     border-color: var(--primary);
     box-shadow: 0 0 0 3px rgba(0, 201, 167, 0.1);
 }
@@ -960,7 +960,10 @@ body.dark-mode .search-input::placeholder {
 
 /* Select en modo oscuro */
 body.dark-mode select.form-control {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%230FD186' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    appearance: auto;
+    -webkit-appearance: menulist;
+    -moz-appearance: menulist;
+    background-image: none !important;
 }
 
 /* Tablas en modo oscuro */
@@ -970,6 +973,12 @@ body.dark-mode .table {
 
 body.dark-mode .table thead {
     background: rgba(0, 0, 0, 0.2);
+}
+
+body.dark-mode .table thead th {
+    background: rgba(0, 0, 0, 0.2) !important;
+    color: var(--text-secondary) !important;
+    border-bottom-color: var(--border) !important;
 }
 
 body.dark-mode .table th {
@@ -983,6 +992,10 @@ body.dark-mode .table td {
 }
 
 body.dark-mode .table tbody tr:hover {
+    background: rgba(0, 201, 167, 0.05);
+}
+
+body.dark-mode .table tbody tr:hover td {
     background: rgba(0, 201, 167, 0.05);
 }
 

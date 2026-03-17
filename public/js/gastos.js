@@ -136,8 +136,8 @@ class GastosModule {
                         ${fecha.toLocaleDateString('es-AR', {day:'2-digit',month:'short',year:'numeric'})}
                     </td>
                     <td style="font-weight:500;padding:12px 10px;">${this.esc(desc.length > 60 ? desc.substring(0,60)+'…' : desc) || '-'}</td>
-                    <td style="padding:12px 10px;">
-                        <span style="background:#e8f4fd;color:var(--primary);padding:4px 10px;border-radius:12px;font-size:11px;font-weight:500;">
+                    <td class="td-categoria" style="padding:12px 10px;">
+                        <span class="gasto-categoria-badge" style="background:#e8f4fd;color:var(--primary);padding:4px 10px;border-radius:12px;font-size:11px;font-weight:500;">
                             <i class="fas fa-tag"></i> ${categoriaLabel}
                         </span>
                     </td>

@@ -67,6 +67,11 @@ body {
     max-width: 100%;
 }
 
+body.theme-no-transition,
+body.theme-no-transition * {
+    transition: none !important;
+}
+
 /* Layout principal */
 .dashboard-layout {
     display: flex;
@@ -203,6 +208,11 @@ body.dark-mode .menu-item.active {
     min-height: 0;
     overflow-y: auto;
     overflow-x: hidden;
+    scrollbar-width: none; /* Firefox */
+}
+
+.sidebar-menu::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
 }
 
 .menu-section {
