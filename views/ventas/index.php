@@ -413,6 +413,7 @@ if (!isset($_SESSION['user_id'])) {
         // Mostrar/ocultar botón cerrar según el tamaño de pantalla
         function updateCartUI() {
             const btnCerrarCarrito = document.getElementById('btnCerrarCarrito');
+            if (!btnCerrarCarrito) return;
             if (window.innerWidth <= 768) {
                 btnCerrarCarrito.style.display = 'inline-flex';
             } else {

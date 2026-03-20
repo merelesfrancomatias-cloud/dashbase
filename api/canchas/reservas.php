@@ -1,14 +1,16 @@
 <?php
-require_once __DIR__ . '/../../config/database.php';
-require_once __DIR__ . '/../utils/Auth.php';
-require_once __DIR__ . '/../utils/Response.php';
+require_once __DIR__ . '/../bootstrap.php';
 
-Auth::requireAuth();
-$negocio_id = $_SESSION['negocio_id'];
+Middleware::cors(['GET', 'POST', 'PUT']);
+Middleware::method($_SERVER['REQUEST_METHOD']);
+
 $method = $_SERVER['REQUEST_METHOD'];
 
 try {
-    $pdo = Database::getConnection();
+    [$negocio_id, $userId] = Middleware::auth();
+    
+    $database = new Database();
+    $pdo = $database->getConnection();
 
     if ($method === 'GET') {
         // ?cancha_id=X&fecha=YYYY-MM-DD  → reservas de esa cancha en esa fecha
@@ -25,7 +27,7 @@ try {
                 JOIN canchas c ON c.id = r.cancha_id
                 WHERE r.id = ? AND c.negocio_id = ?");
             $stmt->execute([$id, $negocio_id]);
-            Response::success($stmt->fetch(PDO::FETCH_ASSOC));
+            Response::success('Reserva', $stmt->fetch(PDO::FETCH_ASSOC));
         } elseif ($canchaId && $fecha) {
             $stmt = $pdo->prepare("
                 SELECT r.*, c.nombre AS cancha_nombre
@@ -34,7 +36,10 @@ try {
                 WHERE r.cancha_id = ? AND r.fecha = ? AND c.negocio_id = ? AND r.estado != 'cancelada'
                 ORDER BY r.hora_inicio");
             $stmt->execute([$canchaId, $fecha, $negocio_id]);
-            Response::success($stmt->fetchAll(PDO::FETCH_ASSOC));
+            Response::success('Reservas por cancha', [
+                'reservas' => $stmt->fetchAll(PDO::FETCH_ASSOC),
+                'stats' => ['total' => 0, 'confirmadas' => 0, 'pendientes' => 0, 'ingresos' => 0]
+            ]);
         } else {
             // Listado con filtros opcionales
             $where   = "c.negocio_id = ?";
@@ -62,7 +67,7 @@ try {
             $stHoy->execute([$negocio_id, $hoy]);
             $stats = $stHoy->fetch(PDO::FETCH_ASSOC);
 
-            Response::success([
+            Response::success('Reservas', [
                 'reservas' => $stmt->fetchAll(PDO::FETCH_ASSOC),
                 'stats'    => $stats,
             ]);
@@ -99,20 +104,22 @@ try {
             $monto = round($diff * $cancha['precio_hora'], 2);
         }
 
-        $stmt = $pdo->prepare("INSERT INTO reservas_canchas
-            (cancha_id, fecha, hora_inicio, hora_fin, cliente_nombre, cliente_telefono,
-             monto, metodo_pago, estado, notas, created_at)
-            VALUES (?,?,?,?,?,?,?,?,?,?, NOW())");
-        $stmt->execute([
-            $cancha_id, $fecha, $hora_inicio, $hora_fin,
-            trim($data['cliente_nombre'] ?? ''),
-            trim($data['cliente_telefono'] ?? ''),
-            $monto,
-            $data['metodo_pago'] ?? 'efectivo',
-            $data['estado'] ?? 'confirmada',
-            trim($data['notas'] ?? ''),
-        ]);
-        Response::success(['id' => $pdo->lastInsertId(), 'monto' => $monto], 'Reserva creada', 201);
+            $stmt = $pdo->prepare("INSERT INTO reservas_canchas
+                (cancha_id, cliente_id, fecha, hora_inicio, hora_fin, cliente_nombre, cliente_telefono,
+                 monto, metodo_pago, estado, notas, created_at)
+                VALUES (?,?,?,?,?,?,?,?,?,?,?, NOW())");
+            $stmt->execute([
+                $cancha_id,
+                intval($data['cliente_id'] ?? 0) ?: null,
+                $fecha, $hora_inicio, $hora_fin,
+                trim($data['cliente_nombre'] ?? ''),
+                trim($data['cliente_telefono'] ?? ''),
+                $monto,
+                $data['metodo_pago'] ?? 'efectivo',
+                $data['estado'] ?? 'confirmada',
+                trim($data['notas'] ?? ''),
+            ]);
+        Response::success('Reserva creada', ['id' => $pdo->lastInsertId(), 'monto' => $monto], 201);
 
     } elseif ($method === 'PUT') {
         $data = json_decode(file_get_contents('php://input'), true);
@@ -126,14 +133,14 @@ try {
 
         $fields = [];
         $params = [];
-        $allowed = ['estado', 'cliente_nombre', 'cliente_telefono', 'monto', 'metodo_pago', 'notas'];
+            $allowed = ['estado', 'cliente_id', 'cliente_nombre', 'cliente_telefono', 'monto', 'metodo_pago', 'notas'];
         foreach ($allowed as $f) {
             if (isset($data[$f])) { $fields[] = "{$f}=?"; $params[] = $data[$f]; }
         }
         if (!$fields) Response::error('Nada que actualizar', 400);
         $params[] = $id;
         $pdo->prepare("UPDATE reservas_canchas SET " . implode(',', $fields) . " WHERE id=?")->execute($params);
-        Response::success(null, 'Reserva actualizada');
+        Response::success('Reserva actualizada');
 
     } elseif ($method === 'DELETE') {
         $data = json_decode(file_get_contents('php://input'), true);
@@ -141,7 +148,7 @@ try {
         if (!$id) Response::error('ID requerido', 400);
         $stmt = $pdo->prepare("UPDATE reservas_canchas r JOIN canchas c ON c.id=r.cancha_id SET r.estado='cancelada' WHERE r.id=? AND c.negocio_id=?");
         $stmt->execute([$id, $negocio_id]);
-        Response::success(null, 'Reserva cancelada');
+        Response::success('Reserva cancelada');
     }
 
 } catch (Exception $e) {

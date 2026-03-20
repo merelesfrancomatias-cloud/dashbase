@@ -1,14 +1,12 @@
 <?php
-require_once __DIR__ . '/../../config/database.php';
-require_once __DIR__ . '/../utils/Auth.php';
-require_once __DIR__ . '/../utils/Response.php';
+require_once __DIR__ . '/../bootstrap.php';
 
-session_start();
-Auth::check();
-$negocioId = (int)$_SESSION['negocio_id'];
+Middleware::cors(['GET', 'POST', 'PUT', 'DELETE']);
+Middleware::method($_SERVER['REQUEST_METHOD']);
 
-$database = new Database();
-$db = $database->getConnection();
+[$negocioId, $userId] = Middleware::auth();
+
+$db = (new Database())->getConnection();
 
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -28,11 +26,11 @@ if ($method === 'GET') {
             SELECT rc.*, c.nombre as cancha_nombre, c.deporte
             FROM reservas_canchas rc
             JOIN canchas c ON c.id = rc.cancha_id
-            WHERE rc.cliente_telefono = ? AND c.negocio_id = ?
+            WHERE rc.cliente_id = ? AND c.negocio_id = ?
             ORDER BY rc.fecha DESC, rc.hora_inicio DESC
             LIMIT 30
         ");
-        $stmtH->execute([$cliente['telefono'], $negocioId]);
+        $stmtH->execute([$id, $negocioId]);
         $cliente['historial'] = $stmtH->fetchAll(PDO::FETCH_ASSOC);
 
         // Estadísticas
@@ -42,12 +40,12 @@ if ($method === 'GET') {
                    MAX(rc.fecha) as ultima_visita
             FROM reservas_canchas rc
             JOIN canchas c ON c.id = rc.cancha_id
-            WHERE rc.cliente_telefono = ? AND c.negocio_id = ? AND rc.estado = 'confirmada'
+            WHERE rc.cliente_id = ? AND c.negocio_id = ? AND rc.estado = 'confirmada'
         ");
-        $stmtS->execute([$cliente['telefono'], $negocioId]);
+        $stmtS->execute([$id, $negocioId]);
         $cliente['stats'] = $stmtS->fetch(PDO::FETCH_ASSOC);
 
-        Response::success($cliente);
+        Response::success('Cliente', $cliente);
     }
 
     // Listado con búsqueda
@@ -67,7 +65,7 @@ if ($method === 'GET') {
                    MAX(rc.fecha) as ultima_reserva,
                    SUM(CASE WHEN rc.estado='confirmada' THEN rc.monto ELSE 0 END) as total_gastado
             FROM clientes_canchas cc
-            LEFT JOIN reservas_canchas rc ON rc.cliente_telefono = cc.telefono
+            LEFT JOIN reservas_canchas rc ON rc.cliente_id = cc.id
             LEFT JOIN canchas c ON c.id = rc.cancha_id AND c.negocio_id = cc.negocio_id
             WHERE cc.negocio_id = ?
             GROUP BY cc.id
@@ -76,7 +74,7 @@ if ($method === 'GET') {
         $stmt->execute([$negocioId]);
     }
     $clientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    Response::success($clientes);
+    Response::success('Clientes', $clientes);
 }
 
 // ── POST ─────────────────────────────────────────────────────────────────────
@@ -101,7 +99,7 @@ if ($method === 'POST') {
 
     $nuevo = $db->prepare("SELECT * FROM clientes_canchas WHERE id = ?");
     $nuevo->execute([$newId]);
-    Response::success($nuevo->fetch(PDO::FETCH_ASSOC), 'Cliente creado', 201);
+    Response::success('Cliente creado', $nuevo->fetch(PDO::FETCH_ASSOC), 201);
 }
 
 // ── PUT ──────────────────────────────────────────────────────────────────────
@@ -122,7 +120,7 @@ if ($method === 'PUT') {
 
     $stmt = $db->prepare("UPDATE clientes_canchas SET nombre=?, telefono=?, email=?, notas=? WHERE id=? AND negocio_id=?");
     $stmt->execute([$nombre, $telefono, $email, $notas, $id, $negocioId]);
-    Response::success(null, 'Cliente actualizado');
+    Response::success('Cliente actualizado');
 }
 
 // ── DELETE ───────────────────────────────────────────────────────────────────
@@ -135,5 +133,5 @@ if ($method === 'DELETE') {
     if (!$check->fetch()) Response::error('Cliente no encontrado', 404);
 
     $db->prepare("DELETE FROM clientes_canchas WHERE id = ? AND negocio_id = ?")->execute([$id, $negocioId]);
-    Response::success(null, 'Cliente eliminado');
+    Response::success('Cliente eliminado');
 }

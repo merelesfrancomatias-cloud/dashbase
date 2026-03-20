@@ -334,7 +334,8 @@
         }
         @keyframes slideDown { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
         .alert.show { display:flex; }
-        .alert-error { background:rgba(255,107,107,.1); color:var(--error); border:1px solid rgba(255,107,107,.25); }
+        .alert-error   { background:rgba(255,107,107,.1); color:var(--error); border:1px solid rgba(255,107,107,.25); }
+        .alert-success { background:rgba(15,209,134,.1); color:var(--primary); border:1px solid rgba(15,209,134,.25); }
 
         /* ── Footer del formulario ── */
         .login-form-footer {

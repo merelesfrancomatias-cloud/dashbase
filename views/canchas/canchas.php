@@ -160,7 +160,7 @@ let canchas = [];
 
 async function cargar() {
     try {
-        const r = await fetch('../../api/canchas/canchas.php');
+        const r = await fetch('../../api/canchas/canchas.php', {credentials: 'include'});
         const d = await r.json();
         document.getElementById('loadingState').style.display = 'none';
         if (d.success) {
@@ -255,7 +255,7 @@ async function guardar() {
     };
     if (id) { body.id = id; body.activo = parseInt(document.getElementById('fActivo').value); }
     try {
-        const r = await fetch('../../api/canchas/canchas.php', {method: id?'PUT':'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
+        const r = await fetch('../../api/canchas/canchas.php', {method: id?'PUT':'POST', credentials: 'include', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
         const d = await r.json();
         if (d.success) { showToast(id?'Cancha actualizada':'Cancha creada'); cerrarModal(); cargar(); }
         else showToast(d.message||'Error', true);
@@ -265,7 +265,7 @@ async function guardar() {
 async function eliminar(id, nombre) {
     if (!confirm(`¿Eliminar la cancha "${nombre}"?`)) return;
     try {
-        const r = await fetch('../../api/canchas/canchas.php', {method:'DELETE', headers:{'Content-Type':'application/json'}, body: JSON.stringify({id})});
+        const r = await fetch('../../api/canchas/canchas.php', {method:'DELETE', credentials: 'include', headers:{'Content-Type':'application/json'}, body: JSON.stringify({id})});
         const d = await r.json();
         if (d.success) { showToast('Cancha eliminada'); cargar(); }
         else showToast(d.message||'Error', true);

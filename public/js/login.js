@@ -75,16 +75,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Función para mostrar alertas
     function showAlert(message, type = 'error') {
-        alertContainer.className = `alert alert-${type}`;
+        alertContainer.className = `alert alert-${type} show`;
         alertContainer.innerHTML = `
             <i class="fas fa-${type === 'error' ? 'exclamation-circle' : 'check-circle'}"></i>
             <span>${message}</span>
         `;
-        alertContainer.classList.remove('hidden');
     }
 
     // Función para ocultar alertas
     function hideAlert() {
+        alertContainer.classList.remove('show');
         alertContainer.classList.add('hidden');
     }
 

@@ -1,19 +1,21 @@
 <?php
-require_once __DIR__ . '/../../config/database.php';
-require_once __DIR__ . '/../utils/Auth.php';
-require_once __DIR__ . '/../utils/Response.php';
+require_once __DIR__ . '/../bootstrap.php';
 
-Auth::check();
-$negocio_id = $_SESSION['negocio_id'];
+Middleware::cors(['GET', 'POST', 'PUT', 'DELETE']);
+Middleware::method($_SERVER['REQUEST_METHOD']);
+
 $method = $_SERVER['REQUEST_METHOD'];
 
 try {
-    $pdo = Database::getConnection();
+    [$negocio_id, $userId] = Middleware::auth();
+    
+    $database = new Database();
+    $pdo = $database->getConnection();
 
     if ($method === 'GET') {
         $stmt = $pdo->prepare("SELECT * FROM canchas WHERE negocio_id = ? ORDER BY nombre ASC");
         $stmt->execute([$negocio_id]);
-        Response::success($stmt->fetchAll(PDO::FETCH_ASSOC));
+        Response::success('Canchas', $stmt->fetchAll(PDO::FETCH_ASSOC));
 
     } elseif ($method === 'POST') {
         $data = json_decode(file_get_contents('php://input'), true);
@@ -31,7 +33,7 @@ try {
         $id = $pdo->lastInsertId();
         $row = $pdo->prepare("SELECT * FROM canchas WHERE id = ?");
         $row->execute([$id]);
-        Response::success($row->fetch(PDO::FETCH_ASSOC), 'Cancha creada', 201);
+        Response::success('Cancha creada', $row->fetch(PDO::FETCH_ASSOC), 201);
 
     } elseif ($method === 'PUT') {
         $data = json_decode(file_get_contents('php://input'), true);
@@ -48,7 +50,7 @@ try {
             intval($data['activo'] ?? 1),
             $id, $negocio_id
         ]);
-        Response::success(null, 'Cancha actualizada');
+        Response::success('Cancha actualizada');
 
     } elseif ($method === 'DELETE') {
         $data = json_decode(file_get_contents('php://input'), true);
@@ -56,7 +58,7 @@ try {
         if (!$id) Response::error('ID requerido', 400);
         $stmt = $pdo->prepare("UPDATE canchas SET activo=0 WHERE id=? AND negocio_id=?");
         $stmt->execute([$id, $negocio_id]);
-        Response::success(null, 'Cancha eliminada');
+        Response::success('Cancha eliminada');
     }
 
 } catch (Exception $e) {

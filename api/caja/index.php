@@ -24,6 +24,10 @@ try {
                 $stmt->execute([':usuario_id' => $usuarioId]);
                 $caja = $stmt->fetch();
 
+                if (!$caja) {
+                    Response::json(['success' => false, 'message' => 'No hay caja abierta', 'data' => null], 200);
+                }
+
                 if ($caja) {
                     $ventasStmt = $db->prepare(
                         "SELECT COALESCE(SUM(total), 0) AS total_ventas FROM ventas WHERE caja_id = :caja_id AND estado = 'completada'"
@@ -51,8 +55,6 @@ try {
                     $caja['detalle_pagos']  = $detallePagos;
 
                     Response::success('Caja activa encontrada', $caja);
-                } else {
-                    Response::error('No hay caja abierta', 404);
                 }
             } elseif (isset($_GET['historial'])) {
                 $limit = (int)($_GET['limit'] ?? 20);

@@ -1,14 +1,12 @@
 <?php
-require_once __DIR__ . '/../../config/database.php';
-require_once __DIR__ . '/../utils/Auth.php';
-require_once __DIR__ . '/../utils/Response.php';
+require_once __DIR__ . '/../bootstrap.php';
 
-session_start();
-Auth::check();
-$negocioId = (int)$_SESSION['negocio_id'];
+Middleware::cors(['GET', 'POST', 'PUT', 'DELETE']);
+Middleware::method($_SERVER['REQUEST_METHOD']);
 
-$database = new Database();
-$db = $database->getConnection();
+[$negocioId, $userId] = Middleware::auth();
+
+$db = (new Database())->getConnection();
 
 $method = $_SERVER['REQUEST_METHOD'];
 $fecha  = isset($_GET['fecha']) ? $_GET['fecha'] : date('Y-m-d');
@@ -75,7 +73,7 @@ if ($method === 'GET') {
     $stmtSemana->execute([$negocioId, $fecha, $fecha]);
     $semana = $stmtSemana->fetchAll(PDO::FETCH_ASSOC);
 
-    Response::success([
+    Response::success('Resumen de caja', [
         'fecha'     => $fecha,
         'totales'   => $totales,
         'porCancha' => $porCancha,
