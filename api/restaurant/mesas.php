@@ -13,15 +13,24 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 if ($method === 'GET') {
     if (isset($_GET['id'])) {
-        // Detalle de mesa + comanda activa si tiene
+        // Detalle de mesa + comanda activa + reserva de hoy
         $stmt = $pdo->prepare("
             SELECT m.*, s.nombre AS sector_nombre, s.color AS sector_color,
                    c.id AS comanda_id, c.numero AS comanda_numero, c.estado AS comanda_estado,
                    c.personas AS comanda_personas,
-                   COALESCE((SELECT SUM(ci.subtotal) FROM restaurant_comanda_items ci WHERE ci.comanda_id = c.id AND ci.estado_cocina != 'cancelado'), 0) AS comanda_total
+                   COALESCE((SELECT SUM(ci.subtotal) FROM restaurant_comanda_items ci WHERE ci.comanda_id = c.id AND ci.estado_cocina != 'cancelado'), 0) AS comanda_total,
+                   rv.id AS reserva_id, rv.cliente_nombre AS reserva_cliente,
+                   rv.hora_inicio AS reserva_hora, rv.personas AS reserva_personas,
+                   rv.estado AS reserva_estado, rv.observaciones AS reserva_obs,
+                   rv.cliente_telefono AS reserva_telefono
             FROM restaurant_mesas m
             LEFT JOIN restaurant_sectores s ON s.id = m.sector_id
             LEFT JOIN restaurant_comandas c ON c.mesa_id = m.id AND c.estado IN ('abierta','en_cocina','lista')
+            LEFT JOIN restaurant_reservas rv
+                   ON rv.mesa_id = m.id AND rv.negocio_id = m.negocio_id
+                   AND rv.fecha_reserva = CURDATE()
+                   AND rv.estado IN ('pendiente','confirmada')
+                   AND rv.hora_inicio <= ADDTIME(CURTIME(), '01:30:00')
             WHERE m.id = :id AND m.negocio_id = :nid
         ");
         $stmt->execute([':id' => (int)$_GET['id'], ':nid' => $negocioId]);
@@ -46,12 +55,22 @@ if ($method === 'GET') {
                c.estado AS comanda_estado,
                c.personas AS comanda_personas,
                c.abierta_at AS comanda_desde,
-               COALESCE((SELECT SUM(ci.subtotal) FROM restaurant_comanda_items ci WHERE ci.comanda_id = c.id AND ci.estado_cocina != 'cancelado'), 0) AS comanda_total
+               COALESCE((SELECT SUM(ci.subtotal) FROM restaurant_comanda_items ci WHERE ci.comanda_id = c.id AND ci.estado_cocina != 'cancelado'), 0) AS comanda_total,
+               rv.id AS reserva_id,
+               rv.cliente_nombre AS reserva_cliente,
+               rv.hora_inicio AS reserva_hora,
+               rv.personas AS reserva_personas,
+               rv.estado AS reserva_estado
         FROM restaurant_mesas m
         LEFT JOIN restaurant_sectores s ON s.id = m.sector_id
         LEFT JOIN restaurant_comandas c
                ON c.mesa_id = m.id AND c.negocio_id = m.negocio_id
                AND c.estado IN ('abierta','en_cocina','lista')
+        LEFT JOIN restaurant_reservas rv
+               ON rv.mesa_id = m.id AND rv.negocio_id = m.negocio_id
+               AND rv.fecha_reserva = CURDATE()
+               AND rv.estado IN ('pendiente','confirmada')
+               AND rv.hora_inicio <= ADDTIME(CURTIME(), '01:30:00')
         WHERE {$where}
         ORDER BY s.orden, m.numero + 0, m.numero
     ");

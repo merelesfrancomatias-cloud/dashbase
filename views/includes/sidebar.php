@@ -157,10 +157,7 @@ if (isset($_SESSION['negocio_id'])) {
         <div class="menu-section">
             <h3 class="menu-section-title">Restaurant</h3>
             <a href="../restaurant/mesas.php" class="menu-item" data-page="mesas">
-                <i class="fas fa-chair"></i><span>Salón / Mesas</span>
-            </a>
-            <a href="../restaurant/reservas.php" class="menu-item" data-page="reservas">
-                <i class="fas fa-calendar-alt"></i><span>Reservas</span>
+                <i class="fas fa-chair"></i><span>Salón / Reservas</span>
             </a>
             <a href="../restaurant/cocina.php" class="menu-item" data-page="cocina" target="_blank">
                 <i class="fas fa-fire"></i>
@@ -169,6 +166,12 @@ if (isset($_SESSION['negocio_id'])) {
             </a>
             <a href="../restaurant/carta.php" class="menu-item" data-page="carta">
                 <i class="fas fa-book-open"></i><span>Carta / Menú</span>
+            </a>
+            <a href="../restaurant/almacen.php" class="menu-item" data-page="almacen">
+                <i class="fas fa-boxes"></i><span>Almacén</span>
+            </a>
+            <a href="../restaurant/reportes.php" class="menu-item" data-page="reportes-rest">
+                <i class="fas fa-chart-line"></i><span>Reportes</span>
             </a>
         </div>
         <?php endif; ?>

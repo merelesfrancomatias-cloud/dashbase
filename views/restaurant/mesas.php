@@ -279,6 +279,57 @@ $base = rtrim(str_replace(str_replace(chr(92), chr(47), $_SERVER['DOCUMENT_ROOT'
         .empty-state { text-align: center; padding: 40px 20px; color: var(--text-secondary); }
         .empty-state i { font-size: 40px; margin-bottom: 12px; opacity: .4; display: block; }
 
+        /* ── Tabs principales ── */
+        .main-tab-btn {
+            display:flex;align-items:center;gap:8px;
+            padding:9px 20px;border-radius:10px;border:none;
+            background:transparent;color:var(--text-secondary);
+            font-size:13px;font-weight:600;cursor:pointer;
+            transition:all .2s;white-space:nowrap;
+        }
+        .main-tab-btn:hover { background:var(--background);color:var(--text-primary); }
+        .main-tab-btn.active { background:var(--primary);color:#fff; }
+
+        /* ── Reservas: navegación fecha ── */
+        .fecha-nav { display:flex;align-items:center;gap:8px; }
+        .fecha-nav button {
+            width:34px;height:34px;border-radius:8px;
+            border:1.5px solid var(--border);background:var(--surface);
+            cursor:pointer;font-size:13px;color:var(--text-secondary);
+            transition:var(--transition);
+        }
+        .fecha-nav button:hover { border-color:var(--primary);color:var(--primary); }
+        .fecha-display {
+            font-size:15px;font-weight:700;color:var(--text-primary);
+            min-width:180px;text-align:center;cursor:pointer;
+        }
+        .fecha-display:hover { color:var(--primary); }
+
+        /* ── Reservas: tarjetas ── */
+        .reserva-card {
+            background:var(--surface);border-radius:12px;
+            border:1.5px solid var(--border);padding:14px 16px;
+            display:flex;align-items:center;gap:14px;
+            cursor:pointer;transition:var(--transition);
+        }
+        .reserva-card:hover { transform:translateY(-1px);box-shadow:var(--shadow-sm); }
+        .rv-estado-bar { width:4px;border-radius:4px;align-self:stretch;flex-shrink:0; }
+        .rv-hora-time { font-size:17px;font-weight:800;color:var(--text-primary);line-height:1; }
+        .rv-hora-dur  { font-size:11px;color:var(--text-secondary); }
+        .rv-nombre    { font-size:15px;font-weight:700;color:var(--text-primary); }
+        .rv-detalle   { font-size:12px;color:var(--text-secondary);margin-top:3px; }
+        .rv-badge { padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase; }
+        .badge-pendiente  { background:#FFF3CD;color:#856404; }
+        .badge-confirmada { background:#D1FAE5;color:#065F46; }
+        .badge-sentada    { background:#DBEAFE;color:#1E40AF; }
+        .badge-cancelada  { background:#F3F4F6;color:#6B7280; }
+        .badge-no_show    { background:#FEE2E2;color:#991B1B; }
+        .rv-bar-pendiente  { background:var(--warning); }
+        .rv-bar-confirmada { background:var(--success); }
+        .rv-bar-sentada    { background:#4299E1; }
+        .rv-bar-cancelada  { background:var(--text-secondary); }
+        .rv-bar-no_show    { background:var(--error); }
+
         /* ════ RESPONSIVE ════ */
         @media (max-width: 768px) {
             .main-content { padding: 12px !important; }
@@ -311,42 +362,104 @@ $base = rtrim(str_replace(str_replace(chr(92), chr(47), $_SERVER['DOCUMENT_ROOT'
     <div class="main-content" style="flex:1; padding: 24px; overflow-y:auto;">
         <?php include '../includes/header.php'; ?>
 
-        <div class="salon-header">
-            <div>
-                <div class="salon-title"><i class="fas fa-utensils" style="color:var(--primary);margin-right:8px;"></i>Salón</div>
-                <div style="font-size:13px;color:var(--text-secondary);margin-top:2px;" id="resumenEstados">Cargando mesas…</div>
-            </div>
-            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-                <div class="leyenda">
-                    <div class="leyenda-item"><div class="leyenda-dot" style="background:var(--libre);"></div> Libre</div>
-                    <div class="leyenda-item"><div class="leyenda-dot" style="background:var(--ocupada);"></div> Ocupada</div>
-                    <div class="leyenda-item"><div class="leyenda-dot" style="background:var(--reservada);"></div> Reservada</div>
+        <!-- ── Tabs principales ── -->
+        <div style="display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:5px;margin-bottom:22px;width:fit-content;">
+            <button class="main-tab-btn active" id="mainTabSalon" onclick="switchMainTab('salon')">
+                <i class="fas fa-chair"></i> Salón
+            </button>
+            <button class="main-tab-btn" id="mainTabReservas" onclick="switchMainTab('reservas')">
+                <i class="fas fa-calendar-alt"></i> Reservas
+            </button>
+        </div>
+
+        <!-- ════ PANEL SALÓN ════ -->
+        <div id="panelSalon">
+            <div class="salon-header">
+                <div>
+                    <div class="salon-title"><i class="fas fa-utensils" style="color:var(--primary);margin-right:8px;"></i>Salón</div>
+                    <div style="font-size:13px;color:var(--text-secondary);margin-top:2px;" id="resumenEstados">Cargando mesas…</div>
                 </div>
-                <button class="btn btn-primary btn-sm" onclick="abrirModalNuevaMesa()">
-                    <i class="fas fa-plus"></i> Nueva mesa
-                </button>
-                <a href="<?= $base ?>/views/restaurant/reservas.php" class="btn btn-outline btn-sm">
-                    <i class="fas fa-calendar-alt"></i> Reservas
-                </a>
-                <a href="<?= $base ?>/views/restaurant/cocina.php" class="btn btn-outline btn-sm" target="_blank">
-                    <i class="fas fa-fire"></i> Cocina
-                </a>
+                <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                    <div class="leyenda">
+                        <div class="leyenda-item"><div class="leyenda-dot" style="background:var(--libre);"></div> Libre</div>
+                        <div class="leyenda-item"><div class="leyenda-dot" style="background:var(--ocupada);"></div> Ocupada</div>
+                        <div class="leyenda-item"><div class="leyenda-dot" style="background:var(--reservada);"></div> Reservada</div>
+                    </div>
+                    <button class="btn btn-primary btn-sm" onclick="abrirModalNuevaMesa()">
+                        <i class="fas fa-plus"></i> Nueva mesa
+                    </button>
+                    <a href="<?= $base ?>/views/restaurant/cocina.php" class="btn btn-outline btn-sm" target="_blank">
+                        <i class="fas fa-fire"></i> Cocina
+                    </a>
+                </div>
+            </div>
+
+            <!-- Tabs sectores -->
+            <div class="sector-tabs" id="sectorTabs" style="margin-bottom:20px;">
+                <div class="sector-tab active" data-sector="todos" onclick="filtrarSector('todos',this)">
+                    <i class="fas fa-th"></i> Todos
+                </div>
+            </div>
+
+            <!-- Grid mesas -->
+            <div class="mesas-grid" id="mesasGrid">
+                <div class="empty-state" style="grid-column:span 6;">
+                    <i class="fas fa-spinner fa-spin"></i><br>Cargando mesas…
+                </div>
             </div>
         </div>
 
-        <!-- Tabs sectores -->
-        <div class="sector-tabs" id="sectorTabs" style="margin-bottom:20px;">
-            <div class="sector-tab active" data-sector="todos" onclick="filtrarSector('todos',this)">
-                <i class="fas fa-th"></i> Todos
+        <!-- ════ PANEL RESERVAS ════ -->
+        <div id="panelReservas" style="display:none;">
+            <div class="salon-header" style="margin-bottom:18px;">
+                <div>
+                    <div class="salon-title"><i class="fas fa-calendar-alt" style="color:var(--primary);margin-right:8px;"></i>Reservas</div>
+                    <div style="font-size:13px;color:var(--text-secondary);margin-top:2px;" id="rvSubtitulo">Hoy</div>
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                    <div class="fecha-nav">
+                        <button onclick="rvCambiarFecha(-1)"><i class="fas fa-chevron-left"></i></button>
+                        <div class="fecha-display" onclick="rvAbrirDatepicker()" id="rvFechaDisplay">—</div>
+                        <input type="date" id="rvDatepicker" style="opacity:0;position:absolute;pointer-events:none;" onchange="rvSetFecha(this.value)">
+                        <button onclick="rvCambiarFecha(1)"><i class="fas fa-chevron-right"></i></button>
+                        <button onclick="rvIrHoy()" style="padding:0 14px;width:auto;font-size:12px;font-weight:700;">Hoy</button>
+                    </div>
+                    <button class="btn btn-primary btn-sm" onclick="rvAbrirNueva()">
+                        <i class="fas fa-plus"></i> Nueva reserva
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats reservas -->
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;margin-bottom:18px;">
+                <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px;text-align:center;">
+                    <div style="font-size:22px;font-weight:800;" id="rvStTotal">—</div>
+                    <div style="font-size:11px;color:var(--text-secondary);font-weight:600;text-transform:uppercase;">Total</div>
+                </div>
+                <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px;text-align:center;">
+                    <div style="font-size:22px;font-weight:800;color:var(--success);" id="rvStConf">—</div>
+                    <div style="font-size:11px;color:var(--text-secondary);font-weight:600;text-transform:uppercase;">Confirmadas</div>
+                </div>
+                <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px;text-align:center;">
+                    <div style="font-size:22px;font-weight:800;color:var(--warning);" id="rvStPend">—</div>
+                    <div style="font-size:11px;color:var(--text-secondary);font-weight:600;text-transform:uppercase;">Pendientes</div>
+                </div>
+                <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px;text-align:center;">
+                    <div style="font-size:22px;font-weight:800;color:#4299E1;" id="rvStSent">—</div>
+                    <div style="font-size:11px;color:var(--text-secondary);font-weight:600;text-transform:uppercase;">Sentadas</div>
+                </div>
+                <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px;text-align:center;">
+                    <div style="font-size:22px;font-weight:800;color:var(--error);" id="rvStNoshow">—</div>
+                    <div style="font-size:11px;color:var(--text-secondary);font-weight:600;text-transform:uppercase;">No Show</div>
+                </div>
+            </div>
+
+            <!-- Lista reservas -->
+            <div id="rvLista">
+                <div class="empty-state"><i class="fas fa-spinner fa-spin"></i><br>Cargando…</div>
             </div>
         </div>
 
-        <!-- Grid mesas -->
-        <div class="mesas-grid" id="mesasGrid">
-            <div class="empty-state" style="grid-column:span 6;">
-                <i class="fas fa-spinner fa-spin"></i><br>Cargando mesas…
-            </div>
-        </div>
     </div>
 </div>
 
@@ -416,6 +529,109 @@ $base = rtrim(str_replace(str_replace(chr(92), chr(47), $_SERVER['DOCUMENT_ROOT'
         <div style="display:flex;gap:10px;margin-top:20px;">
             <button class="cp-btn cp-btn-sec" style="flex:0 0 auto;padding:11px 18px;" onclick="cerrarModal()">Cancelar</button>
             <button class="cp-btn cp-btn-cobrar" onclick="confirmarCobro()"><i class="fas fa-check"></i> Confirmar cobro</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal reserva de hoy -->
+<div class="modal-overlay" id="modalReserva">
+    <div class="modal-box">
+        <div class="modal-title"><i class="fas fa-calendar-check" style="color:var(--reservada);margin-right:8px;"></i>Reserva — <span id="mr_mesa"></span></div>
+        <input type="hidden" id="mr_mesaId">
+        <input type="hidden" id="mr_reservaId">
+        <input type="hidden" id="mr_pax">
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:18px;">
+            <div class="modal-row"><span style="color:var(--text-secondary)"><i class="fas fa-user" style="width:16px;"></i> Cliente</span><strong id="mr_cliente"></strong></div>
+            <div class="modal-row"><span style="color:var(--text-secondary)"><i class="fas fa-clock" style="width:16px;"></i> Hora</span><strong id="mr_hora"></strong></div>
+            <div class="modal-row"><span style="color:var(--text-secondary)"><i class="fas fa-users" style="width:16px;"></i> Personas</span><strong id="mr_personas"></strong></div>
+            <div class="modal-row"><span style="color:var(--text-secondary)"><i class="fas fa-phone" style="width:16px;"></i> Teléfono</span><strong id="mr_telefono"></strong></div>
+            <div id="mr_obs" style="background:var(--background);border-radius:8px;padding:10px;font-size:13px;color:var(--text-secondary);display:none;"></div>
+        </div>
+        <div style="display:flex;gap:10px;">
+            <button class="cp-btn cp-btn-sec" style="flex:0 0 auto;padding:11px 14px;" onclick="document.getElementById('modalReserva').classList.remove('show')"><i class="fas fa-times"></i></button>
+            <button class="cp-btn" style="flex:1;background:#FED7D7;color:#C53030;font-weight:700;border:none;" onclick="cancelarReservaDesdeModal()"><i class="fas fa-ban"></i> Cancelar reserva</button>
+            <button class="cp-btn cp-btn-cobrar" style="flex:1;" onclick="sentarCliente()"><i class="fas fa-chair"></i> Sentar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal abrir comanda (mesa libre) -->
+<div class="modal-overlay" id="modalAbrirMesa">
+    <div class="modal-box">
+        <div class="modal-title"><i class="fas fa-door-open" style="color:var(--primary);margin-right:8px;"></i>Abrir mesa</div>
+        <input type="hidden" id="am_mesaId">
+        <div style="margin-bottom:16px;">
+            <label style="font-size:12px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;display:block;margin-bottom:5px;">Cantidad de personas</label>
+            <input type="number" id="am_personas" value="1" min="1" style="width:100%;padding:10px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;outline:none;">
+        </div>
+        <div style="display:flex;gap:10px;">
+            <button class="cp-btn cp-btn-sec" style="flex:0 0 auto;padding:11px 18px;" onclick="document.getElementById('modalAbrirMesa').classList.remove('show')">Cancelar</button>
+            <button class="cp-btn cp-btn-cobrar" onclick="confirmarAbrirMesa()"><i class="fas fa-check"></i> Abrir mesa</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal reserva (crear/editar) -->
+<div class="modal-overlay" id="modalReservaRV">
+    <div class="modal-box" style="max-height:90vh;overflow-y:auto;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+            <div style="font-size:17px;font-weight:800;" id="rvModalTitulo">Nueva Reserva</div>
+            <button onclick="rvCerrarModal()" style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--text-secondary);"><i class="fas fa-times"></i></button>
+        </div>
+        <input type="hidden" id="rv_id">
+        <div style="margin-bottom:14px;">
+            <label style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;display:block;margin-bottom:5px;">Nombre del cliente *</label>
+            <input type="text" id="rv_nombre" class="form-control" placeholder="Ej: García, Juan" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;outline:none;">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+            <div>
+                <label style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;display:block;margin-bottom:5px;">Fecha *</label>
+                <input type="date" id="rv_fecha" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;outline:none;">
+            </div>
+            <div>
+                <label style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;display:block;margin-bottom:5px;">Hora *</label>
+                <input type="time" id="rv_hora" step="900" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;outline:none;">
+            </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+            <div>
+                <label style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;display:block;margin-bottom:5px;">Personas</label>
+                <input type="number" id="rv_personas" value="2" min="1" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;outline:none;">
+            </div>
+            <div>
+                <label style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;display:block;margin-bottom:5px;">Duración (min)</label>
+                <input type="number" id="rv_duracion" value="90" step="15" min="30" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;outline:none;">
+            </div>
+        </div>
+        <div style="margin-bottom:14px;">
+            <label style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;display:block;margin-bottom:5px;">Mesa</label>
+            <select id="rv_mesa" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;outline:none;background:var(--surface);">
+                <option value="">— Sin asignar —</option>
+            </select>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+            <div>
+                <label style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;display:block;margin-bottom:5px;">Teléfono</label>
+                <input type="text" id="rv_telefono" placeholder="+54 11 ..." style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;outline:none;">
+            </div>
+            <div>
+                <label style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;display:block;margin-bottom:5px;">Estado</label>
+                <select id="rv_estado" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;outline:none;background:var(--surface);">
+                    <option value="pendiente">Pendiente</option>
+                    <option value="confirmada">Confirmada</option>
+                    <option value="sentada">Sentada</option>
+                    <option value="cancelada">Cancelada</option>
+                    <option value="no_show">No Show</option>
+                </select>
+            </div>
+        </div>
+        <div style="margin-bottom:14px;">
+            <label style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;display:block;margin-bottom:5px;">Observaciones</label>
+            <textarea id="rv_obs" rows="2" placeholder="Alergias, ocasión especial…" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;outline:none;resize:vertical;"></textarea>
+        </div>
+        <div style="display:flex;gap:10px;" id="rvModalBtns">
+            <button class="btn btn-outline" style="flex:1;" onclick="rvCerrarModal()">Cancelar</button>
+            <button class="btn btn-primary" style="flex:2;" onclick="rvGuardar()"><i class="fas fa-save"></i> Guardar</button>
         </div>
     </div>
 </div>
@@ -508,12 +724,25 @@ function renderMesas() {
     }
 
     grid.innerHTML = filtro.map(m => {
-        const est  = m.estado;
+        // Estado efectivo: si tiene comanda → ocupada; si tiene reserva hoy → reservada; sino → libre
+        const est  = m.comanda_id ? 'ocupada' : (m.reserva_id ? 'reservada' : 'libre');
         const time = m.comanda_desde ? tiempoDesde(m.comanda_desde) : '';
         const badge = m.comanda_estado === 'lista' ? `<div class="mesa-badge lista">✓ Lista</div>` :
                       (m.comanda_estado === 'en_cocina' ? `<div class="mesa-badge">En cocina</div>` : '');
 
         const icon = est === 'libre' ? 'fa-chair' : est === 'ocupada' ? 'fa-users' : 'fa-calendar-check';
+
+        const infoExtra = m.comanda_id
+            ? `<div class="mesa-comanda">
+                <strong>#${m.comanda_numero}</strong> · ${fmtMoney(m.comanda_total)}<br>
+                <span style="color:var(--text-secondary)">${time}</span>
+               </div>`
+            : (m.reserva_id
+                ? `<div class="mesa-comanda">
+                    <strong>${esc(m.reserva_cliente)}</strong><br>
+                    <span style="color:var(--text-secondary)"><i class="fas fa-clock" style="font-size:10px;"></i> ${m.reserva_hora ? m.reserva_hora.substring(0,5) : ''} · ${m.reserva_personas} pax</span>
+                   </div>`
+                : '');
 
         return `<div class="mesa-card ${est}" onclick="abrirMesa(${m.id})">
             ${badge}
@@ -521,10 +750,7 @@ function renderMesas() {
             <div class="mesa-numero">${m.numero}</div>
             <div class="mesa-cap"><i class="fas fa-user" style="font-size:10px;"></i> ${m.capacidad} personas</div>
             ${m.sector_nombre ? `<div class="mesa-cap">${m.sector_nombre}</div>` : ''}
-            ${m.comanda_id ? `<div class="mesa-comanda">
-                <strong>#${m.comanda_numero}</strong> · ${fmtMoney(m.comanda_total)}<br>
-                <span style="color:var(--text-secondary)">${time}</span>
-            </div>` : ''}
+            ${infoExtra}
         </div>`;
     }).join('');
 }
@@ -549,20 +775,67 @@ async function abrirMesa(mesaId) {
     document.getElementById('cpTitulo').textContent = `Mesa ${d.data.numero}` + (d.data.nombre ? ` — ${d.data.nombre}` : '');
 
     if (d.data.comanda_id) {
-        // Cargar comanda existente
+        // Mesa ocupada → cargar comanda existente
         await cargarComanda(d.data.comanda_id);
+        abrirPanel();
+    } else if (d.data.reserva_id) {
+        // Mesa con reserva de hoy → mostrar modal de reserva
+        abrirModalReserva(d.data);
     } else {
-        // Mesa libre → abrir nueva comanda
-        const cr = await fetch(`${BASE}/api/restaurant/comandas.php`, {
-            method: 'POST',
-            headers: {'Content-Type':'application/json'},
-            body: JSON.stringify({ action: 'abrir', mesa_id: mesaId })
-        });
-        const cd = await cr.json();
-        await cargarComanda(cd.data.id);
+        // Mesa libre → confirmar antes de abrir comanda
+        abrirModalAbrirMesa(mesaId);
     }
+}
 
+async function abrirComandaNueva(mesaId, personas, reservaId = null) {
+    const body = { action: 'abrir', mesa_id: mesaId, personas: personas };
+    if (reservaId) body.reserva_id = reservaId;
+    const cr = await fetch(`${BASE}/api/restaurant/comandas.php`, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(body)
+    });
+    const cd = await cr.json();
+    if (!cd.success || !cd.data?.id) {
+        showToast('Error al abrir la comanda', 'error');
+        return;
+    }
+    await cargarMesas();
+    await cargarComanda(cd.data.id);
     abrirPanel();
+}
+
+/* ── MODAL RESERVA ────────────────────────────────────── */
+function abrirModalReserva(mesa) {
+    document.getElementById('mr_mesa').textContent    = `Mesa ${mesa.numero}`;
+    document.getElementById('mr_cliente').textContent = mesa.reserva_cliente || '—';
+    document.getElementById('mr_hora').textContent    = mesa.reserva_hora ? mesa.reserva_hora.substring(0,5) : '—';
+    document.getElementById('mr_personas').textContent= mesa.reserva_personas || '—';
+    document.getElementById('mr_telefono').textContent= mesa.reserva_telefono || '—';
+    document.getElementById('mr_obs').textContent     = mesa.reserva_obs || '';
+    document.getElementById('mr_obs').style.display   = mesa.reserva_obs ? 'block' : 'none';
+    // Guardar datos para los botones
+    document.getElementById('mr_mesaId').value    = mesa.id;
+    document.getElementById('mr_reservaId').value = mesa.reserva_id;
+    document.getElementById('mr_pax').value       = mesa.reserva_personas || 1;
+    document.getElementById('modalReserva').classList.add('show');
+}
+
+async function sentarCliente() {
+    const mesaId   = parseInt(document.getElementById('mr_mesaId').value);
+    const reservaId= parseInt(document.getElementById('mr_reservaId').value);
+    const personas = parseInt(document.getElementById('mr_pax').value) || 1;
+    document.getElementById('modalReserva').classList.remove('show');
+    await abrirComandaNueva(mesaId, personas, reservaId);
+}
+
+async function cancelarReservaDesdeModal() {
+    const reservaId = parseInt(document.getElementById('mr_reservaId').value);
+    if (!confirm('¿Cancelar esta reserva?')) return;
+    await fetch(`${BASE}/api/restaurant/reservas.php?id=${reservaId}`, { method: 'DELETE' });
+    document.getElementById('modalReserva').classList.remove('show');
+    showToast('Reserva cancelada', 'success');
+    await cargarMesas();
 }
 
 async function cargarComanda(id) {
@@ -841,6 +1114,19 @@ function cerrarPanel() {
 }
 function cerrarModal() { document.getElementById('modalCobrar').classList.remove('show'); }
 
+/* ── ABRIR COMANDA (mesa libre) ───────────────────────── */
+function abrirModalAbrirMesa(mesaId) {
+    document.getElementById('am_mesaId').value = mesaId;
+    document.getElementById('am_personas').value = 1;
+    document.getElementById('modalAbrirMesa').classList.add('show');
+}
+async function confirmarAbrirMesa() {
+    const mesaId  = parseInt(document.getElementById('am_mesaId').value);
+    const personas = parseInt(document.getElementById('am_personas').value) || 1;
+    document.getElementById('modalAbrirMesa').classList.remove('show');
+    await abrirComandaNueva(mesaId, personas, null);
+}
+
 /* ── NUEVA MESA ───────────────────────────────────────── */
 function abrirModalNuevaMesa() {
     const sel = document.getElementById('nm_sector');
@@ -883,6 +1169,209 @@ function showToast(msg, type='success') {
     t.textContent = msg;
     document.body.appendChild(t);
     setTimeout(() => t.remove(), 3500);
+}
+
+/* ── TABS PRINCIPALES ────────────────────────────── */
+let rvIniciado = false;
+function switchMainTab(tab) {
+    document.getElementById('mainTabSalon').classList.toggle('active', tab === 'salon');
+    document.getElementById('mainTabReservas').classList.toggle('active', tab === 'reservas');
+    document.getElementById('panelSalon').style.display    = tab === 'salon'    ? '' : 'none';
+    document.getElementById('panelReservas').style.display = tab === 'reservas' ? '' : 'none';
+    if (tab === 'salon') {
+        startPolling();
+    } else {
+        clearInterval(timerPolling);
+        if (!rvIniciado) { rvIniciado = true; rvInit(); }
+        else { rvCargar(); }
+    }
+}
+
+/* ── RESERVAS ─────────────────────────────────────── */
+let rvFecha = new Date(); rvFecha.setHours(0,0,0,0);
+let rvMesas = [];
+
+async function rvInit() {
+    await rvCargarMesas();
+    rvRenderFecha();
+    rvCargar();
+}
+
+async function rvCargarMesas() {
+    if (mesas.length) { rvMesas = mesas; rvPoblarSelectMesa(); return; }
+    const r = await fetch(`${BASE}/api/restaurant/mesas.php`);
+    const d = await r.json();
+    if (!d.success) return;
+    rvMesas = d.data.mesas;
+    rvPoblarSelectMesa();
+}
+
+function rvPoblarSelectMesa() {
+    const sel = document.getElementById('rv_mesa');
+    sel.innerHTML = '<option value="">— Sin asignar —</option>' +
+        rvMesas.map(m => `<option value="${m.id}">Mesa ${m.numero}${m.sector_nombre?' ('+m.sector_nombre+')':''} · ${m.capacidad} p.</option>`).join('');
+}
+
+function rvRenderFecha() {
+    const opts = {weekday:'long',day:'numeric',month:'long'};
+    document.getElementById('rvFechaDisplay').textContent = rvFecha.toLocaleDateString('es-AR', opts);
+    const hoy = new Date(); hoy.setHours(0,0,0,0);
+    const diff = Math.round((rvFecha - hoy) / 86400000);
+    document.getElementById('rvSubtitulo').textContent =
+        diff === 0 ? 'Hoy' : diff === 1 ? 'Mañana' : diff === -1 ? 'Ayer' : diff > 0 ? `En ${diff} días` : `Hace ${-diff} días`;
+}
+
+function rvCambiarFecha(d) {
+    rvFecha.setDate(rvFecha.getDate() + d);
+    rvRenderFecha(); rvCargar();
+}
+function rvIrHoy() {
+    rvFecha = new Date(); rvFecha.setHours(0,0,0,0);
+    rvRenderFecha(); rvCargar();
+}
+function rvAbrirDatepicker() {
+    const dp = document.getElementById('rvDatepicker');
+    dp.value = rvFechaISO(rvFecha);
+    dp.style.pointerEvents = 'auto'; dp.click(); dp.style.pointerEvents = 'none';
+}
+function rvSetFecha(v) {
+    if (!v) return;
+    rvFecha = new Date(v + 'T00:00:00');
+    rvRenderFecha(); rvCargar();
+}
+
+async function rvCargar() {
+    const fecha = rvFechaISO(rvFecha);
+    const r = await fetch(`${BASE}/api/restaurant/reservas.php?fecha=${fecha}&todas=1`);
+    const d = await r.json();
+    if (!d.success) return;
+    const rv = d.data;
+    document.getElementById('rvStTotal').textContent  = rv.length;
+    document.getElementById('rvStConf').textContent   = rv.filter(x=>x.estado==='confirmada').length;
+    document.getElementById('rvStPend').textContent   = rv.filter(x=>x.estado==='pendiente').length;
+    document.getElementById('rvStSent').textContent   = rv.filter(x=>x.estado==='sentada').length;
+    document.getElementById('rvStNoshow').textContent = rv.filter(x=>x.estado==='no_show').length;
+    rvRenderLista(rv);
+}
+
+function rvRenderLista(reservas) {
+    const cont = document.getElementById('rvLista');
+    if (!reservas.length) {
+        cont.innerHTML = `<div class="empty-state"><i class="fas fa-calendar-times"></i><br>Sin reservas para este día<br>
+            <button class="btn btn-primary btn-sm" style="margin-top:14px;" onclick="rvAbrirNueva()"><i class="fas fa-plus"></i> Agregar</button></div>`;
+        return;
+    }
+    reservas.sort((a,b) => a.hora_inicio.localeCompare(b.hora_inicio));
+    const etiquetas = {pendiente:'Pendiente',confirmada:'Confirmada',sentada:'Sentada',cancelada:'Cancelada',no_show:'No Show'};
+    cont.innerHTML = `<div style="display:flex;flex-direction:column;gap:10px;">` + reservas.map(r => {
+        const hora = r.hora_inicio ? r.hora_inicio.substring(0,5) : '—';
+        const fin  = rvCalcFin(r.hora_inicio, r.duracion_minutos);
+        return `<div class="reserva-card" onclick="rvEditar(${r.id})">
+            <div class="rv-estado-bar rv-bar-${r.estado}"></div>
+            <div style="text-align:center;min-width:52px;">
+                <div class="rv-hora-time">${hora}</div>
+                <div class="rv-hora-dur">${r.duracion_minutos||90}m</div>
+            </div>
+            <div style="flex:1;">
+                <div class="rv-nombre">${esc(r.cliente_nombre)}</div>
+                <div class="rv-detalle">
+                    <i class="fas fa-users"></i> ${r.personas} personas &nbsp;·&nbsp;
+                    <i class="fas fa-chair"></i> ${r.mesa_numero ? 'Mesa '+r.mesa_numero : 'Sin mesa'}
+                    ${r.cliente_telefono ? ` &nbsp;·&nbsp; <i class="fas fa-phone"></i> ${esc(r.cliente_telefono)}` : ''}
+                </div>
+                ${r.observaciones ? `<div class="rv-detalle" style="margin-top:3px;font-style:italic;">"${esc(r.observaciones)}"</div>` : ''}
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+                <div class="rv-badge badge-${r.estado}">${etiquetas[r.estado]||r.estado}</div>
+                ${fin ? `<div style="font-size:11px;color:var(--text-secondary);">hasta ${fin}</div>` : ''}
+            </div>
+        </div>`;
+    }).join('') + `</div>`;
+}
+
+function rvAbrirNueva() {
+    document.getElementById('rv_id').value       = '';
+    document.getElementById('rv_nombre').value   = '';
+    document.getElementById('rv_fecha').value    = rvFechaISO(rvFecha);
+    document.getElementById('rv_hora').value     = '20:00';
+    document.getElementById('rv_personas').value = '2';
+    document.getElementById('rv_duracion').value = '90';
+    document.getElementById('rv_mesa').value     = '';
+    document.getElementById('rv_telefono').value = '';
+    document.getElementById('rv_estado').value   = 'pendiente';
+    document.getElementById('rv_obs').value      = '';
+    document.getElementById('rvModalTitulo').textContent = 'Nueva Reserva';
+    document.getElementById('rvModalBtns').innerHTML = `
+        <button class="btn btn-outline" style="flex:1;" onclick="rvCerrarModal()">Cancelar</button>
+        <button class="btn btn-primary" style="flex:2;" onclick="rvGuardar()"><i class="fas fa-save"></i> Guardar</button>`;
+    document.getElementById('modalReservaRV').classList.add('show');
+}
+
+async function rvEditar(id) {
+    const r = await fetch(`${BASE}/api/restaurant/reservas.php?id=${id}`);
+    const d = await r.json();
+    if (!d.success) return;
+    const rv = d.data;
+    document.getElementById('rv_id').value       = rv.id;
+    document.getElementById('rv_nombre').value   = rv.cliente_nombre;
+    document.getElementById('rv_fecha').value    = rv.fecha_reserva;
+    document.getElementById('rv_hora').value     = rv.hora_inicio ? rv.hora_inicio.substring(0,5) : '';
+    document.getElementById('rv_personas').value = rv.personas;
+    document.getElementById('rv_duracion').value = rv.duracion_minutos || 90;
+    document.getElementById('rv_mesa').value     = rv.mesa_id || '';
+    document.getElementById('rv_telefono').value = rv.cliente_telefono || '';
+    document.getElementById('rv_estado').value   = rv.estado;
+    document.getElementById('rv_obs').value      = rv.observaciones || '';
+    document.getElementById('rvModalTitulo').textContent = 'Editar Reserva';
+    document.getElementById('rvModalBtns').innerHTML = `
+        <button class="btn btn-outline" style="flex:1;border-color:var(--error);color:var(--error);" onclick="rvCancelar(${rv.id})"><i class="fas fa-times"></i> Cancelar reserva</button>
+        <button class="btn btn-primary" style="flex:2;" onclick="rvGuardar()"><i class="fas fa-save"></i> Guardar</button>`;
+    document.getElementById('modalReservaRV').classList.add('show');
+}
+
+async function rvGuardar() {
+    const id = document.getElementById('rv_id').value;
+    const payload = {
+        cliente_nombre:   document.getElementById('rv_nombre').value.trim(),
+        fecha_reserva:    document.getElementById('rv_fecha').value,
+        hora_inicio:      document.getElementById('rv_hora').value,
+        personas:         document.getElementById('rv_personas').value,
+        duracion_minutos: document.getElementById('rv_duracion').value,
+        mesa_id:          document.getElementById('rv_mesa').value || null,
+        cliente_telefono: document.getElementById('rv_telefono').value,
+        estado:           document.getElementById('rv_estado').value,
+        observaciones:    document.getElementById('rv_obs').value,
+    };
+    if (!payload.cliente_nombre || !payload.fecha_reserva || !payload.hora_inicio) {
+        showToast('Completá los campos obligatorios', 'error'); return;
+    }
+    const url    = `${BASE}/api/restaurant/reservas.php${id ? '?id='+id : ''}`;
+    const method = id ? 'PUT' : 'POST';
+    const r = await fetch(url, {method, headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)});
+    const d = await r.json();
+    if (d.success) {
+        rvCerrarModal();
+        showToast(id ? 'Reserva actualizada' : 'Reserva creada', 'success');
+        rvCargar();
+        await cargarMesas(); // refrescar salón también
+    } else { showToast(d.message || 'Error al guardar', 'error'); }
+}
+
+async function rvCancelar(id) {
+    if (!confirm('¿Cancelar esta reserva?')) return;
+    await fetch(`${BASE}/api/restaurant/reservas.php?id=${id}`, {method:'DELETE'});
+    rvCerrarModal();
+    showToast('Reserva cancelada', 'success');
+    rvCargar(); cargarMesas();
+}
+
+function rvCerrarModal() { document.getElementById('modalReservaRV').classList.remove('show'); }
+function rvFechaISO(d) { return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function rvCalcFin(hora, min) {
+    if (!hora || !min) return '';
+    const [h,m] = hora.split(':').map(Number);
+    const fin = new Date(2000,0,1,h,m+parseInt(min));
+    return String(fin.getHours()).padStart(2,'0')+':'+String(fin.getMinutes()).padStart(2,'0');
 }
 
 init();

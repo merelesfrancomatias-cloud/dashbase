@@ -18,8 +18,11 @@ if ($negocioId <= 0) {
 
 $pdo = (new Database())->getConnection();
 
-// Datos del negocio (nombre, logo, color)
-$stmtN = $pdo->prepare("SELECT nombre, logo, color_primario, slogan, horario_inicio, horario_cierre FROM negocios WHERE id = :id AND activo = 1");
+// Datos del negocio
+$stmtN = $pdo->prepare("SELECT nombre, logo, imagen_portada, color_primario, slogan,
+                                horario_inicio, horario_cierre, direccion, ciudad,
+                                telefono, whatsapp, instagram, sitio_web
+                         FROM negocios WHERE id = :id AND activo = 1");
 $stmtN->execute([':id' => $negocioId]);
 $negocio = $stmtN->fetch(PDO::FETCH_ASSOC);
 if (!$negocio) {

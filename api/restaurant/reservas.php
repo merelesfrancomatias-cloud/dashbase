@@ -101,9 +101,10 @@ if ($method === 'POST') {
     ]);
     $newId = $pdo->lastInsertId();
 
-    // Si se confirma y tiene mesa → poner mesa en reservada
-    if (!empty($d['mesa_id']) && in_array($d['estado'] ?? '', ['confirmada','pendiente'])) {
-        $pdo->prepare("UPDATE restaurant_mesas SET estado='reservada' WHERE id=:id AND negocio_id=:nid")
+    // Si tiene mesa y la reserva es HOY → poner mesa en reservada
+    if (!empty($d['mesa_id']) && in_array($d['estado'] ?? 'pendiente', ['confirmada','pendiente'])
+        && ($d['fecha_reserva'] ?? '') === date('Y-m-d')) {
+        $pdo->prepare("UPDATE restaurant_mesas SET estado='reservada' WHERE id=:id AND negocio_id=:nid AND estado='libre'")
             ->execute([':id' => (int)$d['mesa_id'], ':nid' => $negocioId]);
     }
 

@@ -218,11 +218,11 @@ if ($method === 'POST') {
 
         // Copiar ítems a detalle_ventas
         $items = $pdo->query("SELECT * FROM restaurant_comanda_items WHERE comanda_id={$cid} AND estado_cocina != 'cancelado'")->fetchAll(PDO::FETCH_ASSOC);
-        $stmtDV = $pdo->prepare("INSERT INTO detalle_ventas (venta_id, negocio_id, producto_id, cantidad, precio_unitario, subtotal) VALUES (:vid, :nid, :pid, :cant, :precio, :sub)");
+        $stmtDV = $pdo->prepare("INSERT INTO detalle_ventas (venta_id, producto_id, cantidad, precio_unitario, subtotal) VALUES (:vid, :pid, :cant, :precio, :sub)");
         foreach ($items as $item) {
+            if (empty($item['producto_id'])) continue;
             $stmtDV->execute([
                 ':vid'    => $ventaId,
-                ':nid'    => $negocioId,
                 ':pid'    => $item['producto_id'],
                 ':cant'   => $item['cantidad'],
                 ':precio' => $item['precio_unit'],
