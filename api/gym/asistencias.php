@@ -4,6 +4,7 @@ Auth::check();
 
 $negocio_id = $_SESSION['negocio_id'];
 $db = (new Database())->getConnection();
+PlanGuard::requireActive((int)$negocio_id, $db);
 $method = $_SERVER['REQUEST_METHOD'];
 
 if ($method === 'GET') {

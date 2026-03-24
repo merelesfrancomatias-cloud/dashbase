@@ -8,9 +8,10 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 try {
     [$negocio_id, $userId] = Middleware::auth();
-    
+
     $database = new Database();
     $pdo = $database->getConnection();
+    PlanGuard::requireActive((int)$negocio_id, $pdo);
 
     if ($method === 'GET') {
         $stmt = $pdo->prepare("SELECT * FROM canchas WHERE negocio_id = ? ORDER BY nombre ASC");

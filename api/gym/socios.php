@@ -43,7 +43,8 @@ if ($method === 'GET') {
     }
 
     $stmt = $db->prepare("
-        SELECT s.*,
+        SELECT s.id, s.nombre, s.apellido, s.email, s.telefono, s.plan_id,
+               s.fecha_inicio, s.fecha_vencimiento, s.estado, s.notas, s.qr_token,
                p.nombre AS plan_nombre,
                p.precio AS plan_precio,
                DATEDIFF(s.fecha_vencimiento, CURDATE()) AS dias_restantes
@@ -95,11 +96,12 @@ if ($method === 'POST') {
         }
     }
 
+    $qr_token = bin2hex(random_bytes(32));
     $stmt = $db->prepare("
-        INSERT INTO gym_socios (negocio_id,nombre,apellido,email,telefono,plan_id,fecha_inicio,fecha_vencimiento,estado,notas)
-        VALUES (?,?,?,?,?,?,?,?,'activo',?)
+        INSERT INTO gym_socios (negocio_id,nombre,apellido,email,telefono,plan_id,fecha_inicio,fecha_vencimiento,estado,notas,qr_token)
+        VALUES (?,?,?,?,?,?,?,?,'activo',?,?)
     ");
-    $stmt->execute([$negocio_id,$nombre,$apellido,$email,$telefono,$plan_id,$fecha_ini,$fecha_venc,$notas]);
+    $stmt->execute([$negocio_id,$nombre,$apellido,$email,$telefono,$plan_id,$fecha_ini,$fecha_venc,$notas,$qr_token]);
     $id = $db->lastInsertId();
 
     // Registrar pago si hay monto

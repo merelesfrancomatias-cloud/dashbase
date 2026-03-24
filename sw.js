@@ -6,7 +6,7 @@
  *   - PHP/APIs: Network-only (nunca cachear)
  */
 
-const CACHE_NAME  = 'dash-v3';
+const CACHE_NAME  = 'dash-v4';
 const CACHE_ASSETS = [
     '/DASHBASE/offline.html',
     '/DASHBASE/public/img/DASHLOGOSF.png',

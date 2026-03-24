@@ -4,6 +4,7 @@ header('Content-Type: application/json');
 Auth::check();
 $negocioId = (int)$_SESSION['negocio_id'];
 $pdo       = (new Database())->getConnection();
+PlanGuard::requireActive($negocioId, $pdo);
 $method    = $_SERVER['REQUEST_METHOD'];
 
 // Crear tabla si no existe

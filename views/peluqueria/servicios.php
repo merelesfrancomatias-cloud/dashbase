@@ -153,6 +153,10 @@ if (!isset($_SESSION['user_id']) && !isset($_SESSION['usuario_id'])) {
                 </div>
             </div>
             <div class="form-group">
+                <label>Comisión empleado (%)</label>
+                <input type="number" id="sComision" value="0" min="0" max="100" step="0.5" placeholder="Ej: 30 para 30%">
+            </div>
+            <div class="form-group">
                 <label>Color identificador</label>
                 <div class="color-row" id="colorRow">
                     <input type="hidden" id="sColor" value="#8b5cf6">
@@ -236,6 +240,7 @@ function renderGrid() {
                     <div class="sc-duracion"><i class="fas fa-clock"></i>${s.duracion_min} min</div>
                     <div class="sc-precio" style="color:${esc(s.color||'#8b5cf6')}">$${Number(s.precio).toLocaleString('es-AR')}</div>
                 </div>
+                ${parseFloat(s.comision_porcentaje||0) > 0 ? `<div style="font-size:11px;color:#64748b;font-weight:600;margin-top:4px;"><i class="fas fa-percent" style="font-size:9px;margin-right:3px;"></i>Comisión: ${s.comision_porcentaje}%</div>` : ''}
             </div>
             <div class="sc-footer">
                 <button class="sc-btn" title="Editar" onclick="editar(${s.id})"><i class="fas fa-pencil"></i></button>
@@ -251,8 +256,9 @@ function abrirNuevo() {
     document.getElementById('sDesc').value  = '';
     document.getElementById('sCat').value   = 'Cabello';
     document.getElementById('sDur').value   = '30';
-    document.getElementById('sPrecio').value = '0';
-    document.getElementById('sActivo').value = '1';
+    document.getElementById('sPrecio').value   = '0';
+    document.getElementById('sComision').value = '0';
+    document.getElementById('sActivo').value   = '1';
     setColor('#8b5cf6');
     document.getElementById('modalTitulo').innerHTML = '<i class="fas fa-scissors" style="color:#8b5cf6;margin-right:8px;"></i> Nuevo Servicio';
     document.getElementById('modalServicio').classList.add('open');
@@ -266,8 +272,9 @@ function editar(id) {
     document.getElementById('sNombre').value = s.nombre;
     document.getElementById('sDesc').value  = s.descripcion || '';
     document.getElementById('sCat').value   = s.categoria || 'Otro';
-    document.getElementById('sDur').value   = s.duracion_min;
-    document.getElementById('sPrecio').value = s.precio;
+    document.getElementById('sDur').value      = s.duracion_min;
+    document.getElementById('sPrecio').value   = s.precio;
+    document.getElementById('sComision').value = s.comision_porcentaje || 0;
     document.getElementById('sActivo').value = s.activo ? '1' : '0';
     setColor(s.color || '#8b5cf6');
     document.getElementById('modalTitulo').innerHTML = '<i class="fas fa-pencil" style="color:#8b5cf6;margin-right:8px;"></i> Editar Servicio';
@@ -283,8 +290,9 @@ async function guardar() {
         nombre:      nom,
         descripcion: document.getElementById('sDesc').value,
         categoria:   document.getElementById('sCat').value,
-        duracion_min: parseInt(document.getElementById('sDur').value),
-        precio:      parseFloat(document.getElementById('sPrecio').value),
+        duracion_min:          parseInt(document.getElementById('sDur').value),
+        precio:                parseFloat(document.getElementById('sPrecio').value),
+        comision_porcentaje:   parseFloat(document.getElementById('sComision').value) || 0,
         color:       document.getElementById('sColor').value,
         activo:      parseInt(document.getElementById('sActivo').value),
     };

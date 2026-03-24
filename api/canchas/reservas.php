@@ -8,9 +8,10 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 try {
     [$negocio_id, $userId] = Middleware::auth();
-    
+
     $database = new Database();
     $pdo = $database->getConnection();
+    PlanGuard::requireActive((int)$negocio_id, $pdo);
 
     if ($method === 'GET') {
         // ?cancha_id=X&fecha=YYYY-MM-DD  → reservas de esa cancha en esa fecha

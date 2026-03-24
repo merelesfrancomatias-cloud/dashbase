@@ -9,6 +9,7 @@ try {
 
     $database = new Database();
     $db = $database->getConnection();
+    PlanGuard::requireActive($negocioId, $db);
 
     switch ($method) {
         case 'GET':

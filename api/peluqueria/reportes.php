@@ -4,6 +4,7 @@ Auth::check();
 
 $negocioId = (int)$_SESSION['negocio_id'];
 $pdo       = (new Database())->getConnection();
+PlanGuard::requireActive($negocioId, $pdo);
 $tipo      = $_GET['tipo'] ?? 'resumen';
 $desde     = $_GET['desde'] ?? date('Y-m-d', strtotime('-29 days'));
 $hasta     = $_GET['hasta'] ?? date('Y-m-d');
@@ -110,19 +111,46 @@ if ($tipo === 'servicios') {
    RENDIMIENTO POR EMPLEADO
 ═══════════════════════════════════════════════════════════ */
 if ($tipo === 'empleados') {
+    // Ingresos y comisiones por empleado
+    // La comisión se calcula desde turno_servicios (si existe) o desde servicios (por servicio_id del turno)
     $stmt = $pdo->prepare("
-        SELECT e.nombre AS empleado,
-               COUNT(t.id)                                                    AS turnos,
-               SUM(t.estado='completado')                                     AS completados,
-               COALESCE(SUM(CASE WHEN t.estado='completado' THEN t.precio ELSE 0 END),0) AS ingresos
+        SELECT e.id AS empleado_id,
+               e.nombre AS empleado,
+               e.cargo,
+               COUNT(t.id)                                                             AS turnos,
+               SUM(t.estado='completado')                                              AS completados,
+               COALESCE(SUM(CASE WHEN t.estado='completado' THEN t.precio ELSE 0 END),0) AS ingresos,
+               COALESCE(SUM(
+                   CASE WHEN t.estado='completado' THEN
+                       CASE
+                           WHEN t.servicio_id IS NOT NULL THEN
+                               t.precio * COALESCE(s.comision_porcentaje, 0) / 100
+                           ELSE (
+                               SELECT COALESCE(SUM(ts.precio * COALESCE(sv.comision_porcentaje, 0) / 100), 0)
+                               FROM turno_servicios ts
+                               LEFT JOIN servicios sv ON sv.id = ts.servicio_id AND sv.negocio_id = t.negocio_id
+                               WHERE ts.turno_id = t.id
+                           )
+                       END
+                   ELSE 0 END
+               ), 0) AS comision_estimada
         FROM turnos t
         JOIN empleados e ON e.id = t.empleado_id
+        LEFT JOIN servicios s ON s.id = t.servicio_id AND s.negocio_id = t.negocio_id
         WHERE t.negocio_id=? AND t.fecha BETWEEN ? AND ?
-        GROUP BY e.id, e.nombre
+        GROUP BY e.id, e.nombre, e.cargo
         ORDER BY ingresos DESC
     ");
     $stmt->execute([$negocioId, $desde, $hasta]);
-    Response::success('OK', $stmt->fetchAll(PDO::FETCH_ASSOC));
+    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Formatear valores numéricos
+    foreach ($rows as &$row) {
+        $row['ingresos']          = round((float)$row['ingresos'], 2);
+        $row['comision_estimada'] = round((float)$row['comision_estimada'], 2);
+    }
+
+    Response::success('OK', $rows);
 }
 
 /* ═══════════════════════════════════════════════════════════

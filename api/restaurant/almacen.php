@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../bootstrap.php';
 [$negocioId, $usuarioId] = Middleware::auth();
 $pdo    = (new Database())->getConnection();
+PlanGuard::requireActive($negocioId, $pdo);
 $method = $_SERVER['REQUEST_METHOD'];
 $entity = $_GET['entity'] ?? 'insumos'; // insumos | compras | recetas
 

@@ -14,6 +14,8 @@ $esTecnologia       = false;
 $esElectrodomesticos= false;
 $slugSB             = '';
 
+$_suscBanner = null; // datos para el banner de suscripción
+
 if (isset($_SESSION['negocio_id'])) {
     try {
         $host   = $_ENV['DB_HOST'] ?? '127.0.0.1';
@@ -23,9 +25,25 @@ if (isset($_SESSION['negocio_id'])) {
         if (empty($dbname)) { $dbname = 'dashbase_local'; }
         $_pdoSB = new PDO("mysql:host={$host};dbname={$dbname};charset=utf8mb4", $user, $pass,
             [PDO::ATTR_ERRMODE => PDO::ERRMODE_SILENT]);
-        $stmtSB = $_pdoSB->prepare("SELECT r.slug FROM negocios n LEFT JOIN rubros r ON r.id = n.rubro_id WHERE n.id = ?");
+        $stmtSB = $_pdoSB->prepare("SELECT r.slug, n.estado_suscripcion, n.fecha_vencimiento, n.trial_hasta FROM negocios n LEFT JOIN rubros r ON r.id = n.rubro_id WHERE n.id = ?");
         $stmtSB->execute([(int)$_SESSION['negocio_id']]);
-        $slugSB = $stmtSB->fetchColumn() ?: '';
+        $rowSB  = $stmtSB->fetch(PDO::FETCH_ASSOC) ?: [];
+        $slugSB = $rowSB['slug'] ?? '';
+        // Determinar si hay que mostrar banner
+        $estadoSusc = $rowSB['estado_suscripcion'] ?? '';
+        $hoy = date('Y-m-d');
+        if ($estadoSusc === 'vencida' || $estadoSusc === 'cancelada') {
+            $_suscBanner = ['tipo' => 'error', 'msg' => $estadoSusc === 'cancelada' ? 'Suscripción cancelada' : 'Suscripción vencida'];
+        } elseif ($estadoSusc === 'trial' && !empty($rowSB['trial_hasta']) && $rowSB['trial_hasta'] < $hoy) {
+            $_suscBanner = ['tipo' => 'error', 'msg' => 'Período de prueba vencido'];
+        } elseif ($estadoSusc === 'trial' && !empty($rowSB['trial_hasta'])) {
+            $diasTrial = (int)ceil((strtotime($rowSB['trial_hasta']) - time()) / 86400);
+            if ($diasTrial <= 5) $_suscBanner = ['tipo' => 'warning', 'msg' => "Trial: {$diasTrial} día" . ($diasTrial !== 1 ? 's' : '') . " restante" . ($diasTrial !== 1 ? 's' : '')];
+        } elseif ($estadoSusc === 'activa' && !empty($rowSB['fecha_vencimiento'])) {
+            $diasVenc = (int)ceil((strtotime($rowSB['fecha_vencimiento']) - time()) / 86400);
+            if ($diasVenc <= 7 && $diasVenc >= 0) $_suscBanner = ['tipo' => 'warning', 'msg' => "Vence en {$diasVenc} día" . ($diasVenc !== 1 ? 's' : '')];
+            elseif ($diasVenc < 0)                $_suscBanner = ['tipo' => 'error',   'msg' => 'Suscripción vencida'];
+        }
         $esRestaurant   = in_array($slugSB, ['gastronomia','bar','restaurant','cafeteria','panaderia','comida_rapida']);
         $esferreteria   = in_array($slugSB, ['ferreteria','construccion','otro']);
         $esSupermercado = in_array($slugSB, ['supermercado','almacen','libreria','jugueteria','floristeria','deportes','indumentaria']);
@@ -98,6 +116,17 @@ if (isset($_SESSION['negocio_id'])) {
         }
         ?>
     </div><!-- /sidebar-header -->
+
+    <?php if ($_suscBanner): ?>
+    <div style="margin:8px 12px;padding:8px 12px;border-radius:10px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:7px;
+        <?= $_suscBanner['tipo'] === 'error'
+            ? 'background:rgba(239,68,68,.18);border:1px solid rgba(239,68,68,.35);color:#fca5a5;'
+            : 'background:rgba(245,158,11,.18);border:1px solid rgba(245,158,11,.35);color:#fcd34d;' ?>">
+        <i class="fas <?= $_suscBanner['tipo'] === 'error' ? 'fa-circle-exclamation' : 'fa-triangle-exclamation' ?>" style="flex-shrink:0;font-size:13px;"></i>
+        <span><?= htmlspecialchars($_suscBanner['msg']) ?></span>
+        <a href="../perfil/index.php" style="margin-left:auto;font-size:10px;font-weight:800;text-decoration:underline;color:inherit;white-space:nowrap;">Ver plan</a>
+    </div>
+    <?php endif; ?>
 
     <nav class="sidebar-menu">
 
@@ -227,11 +256,17 @@ if (isset($_SESSION['negocio_id'])) {
             <a href="../peluqueria/servicios.php" class="menu-item" data-page="servicios-pelu">
                 <i class="fas fa-scissors"></i><span>Servicios</span>
             </a>
+            <a href="../peluqueria/empleados.php" class="menu-item" data-page="empleados-pelu">
+                <i class="fas fa-user-tie"></i><span>Equipo</span>
+            </a>
             <a href="../peluqueria/clientes.php" class="menu-item" data-page="clientes-pelu">
                 <i class="fas fa-address-book"></i><span>Clientes</span>
             </a>
             <a href="../peluqueria/reportes.php" class="menu-item" data-page="reportes-pelu">
                 <i class="fas fa-chart-line"></i><span>Reportes</span>
+            </a>
+            <a href="../peluqueria/reserva-publica.php?negocio=<?= (int)$_SESSION['negocio_id'] ?>" target="_blank" class="menu-item" data-page="reserva-publica-pelu">
+                <i class="fas fa-link"></i><span>Reserva Online <small style="font-size:9px;opacity:.7;display:block;">Enlace público</small></span>
             </a>
         </div>
         <?php endif; ?>
@@ -254,6 +289,9 @@ if (isset($_SESSION['negocio_id'])) {
             </a>
             <a href="../gym/reportes.php" class="menu-item" data-page="reportes-gym">
                 <i class="fas fa-chart-line"></i><span>Reportes</span>
+            </a>
+            <a href="../gym/qr-checkin.php" class="menu-item" data-page="qr-checkin-gym">
+                <i class="fas fa-qrcode"></i><span>QR Check-in</span>
             </a>
         </div>
         <?php endif; ?>

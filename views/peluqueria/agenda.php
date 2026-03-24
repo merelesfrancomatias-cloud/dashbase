@@ -208,6 +208,61 @@ if (!isset($_SESSION['user_id']) && !isset($_SESSION['usuario_id'])) {
         .servicios-detalle { display: flex; flex-direction: column; gap: 5px; margin-top: 6px; }
         .serv-det-item { display: flex; justify-content: space-between; font-size: 13px; padding: 5px 0; border-bottom: 1px solid var(--border-color,#f1f5f9); }
         .serv-det-item:last-child { border: none; }
+
+        /* ── Vista por empleado ── */
+        .vista-toggle {
+            display: flex; border: 1px solid var(--border-color,#e5e7eb);
+            border-radius: 10px; overflow: hidden; background: var(--card-bg,#fff);
+        }
+        .btn-vista {
+            padding: 7px 14px; border: none; background: transparent; cursor: pointer;
+            font-size: 12px; font-weight: 600; color: var(--muted-color,#64748b);
+            display: flex; align-items: center; gap: 5px; transition: all .15s; white-space: nowrap;
+        }
+        .btn-vista.active { background: #8b5cf6; color: #fff; }
+        .btn-vista:not(.active):hover { background: var(--hover-bg,#f1f5f9); }
+
+        .agenda-empleados {
+            display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; align-items: flex-start;
+        }
+        .agenda-empleados::-webkit-scrollbar { height: 5px; }
+        .agenda-empleados::-webkit-scrollbar-thumb { background: var(--border-color,#e5e7eb); border-radius: 3px; }
+        .emp-columna {
+            flex: 0 0 260px; min-width: 260px;
+            border: 1px solid var(--border-color,#e5e7eb); border-radius: 14px; overflow: hidden;
+        }
+        .emp-header {
+            padding: 11px 14px; background: var(--hover-bg,#f8fafc);
+            display: flex; align-items: center; gap: 10px;
+            border-bottom: 1px solid var(--border-color,#e5e7eb);
+        }
+        .emp-avatar {
+            width: 30px; height: 30px; border-radius: 50%; background: #8b5cf6;
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 12px; font-weight: 700; flex-shrink: 0;
+        }
+        .emp-header-info { flex: 1; min-width: 0; }
+        .emp-header-nombre { font-size: 13px; font-weight: 700; color: var(--text-color,#1e293b); }
+        .emp-header-count { font-size: 10px; color: var(--muted-color,#64748b); font-weight: 500; }
+        .emp-turnos { padding: 8px; display: flex; flex-direction: column; gap: 6px; }
+        .emp-turno-mini {
+            border-radius: 10px; overflow: hidden; border: 1px solid var(--border-color,#e5e7eb);
+            background: var(--card-bg,#fff); cursor: pointer; display: flex;
+            transition: box-shadow .15s, transform .12s;
+        }
+        .emp-turno-mini:hover { box-shadow: 0 2px 12px rgba(0,0,0,.08); transform: translateY(-1px); }
+        .emp-accent { width: 4px; flex-shrink: 0; }
+        .emp-turno-body { padding: 9px 12px; flex: 1; min-width: 0; }
+        .emp-turno-hora { font-size: 10px; font-weight: 700; color: var(--muted-color,#64748b); font-variant-numeric: tabular-nums; }
+        .emp-turno-nombre { font-size: 13px; font-weight: 700; color: var(--text-color,#1e293b); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .emp-turno-serv { font-size: 11px; color: var(--muted-color,#64748b); margin-top: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .emp-turno-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 5px; }
+        .emp-turno-precio { font-size: 12px; font-weight: 800; color: #8b5cf6; }
+        .emp-vacio { padding: 24px; text-align: center; color: var(--muted-color,#9ca3af); font-size: 12px; }
+
+        /* WhatsApp button */
+        .t-btn-wa { color: #16a34a !important; border-color: rgba(22,163,74,.3) !important; }
+        .t-btn-wa:hover { background: rgba(22,163,74,.08) !important; border-color: #16a34a !important; }
     </style>
 </head>
 <body>
@@ -225,6 +280,14 @@ if (!isset($_SESSION['user_id']) && !isset($_SESSION['usuario_id'])) {
             </div>
             <button class="btn-hoy" onclick="irHoy()">Hoy</button>
             <input type="date" id="pickerFecha" style="padding:7px 10px;border-radius:10px;border:1px solid var(--border-color,#e5e7eb);font-size:13px;background:var(--card-bg,#fff);color:var(--text-color);" oninput="setFecha(this.value)">
+            <div class="vista-toggle">
+                <button class="btn-vista active" id="btnVistaLista" onclick="setVista('lista')">
+                    <i class="fas fa-list"></i> Lista
+                </button>
+                <button class="btn-vista" id="btnVistaEmp" onclick="setVista('empleados')">
+                    <i class="fas fa-users"></i> Por empleado
+                </button>
+            </div>
             <button class="btn-nuevo-turno" onclick="abrirNuevo()">
                 <i class="fas fa-plus"></i> Nuevo Turno
             </button>
@@ -320,6 +383,12 @@ if (!isset($_SESSION['user_id']) && !isset($_SESSION['usuario_id'])) {
                 </select>
             </div>
             <div class="form-group">
+                <label>Empleado</label>
+                <select id="tEmpleado">
+                    <option value="">— Sin asignar —</option>
+                </select>
+            </div>
+            <div class="form-group">
                 <label>Notas</label>
                 <textarea id="tNotas" rows="2" placeholder="Observaciones…" style="resize:vertical;"></textarea>
             </div>
@@ -348,9 +417,17 @@ if (!isset($_SESSION['user_id']) && !isset($_SESSION['usuario_id'])) {
 <script>
 const API_T  = '../../api/peluqueria/turnos.php';
 const API_S  = '../../api/peluqueria/servicios.php';
+const API_E  = '../../api/peluqueria/empleados.php';
+
+const COLORES = { pendiente:'#94a3b8', confirmado:'#3b82f6', en_curso:'#f59e0b', completado:'#16a34a', cancelado:'#ef4444', no_show:'#9ca3af' };
+const LABELS  = { pendiente:'Pendiente', confirmado:'Confirmado', en_curso:'En curso', completado:'Completado', cancelado:'Cancelado', no_show:'No show' };
+
 let fechaActual = hoy();
 let servicios   = [];
-let serviciosSeleccionados = []; // [{servicio_id, servicio_nombre, duracion_min, precio}]
+let empleadosList = [];
+let vistaActual = 'lista';
+let _turnosDelDia = [];
+let serviciosSeleccionados = [];
 
 async function cargarServicios() {
     const r = await fetch(API_S, { credentials: 'include' });
@@ -361,6 +438,32 @@ async function cargarServicios() {
         sel.innerHTML = '<option value="">— Seleccionar servicio —</option>' +
             servicios.map(s => `<option value="${s.id}" data-dur="${s.duracion_min}" data-precio="${s.precio}" data-nombre="${s.nombre}">${s.nombre} (${s.duracion_min}min · $${Number(s.precio).toLocaleString('es-AR')})</option>`).join('');
     }
+}
+
+async function cargarEmpleados() {
+    try {
+        const r = await fetch(`${API_E}?activos=1`, { credentials: 'include' });
+        const d = await r.json();
+        if (d.success) {
+            empleadosList = d.data || [];
+            const sel = document.getElementById('tEmpleado');
+            sel.innerHTML = '<option value="">— Sin asignar —</option>' +
+                empleadosList.map(e => `<option value="${e.id}">${esc(e.nombre)} ${esc(e.apellido||'')}</option>`).join('');
+        }
+    } catch(err) { console.warn('cargarEmpleados:', err); }
+}
+
+function setVista(v) {
+    vistaActual = v;
+    document.getElementById('btnVistaLista').classList.toggle('active', v === 'lista');
+    document.getElementById('btnVistaEmp').classList.toggle('active', v === 'empleados');
+    if (v === 'empleados') renderAgendaEmpleados(_turnosDelDia);
+    else renderAgendaLista(_turnosDelDia);
+}
+
+function recordatorioWA(tel, nombre, servicio, fecha, hora) {
+    const msg = encodeURIComponent(`Hola ${nombre}! Te recordamos tu turno de ${servicio} el ${fecha} a las ${hora}. ¡Te esperamos! 💇✂️`);
+    window.open(`https://wa.me/${tel.replace(/\D/g,'')}?text=${msg}`, '_blank');
 }
 
 function agregarServicio() {
@@ -428,10 +531,67 @@ async function cargarDia() {
     document.getElementById('stFacturado').textContent  = '$' + Number(stats.facturado||0).toLocaleString('es-AR');
 
     // Renderizar
-    renderAgenda(turnos);
+    _turnosDelDia = turnos;
+    if (vistaActual === 'empleados') renderAgendaEmpleados(turnos);
+    else renderAgendaLista(turnos);
 }
 
-function renderAgenda(turnos) {
+function renderAgendaEmpleados(turnos) {
+    const cont = document.getElementById('agendaList');
+
+    // Build groups: one per employed, plus "Sin asignar"
+    const grupos = {};
+    empleadosList.forEach(e => {
+        grupos[e.id] = { nombre: `${e.nombre} ${e.apellido||''}`.trim(), turnos: [] };
+    });
+    grupos[0] = { nombre: 'Sin asignar', turnos: [] };
+
+    turnos.forEach(t => {
+        const eid = t.empleado_id || 0;
+        if (!grupos[eid]) grupos[eid] = { nombre: t.empleado_nombre || 'Sin asignar', turnos: [] };
+        grupos[eid].turnos.push(t);
+    });
+
+    const colsConTurnos = Object.entries(grupos).filter(([,g]) => g.turnos.length > 0);
+    if (!colsConTurnos.length) {
+        cont.innerHTML = `<div class="empty-day"><i class="fas fa-calendar-xmark"></i><p>Sin turnos para este día</p></div>`;
+        return;
+    }
+
+    let html = '<div class="agenda-empleados">';
+    colsConTurnos.forEach(([eid, g]) => {
+        const inicial = g.nombre.charAt(0).toUpperCase();
+        html += `<div class="emp-columna">
+            <div class="emp-header">
+                <div class="emp-avatar">${inicial}</div>
+                <div class="emp-header-info">
+                    <div class="emp-header-nombre">${esc(g.nombre)}</div>
+                    <div class="emp-header-count">${g.turnos.length} turno${g.turnos.length!==1?'s':''}</div>
+                </div>
+            </div>
+            <div class="emp-turnos">`;
+        g.turnos.forEach(t => {
+            const color = COLORES[t.estado] || '#94a3b8';
+            html += `<div class="emp-turno-mini" onclick="verDetalle(${t.id})">
+                <div class="emp-accent" style="background:${color};"></div>
+                <div class="emp-turno-body">
+                    <div class="emp-turno-hora">${(t.hora_inicio||'').substring(0,5)} – ${(t.hora_fin||'').substring(0,5)}</div>
+                    <div class="emp-turno-nombre">${esc(t.cliente_nombre)}</div>
+                    <div class="emp-turno-serv">${esc(t.servicio_nombre||'—')}</div>
+                    <div class="emp-turno-footer">
+                        <div class="emp-turno-precio">$${Number(t.precio||0).toLocaleString('es-AR')}</div>
+                        <span class="badge-turno st-${t.estado}" style="font-size:9px;">${LABELS[t.estado]||t.estado}</span>
+                    </div>
+                </div>
+            </div>`;
+        });
+        html += `</div></div>`;
+    });
+    html += '</div>';
+    cont.innerHTML = html;
+}
+
+function renderAgendaLista(turnos) {
     const cont = document.getElementById('agendaList');
     if (!turnos.length) {
         cont.innerHTML = `<div class="empty-day"><i class="fas fa-calendar-xmark"></i><p>Sin turnos para este día</p></div>`;
@@ -439,14 +599,6 @@ function renderAgenda(turnos) {
     }
     let html = '';
     let lastHour = '';
-    const COLORES = {
-        pendiente:'#94a3b8', confirmado:'#3b82f6', en_curso:'#f59e0b',
-        completado:'#16a34a', cancelado:'#ef4444', no_show:'#9ca3af'
-    };
-    const LABELS = {
-        pendiente:'Pendiente', confirmado:'Confirmado', en_curso:'En curso',
-        completado:'Completado', cancelado:'Cancelado', no_show:'No show'
-    };
     turnos.forEach(t => {
         const hora = (t.hora_inicio||'').substring(0,5);
         const h    = hora.substring(0,2);
@@ -467,6 +619,7 @@ function renderAgenda(turnos) {
                 <div class="turno-info">
                     <div class="turno-cliente">${esc(t.cliente_nombre)}</div>
                     <div class="turno-servicio"><i class="fas fa-scissors" style="font-size:10px;margin-right:4px;"></i>${esc(servNombre)}</div>
+                    ${t.empleado_nombre ? `<div class="turno-tel"><i class="fas fa-user" style="font-size:10px;margin-right:4px;"></i>${esc(t.empleado_nombre)}</div>` : ''}
                     ${t.cliente_telefono ? `<div class="turno-tel"><i class="fas fa-phone" style="font-size:10px;margin-right:4px;"></i>${esc(t.cliente_telefono)}</div>` : ''}
                 </div>
                 <div>
@@ -474,6 +627,7 @@ function renderAgenda(turnos) {
                     <div style="margin-top:6px;"><span class="badge-turno st-${t.estado}">${LABELS[t.estado]||t.estado}</span></div>
                 </div>
                 <div class="turno-actions" onclick="event.stopPropagation()">
+                    ${t.cliente_telefono ? `<button class="t-btn t-btn-wa" title="Recordatorio WhatsApp" onclick="recordatorioWA('${t.cliente_telefono.replace(/'/g,'')}','${esc(t.cliente_nombre)}','${esc(t.servicio_nombre||'turno')}','${fmtFecha(t.fecha)}','${(t.hora_inicio||'').substring(0,5)}')"><i class="fab fa-whatsapp"></i></button>` : ''}
                     <button class="t-btn" title="Editar" onclick="editarTurno(${t.id})"><i class="fas fa-pencil"></i></button>
                     <button class="t-btn" title="Cancelar" onclick="cancelarTurno(${t.id})" style="color:#ef4444;border-color:rgba(239,68,68,.3);"><i class="fas fa-times"></i></button>
                 </div>
@@ -501,6 +655,7 @@ function abrirNuevo() {
     document.getElementById('tFecha').value      = fechaActual;
     document.getElementById('tHoraInicio').value = '09:00';
     document.getElementById('tEstado').value     = 'pendiente';
+    document.getElementById('tEmpleado').value   = '';
     document.getElementById('tNotas').value      = '';
     serviciosSeleccionados = [];
     renderServiciosSeleccionados();
@@ -525,6 +680,7 @@ async function editarTurno(id) {
     document.getElementById('tFecha').value      = t.fecha;
     document.getElementById('tHoraInicio').value = (t.hora_inicio||'').substring(0,5);
     document.getElementById('tEstado').value     = t.estado;
+    document.getElementById('tEmpleado').value   = t.empleado_id || '';
     document.getElementById('tNotas').value      = t.notas || '';
 
     // Cargar servicios: usar turno_servicios si existen, sino construir desde el campo simple
@@ -559,11 +715,13 @@ async function guardarTurno() {
     if (!fecha)   { alert('Elegí una fecha'); return; }
     if (!inicio)  { alert('Elegí la hora de inicio'); return; }
 
+    const empId = parseInt(document.getElementById('tEmpleado').value) || null;
     const body = {
         id:               id || undefined,
         cliente_id:       parseInt(document.getElementById('tClienteId').value) || null,
         cliente_nombre:   cliente,
         cliente_telefono: document.getElementById('tTelefono').value,
+        empleado_id:      empId,
         fecha,
         hora_inicio:      inicio,
         estado:           document.getElementById('tEstado').value,
@@ -587,7 +745,6 @@ async function verDetalle(id) {
     const d = await r.json();
     if (!d.success) return;
     const t = d.data;
-    const LABELS = { pendiente:'Pendiente',confirmado:'Confirmado',en_curso:'En curso',completado:'Completado',cancelado:'Cancelado',no_show:'No show' };
     document.getElementById('detNombre').textContent = t.cliente_nombre;
 
     // Mostrar servicios si hay múltiples, o el servicio simple
@@ -733,6 +890,7 @@ document.querySelectorAll('.modal-overlay').forEach(m => {
 
 document.getElementById('pickerFecha').value = fechaActual;
 cargarServicios();
+cargarEmpleados();
 cargarDia();
 </script>
 

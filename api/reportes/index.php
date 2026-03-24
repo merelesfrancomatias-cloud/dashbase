@@ -9,6 +9,7 @@ Middleware::method('GET');
 try {
     $db   = new Database();
     $conn = $db->getConnection();
+    PlanGuard::requireActive($negocioId, $conn);
 
     // Obtener parámetros
     $periodo = $_GET['periodo'] ?? 'mes';

@@ -14,6 +14,7 @@ if (!isset($_SESSION['user_id'])) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../../public/css/dashboard.css?v=<?= filemtime(__DIR__ . '/../../public/css/dashboard.css') ?>">
     <link rel="stylesheet" href="../../public/css/components.css?v=<?= filemtime(__DIR__ . '/../../public/css/components.css') ?>">
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
     <style>
         .badge-estado { display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600; }
         .badge-activo    { background:rgba(72,187,120,.15);color:#22c55e; }
@@ -40,6 +41,18 @@ if (!isset($_SESSION['user_id'])) {
         .btn-renew:hover { background:#22c55e;color:#fff; }
         .btn-edit  { background:rgba(66,153,225,.1);color:#4299e1; }
         .btn-edit:hover  { background:#4299e1;color:#fff; }
+        .btn-qr    { background:rgba(99,102,241,.1);color:#6366f1; }
+        .btn-qr:hover    { background:#6366f1;color:#fff; }
+        /* Modal QR */
+        .qr-wrap { display:inline-block;padding:14px;background:#fff;border-radius:14px;box-shadow:0 4px 20px rgba(0,0,0,.12); }
+        .qr-url  { margin-top:14px;background:rgba(0,0,0,.04);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--text-secondary);word-break:break-all;text-align:left; }
+        /* Banner por vencer */
+        .vencer-banner { background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:14px;padding:16px 20px;margin-bottom:24px; }
+        .vencer-banner-title { font-size:13px;font-weight:700;color:#d97706;margin-bottom:12px;display:flex;align-items:center;gap:7px; }
+        .vencer-item { display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(245,158,11,.1);font-size:13px; }
+        .vencer-item:last-child { border-bottom:none; }
+        .wa-btn { display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:rgba(37,211,102,.12);color:#22c55e;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap; }
+        .wa-btn:hover { background:#22c55e;color:#fff; }
         .modal-overlay { display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center;padding:20px; }
         .modal-overlay.open { display:flex; }
         .modal { background:var(--surface);border-radius:16px;width:100%;max-width:560px;max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2);border:1px solid var(--border); }
@@ -107,6 +120,12 @@ if (!isset($_SESSION['user_id'])) {
                 </div>
             </div>
 
+            <!-- Banner socios por vencer -->
+            <div class="vencer-banner" id="bannerVencer" style="display:none;">
+                <div class="vencer-banner-title"><i class="fas fa-triangle-exclamation"></i> Socios que vencen en los próximos 7 días</div>
+                <div id="vencerLista"></div>
+            </div>
+
             <div class="card">
                 <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
                     <div class="filter-tabs">
@@ -126,7 +145,7 @@ if (!isset($_SESSION['user_id'])) {
                         <table id="sociosTable" style="display:none;">
                             <thead><tr>
                                 <th>#</th><th>Socio</th><th>Teléfono</th>
-                                <th>Plan</th><th>Estado</th><th>Vencimiento</th><th>Acciones</th>
+                                <th>Plan</th><th>Estado</th><th>Vencimiento</th><th>QR</th><th>Acciones</th>
                             </tr></thead>
                             <tbody id="sociosTbody"></tbody>
                         </table>
@@ -254,10 +273,32 @@ if (!isset($_SESSION['user_id'])) {
     </div>
 </div>
 
+<!-- Modal QR -->
+<div class="modal-overlay" id="modalQR">
+    <div class="modal" style="max-width:400px;">
+        <div class="modal-header">
+            <h3><i class="fas fa-qrcode" style="color:#6366f1;margin-right:8px;"></i>QR Check-in</h3>
+            <button class="modal-close" onclick="cerrarModalQR()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body" style="text-align:center;">
+            <p id="qrSocioNombre" style="font-size:15px;font-weight:700;color:var(--text-primary);margin-bottom:4px;"></p>
+            <p style="font-size:12px;color:var(--text-secondary);margin-bottom:20px;">El socio escanea este código para hacer check-in</p>
+            <div class="qr-wrap"><div id="qrCanvas"></div></div>
+            <div class="qr-url" id="qrUrlText"></div>
+        </div>
+        <div class="modal-footer" style="justify-content:center;gap:10px;">
+            <button class="btn btn-secondary" onclick="descargarQR()"><i class="fas fa-download"></i> Descargar PNG</button>
+            <button class="btn btn-secondary" onclick="imprimirQR()"><i class="fas fa-print"></i> Imprimir</button>
+            <button class="btn btn-secondary" onclick="cerrarModalQR()">Cerrar</button>
+        </div>
+    </div>
+</div>
+
 <div class="toast" id="toast"><i class="fas fa-check-circle" style="color:var(--primary);"></i><span id="toastMsg"></span></div>
 
 <script>
 let socios = [], planes = [], filtroEstado = '', searchTimeout;
+const BASE = '/DASHBASE';
 
 async function init() {
     await cargarPlanes();
@@ -331,6 +372,11 @@ function renderTabla(lista) {
             <td>${badges[s.estado]||s.estado}</td>
             <td>${s.fecha_vencimiento?`<div style="font-size:13px;">${s.fecha_vencimiento}</div><div>${diasBadge}</div>`:'—'}</td>
             <td>
+                ${s.qr_token
+                    ? `<button class="btn-table btn-qr" title="Ver QR" onclick="abrirQR(${s.id})"><i class="fas fa-qrcode"></i></button>`
+                    : '<span style="color:var(--text-secondary);font-size:11px;">—</span>'}
+            </td>
+            <td>
                 <div class="action-btns">
                     <button class="btn-table btn-asist" title="Check-in" onclick="regAsist(${s.id},'${s.nombre} ${s.apellido}')"><i class="fas fa-fingerprint"></i></button>
                     <button class="btn-table btn-renew" title="Renovar"  onclick="abrirRenovar(${s.id},'${s.nombre} ${s.apellido}',${s.plan_id||0})"><i class="fas fa-rotate"></i></button>
@@ -339,6 +385,29 @@ function renderTabla(lista) {
             </td>
         </tr>`;
     }).join('');
+
+    // Banner por vencer (dentro de 7 días)
+    const porVencer = socios.filter(s => s.estado === 'activo' && s.dias_restantes !== null && parseInt(s.dias_restantes) >= 0 && parseInt(s.dias_restantes) <= 7);
+    const banner = document.getElementById('bannerVencer');
+    if (porVencer.length) {
+        document.getElementById('vencerLista').innerHTML = porVencer.map(s => {
+            const tel = (s.telefono || '').replace(/\D/g,'');
+            const waLink = tel ? `<a class="wa-btn" href="https://wa.me/${tel}?text=${encodeURIComponent('Hola '+s.nombre+'! Tu membresía vence el '+s.fecha_vencimiento+'. ¿Querés renovar?')}" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>` : '';
+            return `<div class="vencer-item">
+                <div>
+                    <span style="font-weight:600;color:var(--text-primary);">${s.nombre} ${s.apellido}</span>
+                    <span style="color:var(--text-secondary);margin-left:8px;font-size:12px;">${s.plan_nombre||''}</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span style="font-size:12px;font-weight:700;color:#d97706;">Vence: ${s.fecha_vencimiento}</span>
+                    ${waLink}
+                </div>
+            </div>`;
+        }).join('');
+        banner.style.display = 'block';
+    } else {
+        banner.style.display = 'none';
+    }
 }
 
 function onSearch(v) {
@@ -464,8 +533,57 @@ function showToast(msg, error = false) {
     setTimeout(() => t.classList.remove('show'), 3500);
 }
 
-document.addEventListener('keydown', e => { if (e.key === 'Escape') { cerrarModal(); cerrarModalRenovar(); } });
-document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('click', e => { if (e.target === m) { cerrarModal(); cerrarModalRenovar(); } }));
+// ── QR Check-in ──────────────────────────────────────────────────────────────
+let qrInstance = null;
+
+function abrirQR(id) {
+    const s = socios.find(x => x.id == id);
+    if (!s || !s.qr_token) return;
+
+    const url = `${location.origin}${BASE}/views/gym/checkin.php?token=${s.qr_token}`;
+    document.getElementById('qrSocioNombre').textContent = `${s.nombre} ${s.apellido}`;
+    document.getElementById('qrUrlText').textContent = url;
+
+    // Limpiar QR anterior
+    const canvas = document.getElementById('qrCanvas');
+    canvas.innerHTML = '';
+    qrInstance = new QRCode(canvas, {
+        text: url, width: 200, height: 200,
+        colorDark: '#0f172a', colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.H
+    });
+
+    document.getElementById('modalQR').classList.add('open');
+}
+
+function cerrarModalQR() { document.getElementById('modalQR').classList.remove('open'); }
+
+function descargarQR() {
+    const c = document.querySelector('#qrCanvas canvas');
+    if (!c) return;
+    const a = document.createElement('a');
+    a.download = 'qr-checkin.png';
+    a.href = c.toDataURL('image/png');
+    a.click();
+}
+
+function imprimirQR() {
+    const c = document.querySelector('#qrCanvas canvas');
+    const nombre = document.getElementById('qrSocioNombre').textContent;
+    if (!c) return;
+    const w = window.open('', '_blank', 'width=400,height=500');
+    w.document.write(`<!DOCTYPE html><html><head><title>QR Check-in</title>
+        <style>body{font-family:sans-serif;text-align:center;padding:30px;}h2{margin-bottom:8px;}p{color:#64748b;font-size:13px;margin-bottom:20px;}@media print{button{display:none;}}</style>
+        </head><body>
+        <h2>${nombre}</h2><p>Escaneá para registrar tu entrada</p>
+        <img src="${c.toDataURL()}" width="200" height="200"><br>
+        <button onclick="window.print()" style="margin-top:20px;padding:8px 20px;cursor:pointer;">Imprimir</button>
+        </body></html>`);
+    w.document.close();
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { cerrarModal(); cerrarModalRenovar(); cerrarModalQR(); } });
+document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('click', e => { if (e.target === m) { cerrarModal(); cerrarModalRenovar(); cerrarModalQR(); } }));
 
 init();
 </script>

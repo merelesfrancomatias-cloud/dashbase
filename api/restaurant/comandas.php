@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../bootstrap.php';
 [$negocioId, $usuarioId] = Middleware::auth();
 $pdo    = (new Database())->getConnection();
+PlanGuard::requireActive($negocioId, $pdo);
 $method = $_SERVER['REQUEST_METHOD'];
 
 /* ─── helpers ──────────────────────────────────────────────── */
@@ -189,12 +190,16 @@ if ($method === 'POST') {
         if (empty($d['comanda_id'])) Response::error('comanda_id requerido', 400);
         $cid = (int)$d['comanda_id'];
 
-        $comanda = $pdo->query("SELECT * FROM restaurant_comandas WHERE id={$cid} AND negocio_id={$negocioId}")->fetch(PDO::FETCH_ASSOC);
+        $stmtCmd = $pdo->prepare("SELECT * FROM restaurant_comandas WHERE id=:id AND negocio_id=:nid");
+        $stmtCmd->execute([':id' => $cid, ':nid' => $negocioId]);
+        $comanda = $stmtCmd->fetch(PDO::FETCH_ASSOC);
         if (!$comanda) Response::error('Comanda no encontrada', 404);
 
         // Recalcular subtotal antes de cobrar (por si quedó desactualizado)
         recalcularComanda($pdo, $cid);
-        $comanda = $pdo->query("SELECT * FROM restaurant_comandas WHERE id={$cid}")->fetch(PDO::FETCH_ASSOC);
+        $stmtCmd2 = $pdo->prepare("SELECT * FROM restaurant_comandas WHERE id=:id");
+        $stmtCmd2->execute([':id' => $cid]);
+        $comanda = $stmtCmd2->fetch(PDO::FETCH_ASSOC);
 
         $metodoPago = $d['metodo_pago'] ?? 'efectivo';
         $descuento  = (float)($d['descuento'] ?? 0);
@@ -218,7 +223,9 @@ if ($method === 'POST') {
         $ventaId = $pdo->lastInsertId();
 
         // Copiar ítems a detalle_ventas
-        $items = $pdo->query("SELECT * FROM restaurant_comanda_items WHERE comanda_id={$cid} AND estado_cocina != 'cancelado'")->fetchAll(PDO::FETCH_ASSOC);
+        $stmtItems = $pdo->prepare("SELECT * FROM restaurant_comanda_items WHERE comanda_id=:cid AND estado_cocina != 'cancelado'");
+        $stmtItems->execute([':cid' => $cid]);
+        $items = $stmtItems->fetchAll(PDO::FETCH_ASSOC);
         $stmtDV = $pdo->prepare("INSERT INTO detalle_ventas (venta_id, producto_id, cantidad, precio_unitario, subtotal) VALUES (:vid, :pid, :cant, :precio, :sub)");
         foreach ($items as $item) {
             if (empty($item['producto_id'])) continue;
@@ -267,7 +274,9 @@ if ($method === 'PUT') {
         // Actualizar estado de la comanda si todos los ítems están listos
         if (!empty($d['comanda_id'])) {
             $cid     = (int)$d['comanda_id'];
-            $pending = $pdo->query("SELECT COUNT(*) FROM restaurant_comanda_items WHERE comanda_id={$cid} AND estado_cocina IN ('pendiente','en_preparacion')")->fetchColumn();
+            $stmtPend = $pdo->prepare("SELECT COUNT(*) FROM restaurant_comanda_items WHERE comanda_id=:cid AND estado_cocina IN ('pendiente','en_preparacion')");
+            $stmtPend->execute([':cid' => $cid]);
+            $pending = $stmtPend->fetchColumn();
             if ($pending == 0) {
                 $pdo->prepare("UPDATE restaurant_comandas SET estado='lista' WHERE id=:id AND estado='en_cocina'")
                     ->execute([':id' => $cid]);

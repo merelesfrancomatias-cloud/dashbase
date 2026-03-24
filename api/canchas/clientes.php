@@ -7,6 +7,7 @@ Middleware::method($_SERVER['REQUEST_METHOD']);
 [$negocioId, $userId] = Middleware::auth();
 
 $db = (new Database())->getConnection();
+PlanGuard::requireActive($negocioId, $db);
 
 $method = $_SERVER['REQUEST_METHOD'];
 

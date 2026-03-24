@@ -270,12 +270,17 @@ function renderServicios(lista) {
 
 function renderEmpleados(lista) {
     if (!lista.length) { document.getElementById('tablaEmpleados').innerHTML = `<div class="rep-empty"><i class="fas fa-user-tie"></i><p>Sin empleados registrados en turnos</p></div>`; return; }
-    let html = '<div style="overflow-x:auto"><table class="rep-table"><thead><tr><th>Empleado</th><th>Turnos</th><th style="text-align:right">Ingresos</th></tr></thead><tbody>';
+    let html = '<div style="overflow-x:auto"><table class="rep-table"><thead><tr><th>Empleado</th><th>Turnos</th><th style="text-align:right">Ingresos</th><th style="text-align:right">Comisión</th></tr></thead><tbody>';
     lista.forEach(e => {
+        const tieneComision = parseFloat(e.comision_estimada||0) > 0;
         html += `<tr>
-            <td style="font-weight:600">${esc(e.empleado)}</td>
+            <td>
+                <div style="font-weight:700;">${esc(e.empleado)}</div>
+                ${e.cargo ? `<div style="font-size:11px;color:var(--text-secondary)">${esc(e.cargo)}</div>` : ''}
+            </td>
             <td><span style="font-size:12px;color:var(--text-secondary)">${e.completados}/${e.turnos} completados</span></td>
             <td style="text-align:right;font-weight:700;color:#8b5cf6">${$m(e.ingresos)}</td>
+            <td style="text-align:right;font-weight:700;color:${tieneComision?'#16a34a':'#94a3b8'}">${tieneComision ? $m(e.comision_estimada) : '—'}</td>
         </tr>`;
     });
     html += '</tbody></table></div>';

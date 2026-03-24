@@ -9,6 +9,7 @@ $isAdmin = Auth::isAdmin();
 
 $database = new Database();
 $db = $database->getConnection();
+PlanGuard::requireActive($negocioId, $db);
 
 try {
     switch ($method) {

@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../bootstrap.php';
 [$negocioId, $usuarioId] = Middleware::auth();
 $pdo  = (new Database())->getConnection();
+PlanGuard::requireActive($negocioId, $pdo);
 $tipo = $_GET['tipo'] ?? 'resumen';
 
 // Rango de fechas (default: últimos 30 días)
