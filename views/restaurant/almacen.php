@@ -133,6 +133,8 @@ $base = rtrim(str_replace(str_replace(chr(92),chr(47),$_SERVER['DOCUMENT_ROOT'])
       <button class="alm-tab on" onclick="tab('insumos',this)"><i class="fas fa-boxes"></i> Insumos</button>
       <button class="alm-tab"    onclick="tab('compras',this)"><i class="fas fa-receipt"></i> Compras</button>
       <button class="alm-tab"    onclick="tab('costos',this)"><i class="fas fa-calculator"></i> Costo por plato</button>
+      <button class="alm-tab"    onclick="tab('mermas',this)"><i class="fas fa-trash-alt"></i> Mermas</button>
+      <button class="alm-tab"    onclick="tab('proveedores',this)"><i class="fas fa-truck"></i> Proveedores</button>
     </div>
 
     <!-- ══ Tab Insumos ══ -->
@@ -185,6 +187,45 @@ $base = rtrim(str_replace(str_replace(chr(92),chr(47),$_SERVER['DOCUMENT_ROOT'])
               <tr><th>Plato</th><th>Categoría</th><th>Precio venta</th><th>Costo calculado</th><th>Margen</th><th>Ingredientes</th><th></th></tr>
             </thead>
             <tbody id="tbCostos"><tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text-secondary);">Cargando…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ Tab Mermas ══ -->
+    <div class="alm-panel" id="panel-mermas">
+      <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center;">
+        <input type="date" class="form-control" id="mDesde" style="max-width:160px;">
+        <input type="date" class="form-control" id="mHasta" style="max-width:160px;">
+        <button class="btn btn-outline btn-sm" onclick="cargarMermas()"><i class="fas fa-filter"></i> Filtrar</button>
+        <span id="mCostoTotal" style="font-size:15px;font-weight:700;color:#dc2626;margin-left:auto;"></span>
+        <button class="btn btn-primary btn-sm" onclick="abrirModalMerma()"><i class="fas fa-plus"></i> Registrar merma</button>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div class="alm-table-wrap">
+          <table class="alm-table">
+            <thead>
+              <tr><th>Fecha</th><th>Insumo</th><th>Cantidad</th><th>Motivo</th><th>Costo pérdida</th><th>Descripción</th><th>Usuario</th><th></th></tr>
+            </thead>
+            <tbody id="tbMermas"><tr><td colspan="8" style="text-align:center;padding:32px;color:var(--text-secondary);">Cargando…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ Tab Proveedores ══ -->
+    <div class="alm-panel" id="panel-proveedores">
+      <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center;">
+        <input type="text" class="form-control" id="filtroProv" placeholder="Buscar proveedor…" oninput="renderProveedores()" style="max-width:260px;">
+        <button class="btn btn-primary btn-sm" style="margin-left:auto;" onclick="abrirModalProveedor()"><i class="fas fa-plus"></i> Nuevo proveedor</button>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div class="alm-table-wrap">
+          <table class="alm-table">
+            <thead>
+              <tr><th>Nombre</th><th>Contacto</th><th>Teléfono</th><th>Email</th><th>Compras</th><th>Total gastado</th><th></th></tr>
+            </thead>
+            <tbody id="tbProveedores"><tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text-secondary);">Cargando…</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -264,7 +305,7 @@ $base = rtrim(str_replace(str_replace(chr(92),chr(47),$_SERVER['DOCUMENT_ROOT'])
       <div class="form-row"><label>Precio unit. *</label><input type="number" id="mc-precio" step="0.01" placeholder="0.00" oninput="calcTotal()"></div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-      <div class="form-row"><label>Proveedor</label><input type="text" id="mc-prov" placeholder="Nombre del proveedor"></div>
+      <div class="form-row"><label>Proveedor</label><select id="mc-prov"><option value="">Sin proveedor</option></select></div>
       <div class="form-row"><label>Fecha *</label><input type="date" id="mc-fecha"></div>
     </div>
     <div class="form-row"><label>Notas</label><textarea id="mc-notas" rows="2" style="resize:vertical;"></textarea></div>
@@ -279,13 +320,62 @@ $base = rtrim(str_replace(str_replace(chr(92),chr(47),$_SERVER['DOCUMENT_ROOT'])
   </div>
 </div>
 
+<!-- Modal Merma -->
+<div class="modal-overlay" id="modalMerma">
+  <div class="modal-box">
+    <div class="modal-title">Registrar merma</div>
+    <div class="form-row"><label>Insumo *</label><select id="mm-insumo"></select></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div class="form-row"><label>Cantidad *</label><input type="number" id="mm-cant" step="0.01" placeholder="0"></div>
+      <div class="form-row"><label>Fecha *</label><input type="date" id="mm-fecha"></div>
+    </div>
+    <div class="form-row"><label>Motivo</label>
+      <select id="mm-motivo">
+        <option value="vencimiento">Vencimiento</option>
+        <option value="preparacion">Error de preparación</option>
+        <option value="accidente">Accidente</option>
+        <option value="robo">Robo / Pérdida</option>
+        <option value="otro">Otro</option>
+      </select>
+    </div>
+    <div class="form-row"><label>Descripción</label><textarea id="mm-desc" rows="2" style="resize:vertical;"></textarea></div>
+    <div class="form-actions">
+      <button class="btn btn-outline" onclick="cerrarModal('modalMerma')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarMerma()"><i class="fas fa-check"></i> Registrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Proveedor -->
+<div class="modal-overlay" id="modalProveedor">
+  <div class="modal-box">
+    <div class="modal-title" id="mp-titulo">Nuevo proveedor</div>
+    <input type="hidden" id="mp-id">
+    <div class="form-row"><label>Nombre *</label><input type="text" id="mp-nombre" placeholder="Distribuidora XYZ…"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div class="form-row"><label>Contacto</label><input type="text" id="mp-contacto" placeholder="Nombre contacto"></div>
+      <div class="form-row"><label>Teléfono</label><input type="text" id="mp-tel" placeholder="+54 11 …"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div class="form-row"><label>Email</label><input type="email" id="mp-email" placeholder="proveedor@mail.com"></div>
+      <div class="form-row"><label>Dirección</label><input type="text" id="mp-dir" placeholder="Calle, ciudad…"></div>
+    </div>
+    <div class="form-row"><label>Notas</label><textarea id="mp-notas" rows="2" style="resize:vertical;"></textarea></div>
+    <div class="form-actions">
+      <button class="btn btn-outline" onclick="cerrarModal('modalProveedor')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarProveedor()"><i class="fas fa-save"></i> Guardar</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const BASE = window.APP_BASE;
 let insumos = [], platoActual = null, recetaActual = [];
+let proveedores = [], mermas = [];
 
 // ── Init ───────────────────────────────────────────
 async function init() {
-  await Promise.all([cargarResumen(), cargarInsumos()]);
+  await Promise.all([cargarResumen(), cargarInsumos(), cargarProveedores()]);
 }
 
 // ── Tabs ───────────────────────────────────────────
@@ -294,8 +384,10 @@ function tab(id, el) {
   document.querySelectorAll('.alm-panel').forEach(p=>p.classList.remove('on'));
   el.classList.add('on');
   document.getElementById('panel-'+id).classList.add('on');
-  if (id==='compras') cargarCompras();
-  if (id==='costos')  cargarCostos();
+  if (id==='compras')    cargarCompras();
+  if (id==='costos')     cargarCostos();
+  if (id==='mermas')     cargarMermas();
+  if (id==='proveedores') renderProveedores();
 }
 
 // ── Stats ──────────────────────────────────────────
@@ -555,8 +647,11 @@ async function confirmarEliminarInsumo(id, nombre) {
 function abrirModalCompra() {
   const sel = document.getElementById('mc-insumo');
   sel.innerHTML = insumos.map(i=>`<option value="${i.id}" data-precio="${i.precio_unitario}">${esc(i.nombre)} (${esc(i.unidad)})</option>`).join('');
+  const sp = document.getElementById('mc-prov');
+  sp.innerHTML = '<option value="">Sin proveedor</option>' +
+    proveedores.map(p=>`<option value="${p.id}">${esc(p.nombre)}</option>`).join('');
   document.getElementById('mc-fecha').value = new Date().toISOString().slice(0,10);
-  ['mc-cant','mc-prov','mc-notas'].forEach(id=>document.getElementById(id).value='');
+  ['mc-cant','mc-notas'].forEach(id=>document.getElementById(id).value='');
   actualizarPrecioRef();
   document.getElementById('modalCompra').classList.add('show');
 }
@@ -582,10 +677,11 @@ async function guardarCompra() {
   if (!iid||isNaN(cant)||cant<=0||isNaN(precio)||precio<0||!fecha) {
     showToast('Completá todos los campos obligatorios','error'); return;
   }
+  const provSel = document.getElementById('mc-prov').value;
   const r = await fetch(`${BASE}/api/restaurant/almacen.php?entity=compras`,{
     method:'POST',headers:{'Content-Type':'application/json'},
     body:JSON.stringify({insumo_id:iid,cantidad:cant,precio_unitario:precio,fecha,
-      proveedor:document.getElementById('mc-prov').value,
+      proveedor_id: provSel ? parseInt(provSel) : null,
       notas:document.getElementById('mc-notas').value})
   });
   const d = await r.json();
@@ -605,6 +701,156 @@ async function eliminarCompra(id) {
   cargarCompras(); cargarResumen(); cargarInsumos();
 }
 
+// ── Mermas ─────────────────────────────────────────
+async function cargarMermas() {
+  const desde = document.getElementById('mDesde').value;
+  const hasta = document.getElementById('mHasta').value;
+  let url = `${BASE}/api/restaurant/mermas.php`;
+  const qs = [];
+  if (desde) qs.push('desde='+desde);
+  if (hasta) qs.push('hasta='+hasta);
+  if (qs.length) url += '?'+qs.join('&');
+  const r = await fetch(url);
+  const d = await r.json();
+  if (!d.success) return;
+  mermas = d.data.mermas;
+  document.getElementById('mCostoTotal').textContent = 'Pérdida: ' + fmt(d.data.costo_total_perdida);
+  const tb = document.getElementById('tbMermas');
+  if (!mermas.length) { tb.innerHTML=`<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--text-secondary);">Sin mermas en el período</td></tr>`; return; }
+  const motivoLabel = {vencimiento:'Vencimiento',preparacion:'Preparación',accidente:'Accidente',robo:'Robo',otro:'Otro'};
+  tb.innerHTML = mermas.map(m=>`<tr>
+    <td>${m.fecha}</td>
+    <td><strong>${esc(m.insumo_nombre)}</strong> <span style="font-size:11px;color:var(--text-secondary)">${esc(m.unidad)}</span></td>
+    <td>${num(m.cantidad)}</td>
+    <td><span style="background:rgba(220,38,38,.1);color:#dc2626;padding:2px 8px;border-radius:99px;font-size:12px;font-weight:600;">${motivoLabel[m.motivo]||m.motivo}</span></td>
+    <td style="color:#dc2626;font-weight:700;">${fmt(m.costo_perdida)}</td>
+    <td style="color:var(--text-secondary);font-size:12px;">${esc(m.descripcion||'—')}</td>
+    <td style="color:var(--text-secondary)">${esc(m.usuario_nombre||'—')}</td>
+    <td><button class="btn btn-outline btn-sm" onclick="eliminarMerma(${m.id})" title="Eliminar"><i class="fas fa-trash" style="color:var(--error)"></i></button></td>
+  </tr>`).join('');
+}
+
+function abrirModalMerma() {
+  const sel = document.getElementById('mm-insumo');
+  sel.innerHTML = insumos.map(i=>`<option value="${i.id}">${esc(i.nombre)} (${esc(i.unidad)})</option>`).join('');
+  document.getElementById('mm-cant').value  = '';
+  document.getElementById('mm-desc').value  = '';
+  document.getElementById('mm-motivo').value = 'vencimiento';
+  document.getElementById('mm-fecha').value  = new Date().toISOString().slice(0,10);
+  document.getElementById('modalMerma').classList.add('show');
+}
+
+async function guardarMerma() {
+  const iid  = document.getElementById('mm-insumo').value;
+  const cant = parseFloat(document.getElementById('mm-cant').value);
+  const fecha = document.getElementById('mm-fecha').value;
+  if (!iid || isNaN(cant) || cant<=0 || !fecha) { showToast('Completá insumo, cantidad y fecha','error'); return; }
+  const r = await fetch(`${BASE}/api/restaurant/mermas.php`,{
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({
+      insumo_id: parseInt(iid), cantidad: cant, fecha,
+      motivo: document.getElementById('mm-motivo').value,
+      descripcion: document.getElementById('mm-desc').value,
+    })
+  });
+  const d = await r.json();
+  if (d.success) {
+    cerrarModal('modalMerma');
+    showToast('Merma registrada','success');
+    cargarMermas(); cargarInsumos(); cargarResumen();
+  } else { showToast(d.message||'Error','error'); }
+}
+
+async function eliminarMerma(id) {
+  if (!confirm('¿Eliminar esta merma? Se revertirá el stock.')) return;
+  await fetch(`${BASE}/api/restaurant/mermas.php?id=${id}`,{method:'DELETE'});
+  showToast('Merma eliminada','success');
+  cargarMermas(); cargarInsumos(); cargarResumen();
+}
+
+// ── Proveedores ─────────────────────────────────────
+async function cargarProveedores() {
+  const r = await fetch(`${BASE}/api/restaurant/proveedores.php`);
+  const d = await r.json();
+  if (!d.success) return;
+  proveedores = d.data;
+  renderProveedores();
+}
+
+function renderProveedores() {
+  const q   = (document.getElementById('filtroProv')?.value||'').toLowerCase();
+  const fil = q ? proveedores.filter(p=>p.nombre.toLowerCase().includes(q)||(p.contacto||'').toLowerCase().includes(q)) : proveedores;
+  const tb  = document.getElementById('tbProveedores');
+  if (!fil.length) { tb.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text-secondary);">Sin proveedores</td></tr>`; return; }
+  tb.innerHTML = fil.map(p=>`<tr>
+    <td><strong>${esc(p.nombre)}</strong></td>
+    <td style="color:var(--text-secondary)">${esc(p.contacto||'—')}</td>
+    <td style="color:var(--text-secondary)">${esc(p.telefono||'—')}</td>
+    <td style="color:var(--text-secondary)">${esc(p.email||'—')}</td>
+    <td style="text-align:center"><span style="font-size:12px;background:var(--background);padding:2px 8px;border-radius:99px;">${p.total_compras}</span></td>
+    <td><strong style="color:var(--primary)">${fmt(p.total_gastado)}</strong></td>
+    <td>
+      <div style="display:flex;gap:6px;">
+        <button class="btn btn-outline btn-sm" onclick="editarProveedor(${p.id})" title="Editar"><i class="fas fa-edit"></i></button>
+        <button class="btn btn-outline btn-sm" onclick="eliminarProveedor(${p.id},'${esc(p.nombre)}')" title="Eliminar"><i class="fas fa-trash" style="color:var(--error)"></i></button>
+      </div>
+    </td>
+  </tr>`).join('');
+}
+
+function abrirModalProveedor() {
+  document.getElementById('mp-titulo').textContent = 'Nuevo proveedor';
+  document.getElementById('mp-id').value = '';
+  ['mp-nombre','mp-contacto','mp-tel','mp-email','mp-dir','mp-notas'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('modalProveedor').classList.add('show');
+}
+
+function editarProveedor(id) {
+  const p = proveedores.find(x=>x.id==id);
+  if (!p) return;
+  document.getElementById('mp-titulo').textContent = 'Editar proveedor';
+  document.getElementById('mp-id').value       = p.id;
+  document.getElementById('mp-nombre').value   = p.nombre;
+  document.getElementById('mp-contacto').value = p.contacto||'';
+  document.getElementById('mp-tel').value      = p.telefono||'';
+  document.getElementById('mp-email').value    = p.email||'';
+  document.getElementById('mp-dir').value      = p.direccion||'';
+  document.getElementById('mp-notas').value    = p.notas||'';
+  document.getElementById('modalProveedor').classList.add('show');
+}
+
+async function guardarProveedor() {
+  const id     = document.getElementById('mp-id').value;
+  const nombre = document.getElementById('mp-nombre').value.trim();
+  if (!nombre) { showToast('El nombre es requerido','error'); return; }
+  const body = {
+    nombre,
+    contacto:  document.getElementById('mp-contacto').value.trim(),
+    telefono:  document.getElementById('mp-tel').value.trim(),
+    email:     document.getElementById('mp-email').value.trim(),
+    direccion: document.getElementById('mp-dir').value.trim(),
+    notas:     document.getElementById('mp-notas').value.trim(),
+  };
+  if (id) body.id = parseInt(id);
+  const method = id ? 'PUT' : 'POST';
+  const r = await fetch(`${BASE}/api/restaurant/proveedores.php`,{
+    method, headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)
+  });
+  const d = await r.json();
+  if (d.success) {
+    cerrarModal('modalProveedor');
+    showToast(id?'Proveedor actualizado':'Proveedor creado','success');
+    await cargarProveedores();
+  } else { showToast(d.message||'Error','error'); }
+}
+
+async function eliminarProveedor(id, nombre) {
+  if (!confirm(`¿Eliminar proveedor "${nombre}"?`)) return;
+  await fetch(`${BASE}/api/restaurant/proveedores.php?id=${id}`,{method:'DELETE'});
+  showToast('Proveedor eliminado','success');
+  cargarProveedores();
+}
+
 // ── Helpers ────────────────────────────────────────
 function cerrarModal(id) { document.getElementById(id).classList.remove('show'); }
 function fmt(n){ return '$'+Number(n||0).toLocaleString('es-AR',{minimumFractionDigits:0}); }
@@ -621,10 +867,14 @@ function showToast(msg,type='success'){
   setTimeout(()=>t.remove(),3500);
 }
 
-// Inicializar filtro de fechas (mes actual)
+// Inicializar filtros de fechas (mes actual)
 const hoy=new Date();
-document.getElementById('filtroDesde').value=hoy.getFullYear()+'-'+(hoy.getMonth()+1+'').padStart(2,'0')+'-01';
-document.getElementById('filtroHasta').value=hoy.toISOString().slice(0,10);
+const primerDiaMes=hoy.getFullYear()+'-'+(hoy.getMonth()+1+'').padStart(2,'0')+'-01';
+const hoyStr=hoy.toISOString().slice(0,10);
+document.getElementById('filtroDesde').value=primerDiaMes;
+document.getElementById('filtroHasta').value=hoyStr;
+document.getElementById('mDesde').value=primerDiaMes;
+document.getElementById('mHasta').value=hoyStr;
 
 init();
 </script>

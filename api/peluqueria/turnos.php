@@ -136,9 +136,24 @@ if ($method === 'PUT') {
     $id = (int)($d['id'] ?? 0);
     if (!$id) { Response::error('ID requerido', 400); exit; }
 
-    // Solo cambio de estado
-    if (isset($d['estado']) && count($d) === 2) {
-        $pdo->prepare("UPDATE turnos SET estado=? WHERE id=? AND negocio_id=?")->execute([$d['estado'], $id, $negocioId]);
+    // Solo cambio de estado (con metodo_pago opcional)
+    if (isset($d['estado']) && count($d) <= 3) {
+        $metodo = $d['metodo_pago'] ?? null;
+        if ($metodo) {
+            $pdo->prepare("UPDATE turnos SET estado=?, metodo_pago=? WHERE id=? AND negocio_id=?")->execute([$d['estado'], $metodo, $id, $negocioId]);
+            // Actualizar estadísticas del cliente
+            if ($d['estado'] === 'completado') {
+                $row = $pdo->prepare("SELECT cliente_id FROM turnos WHERE id=?");
+                $row->execute([$id]);
+                $clienteId = (int)($row->fetchColumn() ?? 0);
+                if ($clienteId) {
+                    $pdo->prepare("UPDATE clientes_peluqueria SET total_visitas=total_visitas+1, ultima_visita=CURDATE() WHERE id=? AND negocio_id=?")
+                        ->execute([$clienteId, $negocioId]);
+                }
+            }
+        } else {
+            $pdo->prepare("UPDATE turnos SET estado=? WHERE id=? AND negocio_id=?")->execute([$d['estado'], $id, $negocioId]);
+        }
         Response::success('Estado actualizado', []);
         exit;
     }

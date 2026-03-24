@@ -501,6 +501,7 @@ $base = rtrim(str_replace(str_replace(chr(92), chr(47), $_SERVER['DOCUMENT_ROOT'
         <div class="total-row grand"><span>TOTAL</span><span id="cpTotal">$0,00</span></div>
         <div class="cp-actions">
             <button class="cp-btn cp-btn-sec" onclick="cerrarPanel()" title="Volver"><i class="fas fa-arrow-left"></i></button>
+            <button class="cp-btn cp-btn-sec" id="btnPrint" onclick="imprimirComanda()" title="Imprimir comanda"><i class="fas fa-print"></i></button>
             <button class="cp-btn cp-btn-cocina" id="btnCocina" onclick="enviarCocina()"><i class="fas fa-fire"></i> Cocina</button>
             <button class="cp-btn cp-btn-cobrar" id="btnCobrar" onclick="abrirCobro()"><i class="fas fa-cash-register"></i> Cobrar</button>
         </div>
@@ -509,16 +510,32 @@ $base = rtrim(str_replace(str_replace(chr(92), chr(47), $_SERVER['DOCUMENT_ROOT'
 
 <!-- Modal cobrar -->
 <div class="modal-overlay" id="modalCobrar">
-    <div class="modal-box">
+    <div class="modal-box" style="max-width:480px;">
         <div class="modal-title"><i class="fas fa-cash-register" style="color:var(--primary);margin-right:8px;"></i>Cobrar</div>
+
+        <!-- Resumen -->
         <div class="modal-row"><span>Mesa</span><span id="mc_mesa">—</span></div>
         <div class="modal-row"><span>Comanda</span><span id="mc_num">#—</span></div>
         <div class="modal-row"><span>Subtotal</span><span id="mc_sub">$0</span></div>
         <div class="modal-row"><span>Descuento</span><span id="mc_desc">$0</span></div>
-        <div class="modal-row total"><span>Total</span><span id="mc_total">$0</span></div>
-        <div style="margin-top:16px;">
+        <div class="modal-row total"><span>TOTAL</span><span id="mc_total">$0</span></div>
+
+        <!-- Tabs pago -->
+        <div style="display:flex;gap:0;background:var(--background);border-radius:10px;padding:4px;margin:16px 0 14px;">
+            <button id="tabUnico" onclick="setTabCobro('unico')"
+                style="flex:1;padding:8px;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;background:var(--primary);color:#fff;transition:.15s;">
+                <i class="fas fa-credit-card"></i> Pago único
+            </button>
+            <button id="tabSplit" onclick="setTabCobro('split')"
+                style="flex:1;padding:8px;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;background:transparent;color:var(--text-secondary);transition:.15s;">
+                <i class="fas fa-people-group"></i> Dividir cuenta
+            </button>
+        </div>
+
+        <!-- Pago único -->
+        <div id="panelUnico">
             <label style="font-size:12px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;">Método de pago</label>
-            <select id="mc_metodo" style="width:100%;margin-top:6px;padding:10px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;">
+            <select id="mc_metodo" style="width:100%;margin-top:6px;padding:10px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;background:var(--background);color:var(--text-primary);">
                 <option value="efectivo">Efectivo</option>
                 <option value="tarjeta_debito">Tarjeta Débito</option>
                 <option value="tarjeta_credito">Tarjeta Crédito</option>
@@ -526,7 +543,26 @@ $base = rtrim(str_replace(str_replace(chr(92), chr(47), $_SERVER['DOCUMENT_ROOT'
                 <option value="mercado_pago">Mercado Pago</option>
             </select>
         </div>
-        <div style="display:flex;gap:10px;margin-top:20px;">
+
+        <!-- Split -->
+        <div id="panelSplit" style="display:none;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+                <label style="font-size:13px;font-weight:600;color:var(--text-secondary);white-space:nowrap;">Dividir en</label>
+                <div style="display:flex;align-items:center;gap:6px;">
+                    <button onclick="cambiarPartes(-1)" style="width:30px;height:30px;border:1.5px solid var(--border);border-radius:8px;background:var(--surface);cursor:pointer;font-size:16px;font-weight:700;color:var(--text-primary);">−</button>
+                    <span id="splitNumPartes" style="font-size:18px;font-weight:800;color:var(--text-primary);min-width:24px;text-align:center;">2</span>
+                    <button onclick="cambiarPartes(1)"  style="width:30px;height:30px;border:1.5px solid var(--border);border-radius:8px;background:var(--surface);cursor:pointer;font-size:16px;font-weight:700;color:var(--text-primary);">+</button>
+                </div>
+                <span style="font-size:12px;color:var(--text-secondary);">partes</span>
+            </div>
+            <div id="splitPartes" style="display:flex;flex-direction:column;gap:8px;"></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--background);">
+                <span style="font-size:13px;color:var(--text-secondary);">Restante sin asignar</span>
+                <span id="splitRestante" style="font-size:16px;font-weight:800;color:#10b981;">$0</span>
+            </div>
+        </div>
+
+        <div style="display:flex;gap:10px;margin-top:18px;">
             <button class="cp-btn cp-btn-sec" style="flex:0 0 auto;padding:11px 18px;" onclick="cerrarModal()">Cancelar</button>
             <button class="cp-btn cp-btn-cobrar" onclick="confirmarCobro()"><i class="fas fa-check"></i> Confirmar cobro</button>
         </div>
@@ -1064,38 +1100,140 @@ async function enviarCocina() {
 }
 
 /* ── COBRAR ───────────────────────────────────────────── */
+let splitPartes  = 2;
+let cobrarTotal  = 0;
+let tabCobroActual = 'unico';
+
+function setTabCobro(tab) {
+    tabCobroActual = tab;
+    const esUnico = tab === 'unico';
+    document.getElementById('panelUnico').style.display = esUnico ? '' : 'none';
+    document.getElementById('panelSplit').style.display = esUnico ? 'none' : '';
+    document.getElementById('tabUnico').style.background = esUnico ? 'var(--primary)' : 'transparent';
+    document.getElementById('tabUnico').style.color      = esUnico ? '#fff' : 'var(--text-secondary)';
+    document.getElementById('tabSplit').style.background = esUnico ? 'transparent' : 'var(--primary)';
+    document.getElementById('tabSplit').style.color      = esUnico ? 'var(--text-secondary)' : '#fff';
+    if (!esUnico) renderSplitPartes();
+}
+
+function cambiarPartes(delta) {
+    splitPartes = Math.min(10, Math.max(2, splitPartes + delta));
+    document.getElementById('splitNumPartes').textContent = splitPartes;
+    renderSplitPartes();
+}
+
+function renderSplitPartes() {
+    const base   = Math.floor(cobrarTotal / splitPartes * 100) / 100;
+    const resto  = Math.round((cobrarTotal - base * splitPartes) * 100) / 100;
+    const metodos = `<option value="efectivo">Efectivo</option>
+        <option value="tarjeta_debito">Débito</option>
+        <option value="tarjeta_credito">Crédito</option>
+        <option value="transferencia">Transferencia</option>
+        <option value="mercado_pago">Mercado Pago</option>`;
+    let html = '';
+    for (let i = 0; i < splitPartes; i++) {
+        const monto = i === 0 ? base + resto : base;
+        html += `<div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:12px;font-weight:700;color:var(--text-secondary);min-width:48px;">Parte ${i+1}</span>
+            <input type="number" id="sp_monto_${i}" value="${monto.toFixed(2)}" step="0.01" min="0"
+                oninput="recalcularRestante()"
+                style="flex:1;padding:9px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-weight:700;background:var(--background);color:var(--text-primary);">
+            <select id="sp_metodo_${i}" style="flex:1;padding:9px 8px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;background:var(--background);color:var(--text-primary);">${metodos}</select>
+        </div>`;
+    }
+    document.getElementById('splitPartes').innerHTML = html;
+    recalcularRestante();
+}
+
+function recalcularRestante() {
+    let asignado = 0;
+    for (let i = 0; i < splitPartes; i++) {
+        const el = document.getElementById(`sp_monto_${i}`);
+        if (el) asignado += parseFloat(el.value) || 0;
+    }
+    const rest = Math.round((cobrarTotal - asignado) * 100) / 100;
+    const el   = document.getElementById('splitRestante');
+    el.textContent = fmtMoney(rest);
+    el.style.color = Math.abs(rest) < 0.01 ? '#10b981' : '#dc2626';
+}
+
 function abrirCobro() {
     if (!comandaActual || !mesaActual) return;
     const sub  = calcularSubtotalItems();
     const desc = parseFloat(document.getElementById('cpDescuento').value) || 0;
+    cobrarTotal = Math.max(0, sub - desc);
+    splitPartes = Math.max(2, comandaActual.personas || 2);
     document.getElementById('mc_mesa').textContent  = `Mesa ${mesaActual.numero}`;
     document.getElementById('mc_num').textContent   = `#${comandaActual.numero}`;
     document.getElementById('mc_sub').textContent   = fmtMoney(sub);
     document.getElementById('mc_desc').textContent  = fmtMoney(desc);
     document.getElementById('mc_total').textContent = fmtMoney(sub - desc);
+    document.getElementById('splitNumPartes').textContent = splitPartes;
+    setTabCobro('unico');
     document.getElementById('modalCobrar').classList.add('show');
 }
 
 async function confirmarCobro() {
-    const metodo  = document.getElementById('mc_metodo').value;
     const descuento = parseFloat(document.getElementById('cpDescuento').value) || 0;
+    let metodo, splitInfo = null;
+
+    if (tabCobroActual === 'split') {
+        // Validar que la suma de partes sea igual al total
+        let asignado = 0;
+        const partes = [];
+        for (let i = 0; i < splitPartes; i++) {
+            const monto   = parseFloat(document.getElementById(`sp_monto_${i}`).value) || 0;
+            const met     = document.getElementById(`sp_metodo_${i}`).value;
+            asignado += monto;
+            partes.push({ monto, metodo: met });
+        }
+        if (Math.abs(asignado - cobrarTotal) > 0.05) {
+            showToast(`La suma de partes (${fmtMoney(asignado)}) no coincide con el total (${fmtMoney(cobrarTotal)})`, 'error');
+            return;
+        }
+        // Método principal = el primero (para la venta)
+        metodo    = partes[0].metodo;
+        splitInfo = partes;
+    } else {
+        metodo = document.getElementById('mc_metodo').value;
+    }
+
     const r = await fetch(`${BASE}/api/restaurant/comandas.php`, {
         method: 'POST',
         headers: {'Content-Type':'application/json'},
         body: JSON.stringify({
             action: 'cerrar', comanda_id: comandaActual.id,
-            metodo_pago: metodo, descuento: descuento
+            metodo_pago: metodo, descuento: descuento,
+            split: splitInfo
         })
     });
     const d = await r.json();
     if (d.success) {
+        const cmdId = comandaActual.id;
         cerrarModal();
         cerrarPanel();
         showToast(`Cobrado ${fmtMoney(d.data.total)} — Venta #${d.data.venta_id}`, 'success');
+        // Si hay split, abrir un recibo por parte; si no, uno normal
+        if (splitInfo) {
+            abrirRecibosSplit(cmdId, splitInfo);
+        } else {
+            window.open(`${BASE}/views/restaurant/ticket.php?tipo=recibo&id=${cmdId}&autoprint=1`, '_blank', 'width=420,height=680');
+        }
         await cargarMesas();
     } else {
         showToast(d.message, 'error');
     }
+}
+
+function imprimirComanda() {
+    if (!comandaActual) return;
+    window.open(`${BASE}/views/restaurant/ticket.php?tipo=comanda&id=${comandaActual.id}`, '_blank', 'width=420,height=680');
+}
+
+function abrirRecibosSplit(cmdId, partes) {
+    // Construir query string con los montos de cada parte
+    const qs = partes.map((p,i) => `p${i}=${p.monto.toFixed(2)}&m${i}=${encodeURIComponent(p.metodo)}`).join('&');
+    window.open(`${BASE}/views/restaurant/ticket.php?tipo=recibo&id=${cmdId}&split=1&n=${partes.length}&${qs}&autoprint=1`, '_blank', 'width=420,height=680');
 }
 
 /* ── PANEL ────────────────────────────────────────────── */

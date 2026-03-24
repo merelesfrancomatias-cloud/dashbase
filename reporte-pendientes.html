@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>DASHBASE — Estado de Módulos por Rubro</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'Inter',sans-serif; background:#f8fafc; color:#1e293b; font-size:13px; line-height:1.5; }
+  .page { max-width:960px; margin:0 auto; padding:40px 48px; background:#fff; min-height:100vh; }
+
+  .doc-header { display:flex; align-items:center; justify-content:space-between; border-bottom:3px solid #0fd186; padding-bottom:20px; margin-bottom:28px; }
+  .doc-header h1 { font-size:22px; font-weight:800; color:#0f172a; letter-spacing:-.3px; }
+  .doc-header p { font-size:12px; color:#64748b; margin-top:4px; }
+  .dash-badge { display:inline-block; background:#0f172a; color:#0fd186; font-weight:800; font-size:14px; padding:6px 14px; border-radius:8px; letter-spacing:1px; margin-bottom:6px; }
+  .doc-header-right { text-align:right; font-size:11px; color:#94a3b8; }
+
+  .intro { background:#f0fdf4; border-left:4px solid #0fd186; border-radius:0 8px 8px 0; padding:12px 18px; margin-bottom:24px; font-size:13px; color:#15803d; }
+
+  .resumen-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin-bottom:28px; }
+  .resumen-card { border:1px solid #e2e8f0; border-radius:10px; padding:14px; text-align:center; }
+  .resumen-num { font-size:26px; font-weight:800; line-height:1; margin-bottom:4px; }
+  .resumen-lbl { font-size:10px; color:#64748b; font-weight:600; text-transform:uppercase; letter-spacing:.5px; }
+
+  .nivel-titulo { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; padding:7px 14px; border-radius:6px; margin:28px 0 14px; display:flex; align-items:center; gap:8px; }
+  .nivel-verde  { background:#d1fae5; color:#065f46; }
+  .nivel-azul   { background:#ede9fe; color:#5b21b6; }
+  .nivel-amarillo { background:#fef3c7; color:#92400e; }
+  .nivel-rojo   { background:#fee2e2; color:#991b1b; }
+
+  .rubro-card { border:1px solid #e2e8f0; border-radius:12px; margin-bottom:14px; overflow:hidden; page-break-inside:avoid; }
+  .rubro-header { display:flex; align-items:center; gap:12px; padding:13px 18px; background:#f8fafc; border-bottom:1px solid #e2e8f0; }
+  .rubro-icon { width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0; }
+  .rubro-nombre { font-size:14px; font-weight:700; color:#0f172a; flex:1; }
+  .badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:20px; text-transform:uppercase; letter-spacing:.5px; }
+  .badge-verde  { background:#d1fae5; color:#065f46; }
+  .badge-morado { background:#ede9fe; color:#5b21b6; }
+  .badge-amarillo { background:#fef3c7; color:#b45309; }
+  .badge-rojo   { background:#fee2e2; color:#b91c1c; }
+  .badge-azul   { background:#dbeafe; color:#1d4ed8; }
+
+  .rubro-body { padding:14px 18px; }
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .col-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; margin-bottom:7px; }
+  .col-tiene .col-label { color:#059669; }
+  .col-falta .col-label { color:#dc2626; }
+  .tag-list { display:flex; flex-wrap:wrap; gap:5px; }
+  .tag { font-size:11px; padding:3px 9px; border-radius:20px; font-weight:500; }
+  .t-ok  { background:#d1fae5; color:#065f46; }
+  .t-new { background:#ede9fe; color:#5b21b6; }
+  .t-fix { background:#dbeafe; color:#1d4ed8; }
+  .t-no  { background:#fee2e2; color:#991b1b; }
+
+  .nota { margin-top:11px; padding:9px 13px; background:#fffbeb; border:1px solid #fde68a; border-radius:8px; font-size:11px; color:#78350f; }
+  .nota-ok { background:#f0fdf4; border-color:#bbf7d0; color:#15803d; }
+
+  .progress-wrap { margin-top:10px; }
+  .progress-label { display:flex; justify-content:space-between; font-size:11px; color:#64748b; margin-bottom:4px; }
+  .progress-bar { height:6px; border-radius:3px; background:#e2e8f0; overflow:hidden; }
+  .progress-fill { height:100%; border-radius:3px; }
+
+  .doc-footer { margin-top:40px; padding-top:16px; border-top:1px solid #e2e8f0; display:flex; justify-content:space-between; font-size:10px; color:#94a3b8; }
+
+  @media print {
+    body { background:#fff; }
+    .page { padding:24px 32px; }
+    .no-print { display:none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- HEADER -->
+<div class="doc-header">
+  <div>
+    <div class="dash-badge">DASHBASE</div>
+    <h1>Estado de Módulos por Rubro</h1>
+    <p>Funcionalidades implementadas · pendientes · prioridades de desarrollo</p>
+  </div>
+  <div class="doc-header-right">
+    <div style="font-size:11px;color:#475569;font-weight:600">Actualizado</div>
+    <div style="font-size:14px;font-weight:800;color:#0f172a">23 / 03 / 2026</div>
+    <div style="margin-top:6px;font-size:10px;">v3 — tickets · split · QR fix · CSS fix</div>
+  </div>
+</div>
+
+<!-- INTRO -->
+<div class="intro">
+  🚀 <strong>Sesión actual:</strong> Se corrigió el QR menú (token → API), el CSS de Reportes y Caja del Día (main.css → dashboard.css), se implementó impresión de tickets (comanda + recibo) y split de cuenta con múltiples métodos de pago. Mermas y Proveedores integrados en Almacén.
+</div>
+
+<!-- RESUMEN GLOBAL -->
+<div class="resumen-grid">
+  <div class="resumen-card">
+    <div class="resumen-num" style="color:#059669">1</div>
+    <div class="resumen-lbl">Rubro ~completo</div>
+  </div>
+  <div class="resumen-card">
+    <div class="resumen-num" style="color:#7c3aed">2</div>
+    <div class="resumen-lbl">Avanzados</div>
+  </div>
+  <div class="resumen-card">
+    <div class="resumen-num" style="color:#d97706">5</div>
+    <div class="resumen-lbl">En desarrollo</div>
+  </div>
+  <div class="resumen-card">
+    <div class="resumen-num" style="color:#dc2626">3</div>
+    <div class="resumen-lbl">Casi vacíos</div>
+  </div>
+  <div class="resumen-card">
+    <div class="resumen-num" style="color:#6366f1">11</div>
+    <div class="resumen-lbl">Rubros totales</div>
+  </div>
+</div>
+
+<!-- ══ CASI COMPLETO ══ -->
+<div class="nivel-titulo nivel-verde">✅ Casi completo</div>
+
+<!-- Restaurant -->
+<div class="rubro-card">
+  <div class="rubro-header">
+    <div class="rubro-icon" style="background:#fff3e0;color:#e65100">🍽️</div>
+    <div class="rubro-nombre">Restaurant / Gastronomía</div>
+    <span class="badge badge-verde">85% — Prioridad 1</span>
+  </div>
+  <div class="rubro-body">
+    <div class="two-col">
+      <div class="col-tiene">
+        <div class="col-label">✓ Implementado</div>
+        <div class="tag-list">
+          <span class="tag t-ok">Mesas / Salón</span>
+          <span class="tag t-ok">Comandas</span>
+          <span class="tag t-ok">Cocina KDS</span>
+          <span class="tag t-ok">Reservas</span>
+          <span class="tag t-ok">Carta digital pública</span>
+          <span class="tag t-ok">Almacén / Insumos</span>
+          <span class="tag t-ok">Recetas con costo</span>
+          <span class="tag t-ok">Mermas</span>
+          <span class="tag t-ok">Proveedores</span>
+          <span class="tag t-ok">Caja del día</span>
+          <span class="tag t-ok">Reportes analytics</span>
+          <span class="tag t-new">Tickets de impresión ✦</span>
+          <span class="tag t-new">Split de cuenta ✦</span>
+          <span class="tag t-fix">QR menú corregido 🔧</span>
+          <span class="tag t-fix">CSS Caja / Reportes 🔧</span>
+        </div>
+      </div>
+      <div class="col-falta">
+        <div class="col-label">✗ Pendiente</div>
+        <div class="tag-list">
+          <span class="tag t-no">Delivery / Takeaway</span>
+          <span class="tag t-no">Descuentos automáticos</span>
+        </div>
+      </div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-label"><span>Completitud estimada</span><span>85%</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:85%;background:#10b981"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ AVANZADOS ══ -->
+<div class="nivel-titulo nivel-azul">✦ Avanzados — recibieron mejoras recientes</div>
+
+<!-- Gym -->
+<div class="rubro-card">
+  <div class="rubro-header">
+    <div class="rubro-icon" style="background:#fce4ec;color:#c62828">💪</div>
+    <div class="rubro-nombre">Gimnasio</div>
+    <span class="badge badge-morado">70%</span>
+  </div>
+  <div class="rubro-body">
+    <div class="two-col">
+      <div class="col-tiene">
+        <div class="col-label">✓ Implementado</div>
+        <div class="tag-list">
+          <span class="tag t-ok">Socios</span>
+          <span class="tag t-ok">Planes y cuotas</span>
+          <span class="tag t-ok">Clases / Horarios</span>
+          <span class="tag t-ok">Asistencias</span>
+          <span class="tag t-ok">Pagos</span>
+          <span class="tag t-new">Auto-vencimiento cuotas ✦</span>
+          <span class="tag t-new">Reportes de ingresos ✦</span>
+          <span class="tag t-new">Próximos vencimientos ✦</span>
+          <span class="tag t-new">Cobro rápido desde reportes ✦</span>
+        </div>
+      </div>
+      <div class="col-falta">
+        <div class="col-label">✗ Pendiente</div>
+        <div class="tag-list">
+          <span class="tag t-no">QR check-in</span>
+          <span class="tag t-no">Control de acceso</span>
+          <span class="tag t-no">Comunicados a socios</span>
+          <span class="tag t-no">Recordatorio de vencimiento</span>
+        </div>
+      </div>
+    </div>
+    <div class="nota nota-ok">✦ Fix crítico: socios se marcan automáticamente como "vencido" al superar fecha de membresía.</div>
+    <div class="progress-wrap">
+      <div class="progress-label"><span>Completitud estimada</span><span>70%</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:70%;background:#f97316"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Peluquería -->
+<div class="rubro-card">
+  <div class="rubro-header">
+    <div class="rubro-icon" style="background:#f3e5f5;color:#6a1b9a">✂️</div>
+    <div class="rubro-nombre">Peluquería / Estética</div>
+    <span class="badge badge-morado">65%</span>
+  </div>
+  <div class="rubro-body">
+    <div class="two-col">
+      <div class="col-tiene">
+        <div class="col-label">✓ Implementado</div>
+        <div class="tag-list">
+          <span class="tag t-ok">Agenda de turnos</span>
+          <span class="tag t-ok">Clientes</span>
+          <span class="tag t-ok">Servicios</span>
+          <span class="tag t-new">Cobro con método de pago ✦</span>
+          <span class="tag t-new">Historial visitas en cliente ✦</span>
+          <span class="tag t-new">Reportes de ingresos ✦</span>
+          <span class="tag t-new">Servicios más realizados ✦</span>
+          <span class="tag t-new">Rendimiento por empleado ✦</span>
+        </div>
+      </div>
+      <div class="col-falta">
+        <div class="col-label">✗ Pendiente</div>
+        <div class="tag-list">
+          <span class="tag t-no">Turnos por empleado (vista)</span>
+          <span class="tag t-no">Recordatorios de turno</span>
+          <span class="tag t-no">Reserva online pública</span>
+          <span class="tag t-no">Comisiones por servicio</span>
+        </div>
+      </div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-label"><span>Completitud estimada</span><span>65%</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:65%;background:#8b5cf6"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ EN DESARROLLO ══ -->
+<div class="nivel-titulo nivel-amarillo">🟡 Con estructura básica — en desarrollo</div>
+
+<!-- Canchas -->
+<div class="rubro-card">
+  <div class="rubro-header">
+    <div class="rubro-icon" style="background:#e8f5e9;color:#2e7d32">⚽</div>
+    <div class="rubro-nombre">Canchas / Deportes</div>
+    <span class="badge badge-amarillo">55%</span>
+  </div>
+  <div class="rubro-body">
+    <div class="two-col">
+      <div class="col-tiene">
+        <div class="col-label">✓ Implementado</div>
+        <div class="tag-list">
+          <span class="tag t-ok">Reservas</span>
+          <span class="tag t-ok">Gestión de canchas</span>
+          <span class="tag t-ok">Clientes</span>
+          <span class="tag t-ok">Caja del día</span>
+        </div>
+      </div>
+      <div class="col-falta">
+        <div class="col-label">✗ Pendiente</div>
+        <div class="tag-list">
+          <span class="tag t-no">Reportes de ingresos</span>
+          <span class="tag t-no">Grilla visual de disponibilidad</span>
+          <span class="tag t-no">Recordatorios</span>
+          <span class="tag t-no">Reserva online pública</span>
+          <span class="tag t-no">Abonos / membresías</span>
+        </div>
+      </div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-label"><span>Completitud estimada</span><span>55%</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:55%;background:#16a34a"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Hospedaje -->
+<div class="rubro-card">
+  <div class="rubro-header">
+    <div class="rubro-icon" style="background:#e8eaf6;color:#283593">🏨</div>
+    <div class="rubro-nombre">Hospedaje / Hotel</div>
+    <span class="badge badge-amarillo">25%</span>
+  </div>
+  <div class="rubro-body">
+    <div class="two-col">
+      <div class="col-tiene">
+        <div class="col-label">✓ Implementado</div>
+        <div class="tag-list">
+          <span class="tag t-ok">Habitaciones</span>
+          <span class="tag t-ok">Reservas</span>
+        </div>
+      </div>
+      <div class="col-falta">
+        <div class="col-label">✗ Pendiente</div>
+        <div class="tag-list">
+          <span class="tag t-no">Check-in / Check-out</span>
+          <span class="tag t-no">Cargos extra</span>
+          <span class="tag t-no">Reporte de ocupación</span>
+          <span class="tag t-no">Estado de limpieza</span>
+          <span class="tag t-no">Facturación</span>
+          <span class="tag t-no">Reserva online</span>
+        </div>
+      </div>
+    </div>
+    <div class="nota">⚠️ Falta el flujo completo de check-in/check-out, núcleo del rubro.</div>
+    <div class="progress-wrap">
+      <div class="progress-label"><span>Completitud estimada</span><span>25%</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:25%;background:#6366f1"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Veterinaria -->
+<div class="rubro-card">
+  <div class="rubro-header">
+    <div class="rubro-icon" style="background:#f1f8e9;color:#33691e">🐾</div>
+    <div class="rubro-nombre">Veterinaria</div>
+    <span class="badge badge-amarillo">40%</span>
+  </div>
+  <div class="rubro-body">
+    <div class="two-col">
+      <div class="col-tiene">
+        <div class="col-label">✓ Implementado</div>
+        <div class="tag-list">
+          <span class="tag t-ok">Pacientes</span>
+          <span class="tag t-ok">Agenda del día</span>
+          <span class="tag t-ok">Consultas</span>
+          <span class="tag t-ok">Vacunas</span>
+        </div>
+      </div>
+      <div class="col-falta">
+        <div class="col-label">✗ Pendiente</div>
+        <div class="tag-list">
+          <span class="tag t-no">Historia clínica completa</span>
+          <span class="tag t-no">Recordatorio de vacunas</span>
+          <span class="tag t-no">Recetas veterinarias</span>
+          <span class="tag t-no">Facturación</span>
+          <span class="tag t-no">Stock de medicamentos</span>
+        </div>
+      </div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-label"><span>Completitud estimada</span><span>40%</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:40%;background:#84cc16"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Óptica -->
+<div class="rubro-card">
+  <div class="rubro-header">
+    <div class="rubro-icon" style="background:#e1f5fe;color:#01579b">👓</div>
+    <div class="rubro-nombre">Óptica</div>
+    <span class="badge badge-azul">40%</span>
+  </div>
+  <div class="rubro-body">
+    <div class="two-col">
+      <div class="col-tiene">
+        <div class="col-label">✓ Implementado</div>
+        <div class="tag-list">
+          <span class="tag t-ok">Clientes</span>
+          <span class="tag t-ok">Pedidos</span>
+          <span class="tag t-ok">Recetas ópticas</span>
+        </div>
+      </div>
+      <div class="col-falta">
+        <div class="col-label">✗ Pendiente</div>
+        <div class="tag-list">
+          <span class="tag t-no">Seguimiento pedidos laboratorio</span>
+          <span class="tag t-no">Alertas de entrega</span>
+          <span class="tag t-no">Stock de monturas / lentes</span>
+          <span class="tag t-no">Reportes</span>
+        </div>
+      </div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-label"><span>Completitud estimada</span><span>40%</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:40%;background:#0ea5e9"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Tecnología -->
+<div class="rubro-card">
+  <div class="rubro-header">
+    <div class="rubro-icon" style="background:#ede7f6;color:#4527a0">💻</div>
+    <div class="rubro-nombre">Tecnología / Servicio técnico</div>
+    <span class="badge badge-azul">30%</span>
+  </div>
+  <div class="rubro-body">
+    <div class="two-col">
+      <div class="col-tiene">
+        <div class="col-label">✓ Implementado</div>
+        <div class="tag-list">
+          <span class="tag t-ok">Clientes</span>
+          <span class="tag t-ok">Órdenes de servicio</span>
+        </div>
+      </div>
+      <div class="col-falta">
+        <div class="col-label">✗ Pendiente</div>
+        <div class="tag-list">
+          <span class="tag t-no">Diagnóstico y presupuesto</span>
+          <span class="tag t-no">Estados de reparación</span>
+          <span class="tag t-no">Notificación al cliente</span>
+          <span class="tag t-no">Repuestos utilizados</span>
+          <span class="tag t-no">Garantía</span>
+        </div>
+      </div>
+    </div>
+    <div class="nota">💡 Tecnología y Electrodomésticos comparten la misma lógica — se pueden unificar en un módulo "Servicio Técnico".</div>
+    <div class="progress-wrap">
+      <div class="progress-label"><span>Completitud estimada</span><span>30%</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:30%;background:#6366f1"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ VACÍOS ══ -->
+<div class="nivel-titulo nivel-rojo">🔴 Sin implementación real — requieren desarrollo desde cero</div>
+
+<!-- Farmacia -->
+<div class="rubro-card">
+  <div class="rubro-header">
+    <div class="rubro-icon" style="background:#e8f5e9;color:#1b5e20">💊</div>
+    <div class="rubro-nombre">Farmacia</div>
+    <span class="badge badge-rojo">15%</span>
+  </div>
+  <div class="rubro-body">
+    <div class="two-col">
+      <div class="col-tiene">
+        <div class="col-label">✓ Implementado</div>
+        <div class="tag-list">
+          <span class="tag t-ok">Recetas médicas</span>
+          <span class="tag t-ok">Laboratorios</span>
+        </div>
+      </div>
+      <div class="col-falta">
+        <div class="col-label">✗ Pendiente</div>
+        <div class="tag-list">
+          <span class="tag t-no">Stock de medicamentos</span>
+          <span class="tag t-no">Control de vencimientos</span>
+          <span class="tag t-no">Proveedores</span>
+          <span class="tag t-no">Alertas de stock bajo</span>
+          <span class="tag t-no">Clientes / cobertura médica</span>
+          <span class="tag t-no">Reportes de ventas</span>
+        </div>
+      </div>
+    </div>
+    <div class="nota">⚠️ Tiene tablas en DB pero faltan las más críticas: stock y control de vencimientos.</div>
+    <div class="progress-wrap">
+      <div class="progress-label"><span>Completitud estimada</span><span>15%</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:15%;background:#dc2626"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Supermercado -->
+<div class="rubro-card">
+  <div class="rubro-header">
+    <div class="rubro-icon" style="background:#f9fbe7;color:#558b2f">🛒</div>
+    <div class="rubro-nombre">Supermercado / Almacén</div>
+    <span class="badge badge-rojo">10%</span>
+  </div>
+  <div class="rubro-body">
+    <div class="two-col">
+      <div class="col-tiene">
+        <div class="col-label">✓ Implementado</div>
+        <div class="tag-list">
+          <span class="tag t-ok">Punto de venta genérico</span>
+          <span class="tag t-ok">Historial de ventas</span>
+        </div>
+      </div>
+      <div class="col-falta">
+        <div class="col-label">✗ Pendiente</div>
+        <div class="tag-list">
+          <span class="tag t-no">Tablas propias en DB</span>
+          <span class="tag t-no">Control de stock avanzado</span>
+          <span class="tag t-no">Proveedores específicos</span>
+          <span class="tag t-no">Órdenes de compra</span>
+          <span class="tag t-no">Etiquetas / códigos de barra</span>
+        </div>
+      </div>
+    </div>
+    <div class="nota">⚠️ Las vistas existen pero apuntan a lógica genérica. Necesita tablas y API propias.</div>
+    <div class="progress-wrap">
+      <div class="progress-label"><span>Completitud estimada</span><span>10%</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:10%;background:#dc2626"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Ferretería -->
+<div class="rubro-card">
+  <div class="rubro-header">
+    <div class="rubro-icon" style="background:#fff8e1;color:#e65100">🔧</div>
+    <div class="rubro-nombre">Ferretería / Construcción</div>
+    <span class="badge badge-rojo">10%</span>
+  </div>
+  <div class="rubro-body">
+    <div class="two-col">
+      <div class="col-tiene">
+        <div class="col-label">✓ Implementado</div>
+        <div class="tag-list">
+          <span class="tag t-ok">Punto de venta genérico</span>
+          <span class="tag t-ok">Presupuestos (básico)</span>
+        </div>
+      </div>
+      <div class="col-falta">
+        <div class="col-label">✗ Pendiente</div>
+        <div class="tag-list">
+          <span class="tag t-no">Tablas propias en DB</span>
+          <span class="tag t-no">Proveedores funcionales</span>
+          <span class="tag t-no">Órdenes de compra</span>
+          <span class="tag t-no">Listas de precio</span>
+          <span class="tag t-no">Cuentas corrientes</span>
+        </div>
+      </div>
+    </div>
+    <div class="nota">⚠️ Las vistas de proveedores y órdenes existen pero no tienen API ni DB detrás.</div>
+    <div class="progress-wrap">
+      <div class="progress-label"><span>Completitud estimada</span><span>10%</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:10%;background:#f97316"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="doc-footer">
+  <span>DASHBASE · Sistema de gestión multirubro · v3</span>
+  <span>Actualizado 23/03/2026</span>
+</div>
+
+</div><!-- /page -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<div class="no-print" style="position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;gap:8px;align-items:flex-end;">
+  <button onclick="descargarPDF()" id="btnPDF" style="background:#0f172a;color:#0fd186;border:none;padding:12px 24px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,.3);display:flex;align-items:center;gap:8px;">
+    ⬇️ Descargar PDF
+  </button>
+  <button onclick="window.print()" style="background:#334155;color:#fff;border:none;padding:8px 18px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;">
+    🖨️ Imprimir
+  </button>
+</div>
+
+<script>
+function descargarPDF() {
+  const btn = document.getElementById('btnPDF');
+  btn.textContent = '⏳ Generando...';
+  btn.disabled = true;
+
+  const opts = {
+    margin:       [10, 10, 10, 10],
+    filename:     'DASHBASE-estado-modulos.pdf',
+    image:        { type: 'jpeg', quality: 0.97 },
+    html2canvas:  { scale: 2, useCORS: true, logging: false },
+    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    pagebreak:    { mode: ['avoid-all', 'css'] }
+  };
+
+  html2pdf().set(opts).from(document.querySelector('.page')).save().then(() => {
+    btn.innerHTML = '⬇️ Descargar PDF';
+    btn.disabled = false;
+  });
+}
+</script>
+</body>
+</html>

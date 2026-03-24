@@ -73,9 +73,10 @@ if ($method === 'GET') {
     $where  = ["c.negocio_id = :nid"];
     $params = [':nid' => $negocioId];
 
-    if (!empty($_GET['mesa_id'])) { $where[] = "c.mesa_id = :mid"; $params[':mid'] = (int)$_GET['mesa_id']; }
-    if (!empty($_GET['estado']))  { $where[] = "c.estado = :est";  $params[':est'] = $_GET['estado']; }
-    if (empty($_GET['todas']))    { $where[] = "c.estado IN ('abierta','en_cocina','lista')"; }
+    if (!empty($_GET['mesa_id'])) { $where[] = "c.mesa_id = :mid";          $params[':mid']   = (int)$_GET['mesa_id']; }
+    if (!empty($_GET['fecha']))   { $where[] = "DATE(c.cerrada_at) = :fec"; $params[':fec']   = $_GET['fecha']; }
+    if (!empty($_GET['estado']))  { $where[] = "c.estado = :est";           $params[':est']   = $_GET['estado']; }
+    elseif (empty($_GET['todas'])){ $where[] = "c.estado IN ('abierta','en_cocina','lista')"; }
 
     $stmt = $pdo->prepare("
         SELECT c.*, m.numero AS mesa_numero, s.nombre AS sector_nombre,

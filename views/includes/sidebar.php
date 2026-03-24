@@ -167,8 +167,14 @@ if (isset($_SESSION['negocio_id'])) {
             <a href="../restaurant/carta.php" class="menu-item" data-page="carta">
                 <i class="fas fa-book-open"></i><span>Carta / Menú</span>
             </a>
+            <a href="../restaurant/caja.php" class="menu-item" data-page="caja-rest">
+                <i class="fas fa-cash-register"></i><span>Caja del Día</span>
+            </a>
             <a href="../restaurant/almacen.php" class="menu-item" data-page="almacen">
                 <i class="fas fa-boxes"></i><span>Almacén</span>
+            </a>
+            <a href="../restaurant/qr-menu.php" class="menu-item" data-page="qr-menu">
+                <i class="fas fa-qrcode"></i><span>QR Menú</span>
             </a>
             <a href="../restaurant/reportes.php" class="menu-item" data-page="reportes-rest">
                 <i class="fas fa-chart-line"></i><span>Reportes</span>
@@ -224,6 +230,9 @@ if (isset($_SESSION['negocio_id'])) {
             <a href="../peluqueria/clientes.php" class="menu-item" data-page="clientes-pelu">
                 <i class="fas fa-address-book"></i><span>Clientes</span>
             </a>
+            <a href="../peluqueria/reportes.php" class="menu-item" data-page="reportes-pelu">
+                <i class="fas fa-chart-line"></i><span>Reportes</span>
+            </a>
         </div>
         <?php endif; ?>
 
@@ -242,6 +251,9 @@ if (isset($_SESSION['negocio_id'])) {
             </a>
             <a href="../gym/pagos.php" class="menu-item" data-page="pagos-gym">
                 <i class="fas fa-dollar-sign"></i><span>Pagos / Cuotas</span>
+            </a>
+            <a href="../gym/reportes.php" class="menu-item" data-page="reportes-gym">
+                <i class="fas fa-chart-line"></i><span>Reportes</span>
             </a>
         </div>
         <?php endif; ?>

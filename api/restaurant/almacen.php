@@ -42,10 +42,12 @@ if ($method === 'GET') {
 
         $stmt = $pdo->prepare("
             SELECT c.*, i.nombre AS insumo_nombre, i.unidad,
-                   u.nombre AS usuario_nombre
+                   u.nombre AS usuario_nombre,
+                   p.nombre AS proveedor
             FROM restaurant_compras c
             JOIN restaurant_insumos i ON i.id = c.insumo_id
             LEFT JOIN usuarios u ON u.id = c.usuario_id
+            LEFT JOIN restaurant_proveedores p ON p.id = c.proveedor_id
             WHERE " . implode(' AND ', $where) . "
             ORDER BY c.fecha DESC, c.id DESC
             LIMIT " . (int)($_GET['limit'] ?? 200)
@@ -157,16 +159,17 @@ if ($method === 'POST') {
         try {
             // Insertar compra
             $stmt = $pdo->prepare("
-                INSERT INTO restaurant_compras (negocio_id, insumo_id, cantidad, precio_unitario, total, proveedor, fecha, notas, usuario_id)
+                INSERT INTO restaurant_compras (negocio_id, insumo_id, cantidad, precio_unitario, total, proveedor_id, fecha, notas, usuario_id)
                 VALUES (:nid,:iid,:cant,:precio,:total,:prov,:fecha,:notas,:uid)
             ");
+            $provId = !empty($d['proveedor_id']) ? (int)$d['proveedor_id'] : null;
             $stmt->execute([
                 ':nid'    => $negocioId,
                 ':iid'    => (int)$d['insumo_id'],
                 ':cant'   => $cantidad,
                 ':precio' => $precio,
                 ':total'  => $total,
-                ':prov'   => trim($d['proveedor'] ?? ''),
+                ':prov'   => $provId,
                 ':fecha'  => $d['fecha'],
                 ':notas'  => trim($d['notas'] ?? ''),
                 ':uid'    => $_SESSION['user_id'] ?? $_SESSION['usuario_id'] ?? null,

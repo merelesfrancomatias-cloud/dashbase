@@ -630,12 +630,34 @@ async function verDetalle(id) {
 }
 
 async function cambiarEstado(id, estado) {
+    if (estado === 'completado') {
+        // Pedir método de pago antes de marcar completado
+        document.getElementById('cobroTurnoId').value = id;
+        document.getElementById('cobroMetodo').value  = 'efectivo';
+        document.getElementById('modalCobro').classList.add('open');
+        return;
+    }
     const r = await fetch(API_T, {
         method:'PUT', headers:{'Content-Type':'application/json'}, credentials:'include',
         body: JSON.stringify({ id, estado })
     });
     const d = await r.json();
     if (d.success) { cerrarModal('modalDetalle'); cargarDia(); }
+}
+
+async function confirmarCobro() {
+    const id     = document.getElementById('cobroTurnoId').value;
+    const metodo = document.getElementById('cobroMetodo').value;
+    const r = await fetch(API_T, {
+        method:'PUT', headers:{'Content-Type':'application/json'}, credentials:'include',
+        body: JSON.stringify({ id: parseInt(id), estado: 'completado', metodo_pago: metodo })
+    });
+    const d = await r.json();
+    if (d.success) {
+        cerrarModal('modalCobro');
+        cerrarModal('modalDetalle');
+        cargarDia();
+    }
 }
 
 async function cancelarTurno(id) {
@@ -713,5 +735,33 @@ document.getElementById('pickerFecha').value = fechaActual;
 cargarServicios();
 cargarDia();
 </script>
+
+<!-- Modal cobro rápido -->
+<div class="modal-overlay" id="modalCobro">
+    <div class="modal" style="max-width:360px;">
+        <div class="modal-header">
+            <h3 style="margin:0;font-size:16px;font-weight:700;"><i class="fas fa-check-circle" style="color:#22c55e;margin-right:8px;"></i>Completar turno</h3>
+            <button class="modal-close" onclick="cerrarModal('modalCobro')"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body" style="padding:20px 24px;">
+            <input type="hidden" id="cobroTurnoId">
+            <div class="form-group">
+                <label class="form-label">Método de pago</label>
+                <select class="form-control" id="cobroMetodo">
+                    <option value="efectivo">💵 Efectivo</option>
+                    <option value="transferencia">📱 Transferencia</option>
+                    <option value="tarjeta">💳 Tarjeta de crédito</option>
+                    <option value="debito">💳 Débito</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-footer" style="padding:14px 24px;display:flex;gap:10px;justify-content:flex-end;border-top:1px solid var(--border-color,#e5e7eb);">
+            <button class="btn btn-secondary" onclick="cerrarModal('modalCobro')">Cancelar</button>
+            <button class="btn btn-primary" style="background:#22c55e;border-color:#22c55e;" onclick="confirmarCobro()">
+                <i class="fas fa-check"></i> Confirmar cobro
+            </button>
+        </div>
+    </div>
+</div>
 </body>
 </html>

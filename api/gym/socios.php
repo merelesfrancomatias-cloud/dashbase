@@ -6,6 +6,10 @@ $negocio_id = $_SESSION['negocio_id'];
 $db = (new Database())->getConnection();
 $method = $_SERVER['REQUEST_METHOD'];
 
+// Auto-actualizar socios vencidos (fecha pasó y aún figuran como activo)
+$db->prepare("UPDATE gym_socios SET estado='vencido' WHERE negocio_id=? AND estado='activo' AND fecha_vencimiento IS NOT NULL AND fecha_vencimiento < CURDATE()")
+   ->execute([$negocio_id]);
+
 // GET - listar o buscar socios
 if ($method === 'GET') {
     $estado = $_GET['estado'] ?? '';

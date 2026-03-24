@@ -9,14 +9,28 @@ require_once __DIR__ . '/../bootstrap.php';
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
 
-$negocioId = (int)($_GET['negocio_id'] ?? 0);
-if ($negocioId <= 0) {
-    http_response_code(400);
-    echo json_encode(['success' => false, 'message' => 'negocio_id requerido']);
-    exit;
+$pdo = (new Database())->getConnection();
+
+// Acepta negocio_id directo o token
+if (!empty($_GET['token'])) {
+    $stmtT = $pdo->prepare("SELECT id FROM negocios WHERE carta_token = ? AND carta_activa = 1 AND activo = 1");
+    $stmtT->execute([trim($_GET['token'])]);
+    $row = $stmtT->fetch(PDO::FETCH_ASSOC);
+    if (!$row) {
+        http_response_code(404);
+        echo json_encode(['success' => false, 'message' => 'Menú no disponible']);
+        exit;
+    }
+    $negocioId = (int)$row['id'];
+} else {
+    $negocioId = (int)($_GET['negocio_id'] ?? 0);
 }
 
-$pdo = (new Database())->getConnection();
+if ($negocioId <= 0) {
+    http_response_code(400);
+    echo json_encode(['success' => false, 'message' => 'Parámetro requerido: token o negocio_id']);
+    exit;
+}
 
 // Datos del negocio
 $stmtN = $pdo->prepare("SELECT nombre, logo, imagen_portada, color_primario, slogan,

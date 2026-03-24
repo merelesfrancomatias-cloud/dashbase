@@ -415,17 +415,19 @@ body{
 
 <script>
 // ── Config ─────────────────────────────────────────
-const qp = new URLSearchParams(location.search);
-const NID = qp.get('negocio_id') || '';
-const B   = location.origin + '/DASHBASE';
+const qp    = new URLSearchParams(location.search);
+const TOKEN = qp.get('token') || '';
+const NID   = qp.get('negocio_id') || '';
+const B     = location.origin + '/DASHBASE';
 
 let platos = [], cats = [], catOn = 'all', layoutGrid = true;
 
 // ── Init ────────────────────────────────────────────
 async function init() {
-  if (!NID) { hideSplash(); err('Enlace inválido','Usá el QR del restaurante.'); return; }
+  if (!TOKEN && !NID) { hideSplash(); err('Enlace inválido','Usá el QR del restaurante.'); return; }
+  const param = TOKEN ? `token=${TOKEN}` : `negocio_id=${NID}`;
   try {
-    const r = await fetch(`${B}/api/restaurant/carta-publica.php?negocio_id=${NID}`);
+    const r = await fetch(`${B}/api/restaurant/carta-publica.php?${param}`);
     const d = await r.json();
     if (!d.success) { hideSplash(); err('No disponible', d.message||''); return; }
     platos = d.platos || [];
