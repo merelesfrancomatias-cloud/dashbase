@@ -15,6 +15,138 @@ window.addEventListener('load', () => {
 document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('loginForm');
     const alertContainer = document.getElementById('alertContainer');
+    const googleLoginBtn = document.getElementById('googleLoginBtn');
+
+    const BASE = (function() {
+        const parts = window.location.pathname.split('/').filter(Boolean);
+        if (parts.length >= 1 && !parts[0].includes('.')) return '/' + parts[0];
+        return '';
+    })();
+
+    let isGoogleLoading = false;
+    let googleTokenClient = null;
+
+    function hasGoogleGIS() {
+        return !!(window.google && window.google.accounts && window.google.accounts.id);
+    }
+
+    function loadGoogleScript() {
+        return new Promise((resolve) => {
+            if (hasGoogleGIS()) {
+                resolve(true);
+                return;
+            }
+
+            const existing = document.querySelector('script[data-google-gsi="1"]');
+            if (existing) {
+                existing.addEventListener('load', () => resolve(hasGoogleGIS()), { once: true });
+                existing.addEventListener('error', () => resolve(false), { once: true });
+                setTimeout(() => resolve(hasGoogleGIS()), 2500);
+                return;
+            }
+
+            const script = document.createElement('script');
+            script.src = 'https://accounts.google.com/gsi/client';
+            script.async = true;
+            script.defer = true;
+            script.setAttribute('data-google-gsi', '1');
+            script.onload = () => resolve(hasGoogleGIS());
+            script.onerror = () => resolve(false);
+            document.head.appendChild(script);
+
+            setTimeout(() => resolve(hasGoogleGIS()), 2500);
+        });
+    }
+
+    async function loginWithGoogleToken(accessToken) {
+        if (!accessToken) {
+            showAlert('No se pudo obtener token de Google', 'error');
+            return;
+        }
+
+        if (isGoogleLoading) return;
+        isGoogleLoading = true;
+        googleLoginBtn.disabled = true;
+        googleLoginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Validando Google...';
+        hideAlert();
+
+        try {
+            const loginRes = await fetch(`${BASE}/api/auth/login-google.php`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ access_token: accessToken }),
+                credentials: 'include'
+            });
+            const loginData = await loginRes.json();
+
+            if (loginData.success) {
+                showAlert('Inicio con Google exitoso. Redirigiendo...', 'success');
+                localStorage.setItem('user', JSON.stringify(loginData.data));
+                setTimeout(() => {
+                    window.location.href = 'views/dashboard/index.php';
+                }, 900);
+                return;
+            }
+
+            showAlert(loginData.message || 'No se pudo iniciar con Google', 'error');
+        } catch (error) {
+            console.error('Error Google login:', error);
+            showAlert('Error de conexión al iniciar con Google', 'error');
+        } finally {
+            isGoogleLoading = false;
+            googleLoginBtn.disabled = false;
+            googleLoginBtn.innerHTML = '<i class="fab fa-google"></i> Ingresar con Google';
+        }
+    }
+
+    async function initGoogleLogin() {
+        if (!googleLoginBtn) return;
+
+        try {
+            const response = await fetch(`${BASE}/api/auth/google-config.php`, {
+                method: 'GET',
+                credentials: 'include'
+            });
+            const config = await response.json();
+
+            if (!config.success || !config.data?.enabled || !config.data?.client_id) {
+                return;
+            }
+
+            const gisReady = await loadGoogleScript();
+            if (!gisReady || !window.google?.accounts?.oauth2) {
+                googleLoginBtn.style.display = 'flex';
+                googleLoginBtn.title = 'No se pudo cargar Google. Revisá AdBlock/antitracker y recargá.';
+                return;
+            }
+
+            googleTokenClient = window.google.accounts.oauth2.initTokenClient({
+                client_id: config.data.client_id,
+                scope: 'openid email profile',
+                callback: async (tokenResponse) => {
+                    if (tokenResponse?.error) {
+                        showAlert('Google canceló o bloqueó la autorización', 'error');
+                        return;
+                    }
+
+                    await loginWithGoogleToken(tokenResponse?.access_token || '');
+                }
+            });
+
+            googleLoginBtn.style.display = 'flex';
+            googleLoginBtn.addEventListener('click', () => {
+                if (!googleTokenClient) {
+                    showAlert('Google no está disponible ahora', 'error');
+                    return;
+                }
+                googleTokenClient.requestAccessToken({ prompt: 'select_account' });
+            });
+        } catch (error) {
+            console.error('Google config error:', error);
+        }
+    }
+
+    initGoogleLogin();
 
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();

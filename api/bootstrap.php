@@ -27,6 +27,7 @@ require_once __DIR__ . '/utils/Response.php';
 require_once __DIR__ . '/utils/Auth.php';
 require_once __DIR__ . '/utils/PlanGuard.php';
 require_once __DIR__ . '/utils/Middleware.php';
+require_once __DIR__ . '/utils/GoogleAuth.php';
 
 // Header JSON por defecto para todas las respuestas de la API
 header('Content-Type: application/json; charset=utf-8');

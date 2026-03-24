@@ -297,6 +297,52 @@
         .btn-login:active   { transform:translateY(0); filter:brightness(.98); }
         .btn-login:disabled { opacity:.5; cursor:not-allowed; transform:none; filter:none; box-shadow:none; }
 
+        .btn-google {
+            width:100%; padding:12px; border:1.5px solid var(--border); border-radius:12px;
+            background:var(--surface-2); color:var(--text); font-size:14px; font-weight:700;
+            font-family:inherit; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;
+            transition:var(--transition); margin-top:10px;
+        }
+        .btn-google:hover { border-color:var(--primary); color:var(--primary); box-shadow:0 0 0 3px var(--primary-glow); }
+        .btn-google:disabled { opacity:.55; cursor:not-allowed; }
+
+        .google-btn-shell {
+            width:100%; margin-top:10px; padding:0;
+            border:none; border-radius:12px;
+            background:transparent;
+            display:flex; justify-content:center;
+            position:relative;
+        }
+        .google-btn-shell-inner { width:100%; display:flex; justify-content:center; }
+        .google-btn-mask {
+            position:absolute;
+            left:10px;
+            top:50%;
+            transform:translateY(-50%);
+            width:46px;
+            height:34px;
+            border-radius:8px;
+            background:#202124;
+            pointer-events:none;
+            z-index:2;
+            display:none;
+        }
+        .google-btn-overlay-icon {
+            position:absolute;
+            left:23px;
+            top:50%;
+            transform:translateY(-50%);
+            color:#EA4335;
+            font-size:19px;
+            pointer-events:none;
+            z-index:3;
+            display:none;
+        }
+        .google-btn-shell.dark .google-btn-mask,
+        .google-btn-shell.dark .google-btn-overlay-icon {
+            display:block;
+        }
+
         /* ── Divider y botón registro ── */
         .divider {
             display:flex; align-items:center; gap:12px; margin:22px 0 16px;
@@ -652,6 +698,16 @@
                 <span id="btnText"><i class="fas fa-arrow-right-to-bracket"></i> &nbsp;Ingresar ahora</span>
                 <div id="btnSpinner" class="spinner hidden"></div>
             </button>
+
+            <button type="button" class="btn-google" id="googleLoginBtn" style="display:none;">
+                <i class="fab fa-google"></i> Ingresar con Google
+            </button>
+
+            <div id="googleLoginShell" class="google-btn-shell dark" style="display:none;">
+                <span class="google-btn-mask" aria-hidden="true"></span>
+                <i class="fab fa-google google-btn-overlay-icon" aria-hidden="true"></i>
+                <div id="googleLoginRender" class="google-btn-shell-inner"></div>
+            </div>
         </form>
 
         <div class="divider"><span>¿Todavía no tenés cuenta?</span></div>
@@ -671,6 +727,7 @@
 </div>
 
 <script src="public/js/splash.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <script>
 (function() {
     const saved = localStorage.getItem('dash-theme') || 'dark';

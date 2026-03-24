@@ -38,6 +38,10 @@ try {
 
     $user = $stmt->fetch();
 
+    if (($user['auth_provider'] ?? 'local') === 'google' && empty($user['password'])) {
+        Response::error('Esta cuenta usa Google. Iniciá sesión con Google.', 401);
+    }
+
     // Verificar contraseña con password_verify para bcrypt
     if (!password_verify($data->password, $user['password'])) {
         Response::error('Usuario o contraseña incorrectos', 401);

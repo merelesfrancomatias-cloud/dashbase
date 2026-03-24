@@ -352,6 +352,53 @@
         .btn-ghost { background:var(--surface-2); color:var(--muted); border:1.5px solid var(--border); flex:0 0 auto; padding:12px 16px; }
         .btn-ghost:hover { background:var(--surface-3); color:var(--text); border-color:var(--muted); }
 
+        .btn-google {
+            width:100%; padding:11px 14px; border-radius:10px;
+            border:1.5px solid var(--border); background:var(--surface-2);
+            color:var(--text); font-size:13px; font-weight:700; font-family:inherit;
+            cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;
+            transition:var(--transition);
+        }
+        .btn-google:hover { border-color:var(--primary); color:var(--primary); box-shadow:0 0 0 3px var(--primary-glow); }
+        .btn-google:disabled { opacity:.55; cursor:not-allowed; }
+
+        .google-btn-shell {
+            width:100%; margin-bottom:10px; padding:0;
+            border:none; border-radius:12px;
+            background:transparent;
+            display:flex; justify-content:center;
+            position:relative;
+        }
+        .google-btn-shell-inner { width:100%; display:flex; justify-content:center; }
+        .google-btn-mask {
+            position:absolute;
+            left:10px;
+            top:50%;
+            transform:translateY(-50%);
+            width:46px;
+            height:34px;
+            border-radius:8px;
+            background:#202124;
+            pointer-events:none;
+            z-index:2;
+            display:none;
+        }
+        .google-btn-overlay-icon {
+            position:absolute;
+            left:23px;
+            top:50%;
+            transform:translateY(-50%);
+            color:#EA4335;
+            font-size:19px;
+            pointer-events:none;
+            z-index:3;
+            display:none;
+        }
+        .google-btn-shell.dark .google-btn-mask,
+        .google-btn-shell.dark .google-btn-overlay-icon {
+            display:block;
+        }
+
         /* ── Resumen ── */
         .resumen-box {
             background:var(--surface-2); border:1px solid var(--border);
@@ -563,6 +610,14 @@
 
         <!-- PASO 2 -->
         <div class="step-panel" id="panel2">
+            <button class="btn-google" id="btnGoogleRegister" type="button" style="display:none;margin-bottom:4px;" onclick="registrarConGoogle()">
+                <i class="fab fa-google"></i> Completar registro con Google
+            </button>
+            <div id="googleRegisterShell" class="google-btn-shell dark" style="display:none;">
+                <span class="google-btn-mask" aria-hidden="true"></span>
+                <i class="fab fa-google google-btn-overlay-icon" aria-hidden="true"></i>
+                <div id="googleRegisterRender" class="google-btn-shell-inner"></div>
+            </div>
             <div class="form-row">
                 <div class="fg">
                     <label>Nombre *</label>
@@ -654,6 +709,7 @@
     </div>
 </div>
 
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <script>
 (function() {
     const saved = localStorage.getItem('dash-theme') || 'dark';
@@ -675,6 +731,119 @@ const BASE = (function() {
 
 let rubros = [];
 let rubroSeleccionado = null;
+let googleRegisterReady = false;
+let googleRegisterTokenClient = null;
+
+async function initGoogleRegister() {
+    try {
+        const res = await fetch(`${BASE}/api/auth/google-config.php`, {
+            method: 'GET',
+            credentials: 'include'
+        });
+        const data = await res.json();
+        if (!data.success || !data.data?.enabled || !data.data?.client_id) return;
+        if (!window.google || !window.google.accounts || !window.google.accounts.oauth2) return;
+
+        googleRegisterTokenClient = window.google.accounts.oauth2.initTokenClient({
+            client_id: data.data.client_id,
+            scope: 'openid email profile',
+            callback: onGoogleRegisterCredential
+        });
+
+        const googleBtn = document.getElementById('btnGoogleRegister');
+        if (googleBtn) googleBtn.style.display = 'flex';
+
+        const googleShell = document.getElementById('googleRegisterShell');
+        if (googleShell) {
+            googleShell.style.display = 'none';
+        }
+
+        googleRegisterReady = true;
+    } catch (e) {
+        console.error('No se pudo inicializar Google en registro', e);
+    }
+}
+
+function registrarConGoogle() {
+    hideAlert();
+
+    if (!document.getElementById('nombre_negocio').value.trim()) {
+        showAlert('Primero ingresá el nombre del negocio', 'error');
+        goStep(1);
+        return;
+    }
+    if (!document.getElementById('rubro_id').value) {
+        showAlert('Primero seleccioná el rubro del negocio', 'error');
+        goStep(1);
+        return;
+    }
+
+    if (!googleRegisterReady || !googleRegisterTokenClient) {
+        showAlert('Google no está disponible ahora. Verificá bloqueadores/extensiones y recargá.', 'error');
+        return;
+    }
+
+    googleRegisterTokenClient.requestAccessToken({ prompt: 'select_account' });
+}
+
+async function onGoogleRegisterCredential(tokenResponse) {
+    if (tokenResponse?.error) {
+        showAlert('Google canceló o bloqueó la autorización', 'error');
+        return;
+    }
+
+    if (!tokenResponse?.access_token) {
+        showAlert('No se pudo obtener la autorización de Google', 'error');
+        return;
+    }
+
+    const btn = document.getElementById('btnGoogleRegister');
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registrando con Google...';
+    }
+
+    const usuarioValue = document.getElementById('usuario').value.trim();
+    const body = {
+        access_token: tokenResponse.access_token,
+        nombre_negocio: document.getElementById('nombre_negocio').value.trim(),
+        rubro_id: parseInt(document.getElementById('rubro_id').value, 10),
+        nombre: document.getElementById('nombre').value.trim() || undefined,
+        apellido: document.getElementById('apellido').value.trim() || undefined,
+        usuario: usuarioValue || undefined,
+    };
+
+    try {
+        const res = await fetch(`${BASE}/api/auth/register-google.php`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+            credentials: 'include'
+        });
+
+        const data = await res.json();
+        if (data.success) {
+            const userData = data.data?.user || null;
+            if (userData) {
+                localStorage.setItem('user', JSON.stringify(userData));
+            }
+            showAlert('Registro con Google exitoso. Redirigiendo...', 'success');
+            setTimeout(() => {
+                window.location.href = `${BASE}/views/dashboard/index.php`;
+            }, 900);
+            return;
+        }
+
+        showAlert(data.message || 'Error al registrar con Google', 'error');
+    } catch (e) {
+        showAlert('Error de conexión. Intentá de nuevo.', 'error');
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fab fa-google"></i> Completar registro con Google';
+        }
+    }
+}
 
 async function cargarRubros() {
     try {
@@ -853,6 +1022,7 @@ function showAlert(msg, type) {
 function hideAlert() { document.getElementById('alertBox').className = 'alert'; }
 
 cargarRubros();
+initGoogleRegister();
 </script>
 </body>
 </html>
