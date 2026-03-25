@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Servidor: 127.0.0.1
--- Tiempo de generación: 17-03-2026 a las 13:54:38
--- Versión del servidor: 10.4.32-MariaDB
--- Versión de PHP: 8.2.12
+-- Servidor: localhost
+-- Tiempo de generación: 25-03-2026 a las 14:17:51
+-- Versión del servidor: 10.4.28-MariaDB
+-- Versión de PHP: 8.0.28
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -20,6 +20,31 @@ SET time_zone = "+00:00";
 --
 -- Base de datos: `dashbase_local`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `abonos_canchas`
+--
+
+CREATE TABLE `abonos_canchas` (
+  `id` int(11) NOT NULL,
+  `negocio_id` int(11) NOT NULL,
+  `cancha_id` int(11) NOT NULL,
+  `cliente_nombre` varchar(150) NOT NULL,
+  `cliente_telefono` varchar(40) DEFAULT NULL,
+  `dia_semana` tinyint(1) NOT NULL COMMENT '0=Dom,1=Lun,...,6=Sab',
+  `hora_inicio` time NOT NULL,
+  `hora_fin` time NOT NULL,
+  `duracion_horas` decimal(3,1) DEFAULT 1.0,
+  `monto_mensual` decimal(10,2) DEFAULT 0.00,
+  `fecha_inicio` date NOT NULL,
+  `fecha_fin` date NOT NULL,
+  `estado` varchar(30) DEFAULT 'activo' COMMENT 'activo, pausado, vencido, cancelado',
+  `notas` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -166,40 +191,67 @@ INSERT INTO `audit_logs` (`id`, `negocio_id`, `usuario_id`, `accion`, `tabla`, `
 (118, 6, 6, 'login', 'usuarios', 6, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-07 19:14:24'),
 (119, 7, 7, 'login', 'usuarios', 7, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-07 19:15:24'),
 (120, 7, 7, 'logout', 'usuarios', 7, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-07 19:16:44'),
-(121, 4, 5, 'login', 'usuarios', 5, NULL, NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-07 20:13:23'),
-(122, 4, 5, 'create', 'productos', 68, NULL, '{\"nombre\":\"prueba prueba prueba\",\"descripcion\":\"\",\"categoria_id\":\"50\",\"codigo_barras\":\"123112233\",\"precio_costo\":1000,\"precio_venta\":2000,\"stock\":0,\"stock_minimo\":0,\"unidad_medida\":\"unidad\",\"foto\":null}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-07 20:31:06'),
-(123, 4, 5, 'update', 'productos', 68, '{\"id\":68,\"negocio_id\":4,\"categoria_id\":50,\"nombre\":\"prueba prueba prueba\",\"descripcion\":\"\",\"codigo_barras\":\"123112233\",\"precio_costo\":\"1000.00\",\"precio_venta\":\"2000.00\",\"stock\":0,\"stock_minimo\":0,\"unidad_medida\":\"unidad\",\"foto\":null,\"activo\":1,\"fecha_creacion\":\"2026-03-07 17:31:06\",\"fecha_actualizacion\":\"2026-03-07 17:31:06\",\"fecha_vencimiento\":null,\"proveedor_id\":null,\"ubicacion\":null,\"categoria_nombre\":\"Electricidad\",\"categoria_color\":\"#eab308\"}', '{\"nombre\":\"prueba prueba\",\"descripcion\":\"\",\"categoria_id\":\"50\",\"codigo_barras\":\"123112233\",\"precio_costo\":1000,\"precio_venta\":2000,\"stock\":0,\"stock_minimo\":0,\"unidad_medida\":\"unidad\",\"foto\":null,\"id\":\"68\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-07 20:31:19'),
-(124, 4, 5, 'delete', 'productos', 68, '{\"id\":68,\"negocio_id\":4,\"categoria_id\":50,\"nombre\":\"prueba prueba\",\"descripcion\":\"\",\"codigo_barras\":\"123112233\",\"precio_costo\":\"1000.00\",\"precio_venta\":\"2000.00\",\"stock\":0,\"stock_minimo\":0,\"unidad_medida\":\"unidad\",\"foto\":null,\"activo\":1,\"fecha_creacion\":\"2026-03-07 17:31:06\",\"fecha_actualizacion\":\"2026-03-07 17:31:19\",\"fecha_vencimiento\":null,\"proveedor_id\":null,\"ubicacion\":null,\"categoria_nombre\":\"Electricidad\",\"categoria_color\":\"#eab308\"}', NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-07 20:31:33'),
-(125, 4, 5, 'create', 'categorias', 112, NULL, '{\"nombre\":\"azul\",\"descripcion\":\"azul prueba\",\"color\":\"#2196F3\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-07 20:32:24'),
-(126, 4, 5, 'update', 'categorias', 112, '{\"id\":112,\"negocio_id\":4,\"nombre\":\"azul\",\"descripcion\":\"azul prueba\",\"color\":\"#2196F3\",\"activo\":1,\"fecha_creacion\":\"2026-03-07 17:32:24\"}', '{\"nombre\":\"azul11111\",\"descripcion\":\"azul prueba\",\"color\":\"#2196F3\",\"id\":\"112\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-07 20:32:31'),
-(127, 4, 5, 'delete', 'categorias', 112, '{\"id\":112,\"negocio_id\":4,\"nombre\":\"azul11111\",\"descripcion\":\"azul prueba\",\"color\":\"#2196F3\",\"activo\":1,\"fecha_creacion\":\"2026-03-07 17:32:24\"}', NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-07 20:32:34'),
-(128, 4, 5, 'create', 'ventas', 4, NULL, '{\"metodo_pago\":\"transferencia\",\"total_items\":2}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-07 21:51:07'),
-(129, 4, 5, 'logout', 'usuarios', 5, NULL, NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-07 22:50:22'),
-(130, 3, 4, 'login', 'usuarios', 4, NULL, NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-08 19:31:31'),
-(131, 3, 4, 'logout', 'usuarios', 4, NULL, NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-08 20:38:38'),
-(132, 6, 6, 'login', 'usuarios', 6, NULL, NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-08 20:39:18'),
-(133, 6, 6, 'update', 'productos', 41, '{\"id\":41,\"negocio_id\":6,\"categoria_id\":57,\"nombre\":\"Aceite Girasol 1.5L\",\"descripcion\":\"Aceite de girasol primera prensada\",\"codigo_barras\":\"7791234500001\",\"precio_costo\":\"780.00\",\"precio_venta\":\"1250.00\",\"stock\":48,\"stock_minimo\":10,\"unidad_medida\":\"unidad\",\"foto\":null,\"activo\":1,\"fecha_creacion\":\"2026-02-27 15:43:47\",\"fecha_actualizacion\":\"2026-02-27 15:43:47\",\"fecha_vencimiento\":null,\"proveedor_id\":1,\"ubicacion\":\"Pasillo A-1\",\"categoria_nombre\":\"Almacén\",\"categoria_color\":\"#f59e0b\"}', '{\"nombre\":\"Aceite Girasol 1.5L\",\"descripcion\":\"Aceite de girasol primera prensada\",\"categoria_id\":\"57\",\"codigo_barras\":\"7791234500001\",\"precio_costo\":780,\"precio_venta\":1250,\"stock\":48,\"stock_minimo\":10,\"unidad_medida\":\"unidad\",\"foto\":null,\"id\":\"41\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-08 20:40:15'),
-(134, 6, 6, 'create', 'ventas', 14, NULL, '{\"metodo_pago\":\"efectivo\",\"total_items\":5}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-08 20:40:33'),
-(135, 6, 6, 'delete', 'ventas', 3, NULL, '{\"anulada\":true}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-08 20:46:56'),
-(136, 6, 6, 'logout', 'usuarios', 6, NULL, NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-08 20:49:52'),
-(137, 7, 7, 'login', 'usuarios', 7, NULL, NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-09 21:55:28'),
-(138, 7, 7, 'create', 'productos', 69, NULL, '{\"nombre\":\"corte de cabello\",\"descripcion\":\"\",\"categoria_id\":null,\"codigo_barras\":null,\"precio_costo\":6000,\"precio_venta\":12000,\"stock\":0,\"stock_minimo\":0,\"unidad_medida\":\"unidad\",\"foto\":null}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-09 21:56:02'),
-(139, 7, 7, 'create', 'categorias', 113, NULL, '{\"nombre\":\"corte hombre\",\"descripcion\":\"\",\"color\":\"#FF5252\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-09 21:56:14'),
-(140, 7, 7, 'update', 'productos', 69, '{\"id\":69,\"negocio_id\":7,\"categoria_id\":null,\"nombre\":\"corte de cabello\",\"descripcion\":\"\",\"codigo_barras\":null,\"precio_costo\":\"6000.00\",\"precio_venta\":\"12000.00\",\"stock\":0,\"stock_minimo\":0,\"unidad_medida\":\"unidad\",\"foto\":null,\"activo\":1,\"fecha_creacion\":\"2026-03-09 18:56:02\",\"fecha_actualizacion\":\"2026-03-09 18:56:02\",\"fecha_vencimiento\":null,\"proveedor_id\":null,\"ubicacion\":null,\"categoria_nombre\":null,\"categoria_color\":null}', '{\"nombre\":\"corte de cabello\",\"descripcion\":\"\",\"categoria_id\":\"113\",\"codigo_barras\":null,\"precio_costo\":6000,\"precio_venta\":12000,\"stock\":0,\"stock_minimo\":0,\"unidad_medida\":\"unidad\",\"foto\":null,\"id\":\"69\"}', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-09 21:56:23'),
-(141, 7, 7, 'logout', 'usuarios', 7, NULL, NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-09 22:07:57'),
-(142, 7, 7, 'login', 'usuarios', 7, NULL, NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-09 22:08:14'),
-(143, 7, 7, 'logout', 'usuarios', 7, NULL, NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-09 22:08:19'),
-(144, 1, 1, 'login', 'usuarios', 1, NULL, NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-09 22:08:28'),
-(145, 1, 1, 'logout', 'usuarios', 1, NULL, NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-09 22:08:38'),
-(146, 8, 8, 'login', 'usuarios', 8, NULL, NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 12:47:40'),
-(147, 8, 8, 'logout', 'usuarios', 8, NULL, NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 13:00:45'),
-(148, 11, 11, 'login', 'usuarios', 11, NULL, NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 13:00:57'),
-(149, 11, 11, 'logout', 'usuarios', 11, NULL, NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 13:02:18'),
-(150, 4, 5, 'login', 'usuarios', 5, NULL, NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-12 01:08:05'),
-(151, 4, 5, 'logout', 'usuarios', 5, NULL, NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-12 01:08:19'),
-(152, 19, 19, 'login', 'usuarios', 19, NULL, NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-12 01:27:46'),
-(153, 19, 19, 'logout', 'usuarios', 19, NULL, NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-12 01:27:52'),
-(154, 3, 4, 'login', 'usuarios', 4, NULL, NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-16 20:50:36');
+(121, 4, 5, 'login', 'usuarios', 5, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-07 20:39:29'),
+(122, 4, 5, 'logout', 'usuarios', 5, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-09 20:52:12'),
+(123, 19, 19, 'login', 'usuarios', 19, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 17:39:36'),
+(124, 19, 19, 'logout', 'usuarios', 19, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 17:46:31'),
+(125, 1, 1, 'logout', 'usuarios', 1, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-11 14:32:43'),
+(126, 1, 1, 'logout', 'usuarios', 1, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-11 14:34:01'),
+(127, 7, 7, 'login', 'usuarios', 7, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-11 14:34:15'),
+(128, 7, 7, 'logout', 'usuarios', 7, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-12 13:06:47'),
+(129, 8, 8, 'login', 'usuarios', 8, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-12 13:08:37'),
+(130, 7, 7, 'login', 'usuarios', 7, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-12 13:09:26'),
+(131, 7, 7, 'logout', 'usuarios', 7, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-13 00:20:04'),
+(132, 20, 20, 'login', 'usuarios', 20, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-13 00:26:36'),
+(133, 1, 1, 'logout', 'usuarios', 1, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-13 13:37:38'),
+(134, 1, 1, 'login', 'usuarios', 1, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-13 15:31:20'),
+(135, 1, 1, 'logout', 'usuarios', 1, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-13 15:32:02'),
+(136, 1, 1, 'login', 'usuarios', 1, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-13 15:49:01'),
+(137, 1, 1, 'create', 'productos', 68, NULL, '{\"nombre\":\"Lomito\",\"descripcion\":\"\",\"categoria_id\":\"1\",\"codigo_barras\":\"2313231\",\"precio_costo\":30000,\"precio_venta\":35000,\"stock\":3,\"stock_minimo\":0,\"unidad_medida\":\"unidad\",\"foto\":\"prod_69b4320aaa494_1773416970.webp\"}', '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-13 15:50:04'),
+(138, 1, 1, 'create', 'productos', 69, NULL, '{\"nombre\":\"Polenta Presto Pronta\",\"descripcion\":\"500g\",\"categoria_id\":\"1\",\"codigo_barras\":\"12313221\",\"precio_costo\":20000,\"precio_venta\":27000,\"stock\":20,\"stock_minimo\":5,\"unidad_medida\":\"unidad\",\"foto\":\"prod_69b432bbabb6b_1773417147.jpg\"}', '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-13 15:53:04'),
+(139, 1, 1, 'create', 'productos', 70, NULL, '{\"nombre\":\"Fideo Anita\",\"descripcion\":\"\",\"categoria_id\":null,\"codigo_barras\":null,\"precio_costo\":20000,\"precio_venta\":25000,\"stock\":2,\"stock_minimo\":1,\"unidad_medida\":\"unidad\",\"foto\":\"prod_69b4330b1c66e_1773417227.jpg\"}', '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-13 15:54:06'),
+(140, 1, 1, 'create', 'productos', 71, NULL, '{\"nombre\":\"Fanta 3L\",\"descripcion\":\"\",\"categoria_id\":\"1\",\"codigo_barras\":\"41212\",\"precio_costo\":20000,\"precio_venta\":30000,\"stock\":3,\"stock_minimo\":1,\"unidad_medida\":\"unidad\",\"foto\":\"prod_69b43381e016d_1773417345.jpg\"}', '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-13 15:55:48'),
+(141, 1, 1, 'login', 'usuarios', 1, NULL, NULL, '192.168.100.248', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-13 15:59:33'),
+(142, 1, 1, 'logout', 'usuarios', 1, NULL, NULL, '192.168.100.248', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-13 16:04:47'),
+(143, 8, 8, 'login', 'usuarios', 8, NULL, NULL, '192.168.100.248', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-13 16:05:25'),
+(144, 3, 4, 'login', 'usuarios', 4, NULL, NULL, '192.168.100.248', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-13 16:06:32'),
+(145, 1, 1, 'logout', 'usuarios', 1, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-13 16:25:09'),
+(146, 1, 1, 'login', 'usuarios', 1, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-13 16:27:56'),
+(147, 3, 4, 'login', 'usuarios', 4, NULL, NULL, '192.168.100.248', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-14 14:15:02'),
+(148, 1, 1, 'logout', 'usuarios', 1, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-16 20:33:54'),
+(149, 1, 1, 'logout', 'usuarios', 1, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-17 03:21:49'),
+(150, 8, 8, 'login', 'usuarios', 8, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-17 03:22:31'),
+(151, 7, 7, 'login', 'usuarios', 7, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-17 03:23:13'),
+(152, 7, 7, 'logout', 'usuarios', 7, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-17 03:25:39'),
+(153, 3, 4, 'login', 'usuarios', 4, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-17 03:25:47'),
+(154, 3, 4, 'logout', 'usuarios', 4, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-17 03:26:28'),
+(155, 21, 21, 'login', 'usuarios', 21, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-17 03:27:48'),
+(156, 21, 21, 'logout', 'usuarios', 21, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-17 03:28:56'),
+(157, 1, 1, 'login', 'usuarios', 1, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-17 03:29:09'),
+(158, 1, 1, 'create', 'categorias', 127, NULL, '{\"nombre\":\"Unas\",\"descripcion\":\"\",\"color\":\"#FFC107\"}', '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-17 03:29:26'),
+(159, 11, 11, 'login', 'usuarios', 11, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-23 14:31:28'),
+(160, 11, 11, 'logout', 'usuarios', 11, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-23 14:33:07'),
+(161, 3, 4, 'login', 'usuarios', 4, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-23 14:34:01'),
+(162, 3, 4, 'logout', 'usuarios', 4, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-23 23:14:33'),
+(163, 8, 8, 'login', 'usuarios', 8, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-23 23:14:57'),
+(164, 7, 7, 'login', 'usuarios', 7, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-23 23:26:14'),
+(165, 3, 4, 'login', 'usuarios', 4, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-24 00:38:12'),
+(166, 8, 8, 'login', 'usuarios', 8, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-24 17:50:46'),
+(167, 8, 8, 'logout', 'usuarios', 8, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-24 17:50:59'),
+(168, 8, 8, 'login', 'usuarios', 8, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-24 17:51:56'),
+(169, 8, 8, 'logout', 'usuarios', 8, NULL, NULL, '::1', 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Mobile Safari/537.36', '2026-03-24 17:57:50'),
+(170, 8, 8, 'login', 'usuarios', 8, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-24 17:58:31'),
+(171, 8, 8, 'logout', 'usuarios', 8, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-24 17:58:55'),
+(172, 7, 7, 'login', 'usuarios', 7, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-24 18:09:38'),
+(173, 7, 7, 'logout', 'usuarios', 7, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-24 18:11:02'),
+(174, 7, 7, 'login', 'usuarios', 7, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-24 18:12:24'),
+(175, 11, 11, 'login', 'usuarios', 11, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-24 18:33:00'),
+(176, 3, 4, 'logout', 'usuarios', 4, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-24 18:59:42'),
+(177, 11, 11, 'login', 'usuarios', 11, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-24 19:00:01'),
+(178, 11, 11, 'logout', 'usuarios', 11, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-24 22:51:07'),
+(179, 22, 22, 'login', 'usuarios', 22, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-24 22:53:01'),
+(180, 22, 22, 'logout', 'usuarios', 22, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-24 23:07:38'),
+(181, 23, 23, 'login', 'usuarios', 23, NULL, NULL, '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-24 23:08:38');
 
 -- --------------------------------------------------------
 
@@ -236,7 +288,26 @@ INSERT INTO `cajas` (`id`, `negocio_id`, `usuario_id`, `monto_inicial`, `monto_v
 (6, 6, 6, 480.00, 0.00, 0.00, 480.00, 230.00, -250.00, 'cerrada', 'nos euqe paso', '2026-03-03 00:42:36', '2026-03-03 00:46:08'),
 (7, 6, 6, 2000.00, 0.00, 0.00, NULL, NULL, NULL, 'abierta', NULL, '2026-03-03 00:46:38', NULL),
 (8, 8, 8, 20000.00, 0.00, 0.00, NULL, NULL, NULL, 'abierta', NULL, '2026-03-03 23:00:17', NULL),
-(9, 7, 7, 10000.00, 0.00, 0.00, NULL, NULL, NULL, 'abierta', NULL, '2026-03-09 21:56:37', NULL);
+(9, 7, 7, 2000.00, 0.00, 0.00, NULL, NULL, NULL, 'abierta', NULL, '2026-03-24 18:10:10', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `canchas`
+--
+
+CREATE TABLE `canchas` (
+  `id` int(11) NOT NULL,
+  `negocio_id` int(11) NOT NULL,
+  `nombre` varchar(150) NOT NULL,
+  `deporte` varchar(100) DEFAULT NULL,
+  `descripcion` text DEFAULT NULL,
+  `precio_hora` decimal(10,2) DEFAULT 0.00,
+  `capacidad` int(11) DEFAULT 0,
+  `activo` tinyint(1) DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -350,10 +421,28 @@ INSERT INTO `categorias` (`id`, `negocio_id`, `nombre`, `descripcion`, `color`, 
 (109, 18, 'General', NULL, '#667eea', 1, '2026-03-07 02:49:24'),
 (110, 18, 'Servicios', NULL, '#10b981', 1, '2026-03-07 02:49:24'),
 (111, 18, 'Productos', NULL, '#3b82f6', 1, '2026-03-07 02:49:24'),
-(113, 7, 'corte hombre', '', '#FF5252', 1, '2026-03-09 21:56:14'),
-(114, 19, 'General', NULL, '#667eea', 1, '2026-03-12 01:08:57'),
-(115, 19, 'Servicios', NULL, '#10b981', 1, '2026-03-12 01:08:57'),
-(116, 19, 'Productos', NULL, '#3b82f6', 1, '2026-03-12 01:08:57');
+(112, 19, 'Herramientas', NULL, '#f59e0b', 1, '2026-03-10 17:39:20'),
+(113, 19, 'Electricidad', NULL, '#eab308', 1, '2026-03-10 17:39:20'),
+(114, 19, 'Plomería', NULL, '#06b6d4', 1, '2026-03-10 17:39:20'),
+(115, 19, 'Pinturas', NULL, '#ef4444', 1, '2026-03-10 17:39:20'),
+(116, 19, 'Fijaciones', NULL, '#64748b', 1, '2026-03-10 17:39:20'),
+(117, 20, 'Celulares', NULL, '#3b82f6', 1, '2026-03-13 00:26:26'),
+(118, 20, 'Accesorios', NULL, '#6366f1', 1, '2026-03-13 00:26:26'),
+(119, 20, 'Computadoras', NULL, '#64748b', 1, '2026-03-13 00:26:26'),
+(120, 20, 'Servicios', NULL, '#10b981', 1, '2026-03-13 00:26:26'),
+(121, 21, 'Fútbol', NULL, '#16a34a', 1, '2026-03-17 03:27:36'),
+(122, 21, 'Pádel', NULL, '#0ea5e9', 1, '2026-03-17 03:27:36'),
+(123, 21, 'Vóley', NULL, '#8b5cf6', 1, '2026-03-17 03:27:36'),
+(124, 21, 'Tenis', NULL, '#f59e0b', 1, '2026-03-17 03:27:36'),
+(125, 21, 'Básquet', NULL, '#ef4444', 1, '2026-03-17 03:27:36'),
+(126, 21, 'Otros', NULL, '#64748b', 1, '2026-03-17 03:27:36'),
+(127, 1, 'Unas', '', '#FFC107', 1, '2026-03-17 03:29:26'),
+(128, 22, 'General', NULL, '#667eea', 1, '2026-03-24 22:52:52'),
+(129, 22, 'Servicios', NULL, '#10b981', 1, '2026-03-24 22:52:52'),
+(130, 22, 'Productos', NULL, '#3b82f6', 1, '2026-03-24 22:52:52'),
+(131, 23, 'General', NULL, '#667eea', 1, '2026-03-24 23:08:29'),
+(132, 23, 'Servicios', NULL, '#10b981', 1, '2026-03-24 23:08:29'),
+(133, 23, 'Productos', NULL, '#3b82f6', 1, '2026-03-24 23:08:29');
 
 -- --------------------------------------------------------
 
@@ -364,30 +453,12 @@ INSERT INTO `categorias` (`id`, `negocio_id`, `nombre`, `descripcion`, `color`, 
 CREATE TABLE `clientes` (
   `id` int(11) NOT NULL,
   `negocio_id` int(11) NOT NULL,
-  `codigo_cliente` varchar(50) DEFAULT NULL,
-  `tipo` enum('persona','empresa') DEFAULT 'persona',
   `nombre` varchar(255) NOT NULL,
   `apellido` varchar(255) DEFAULT NULL,
-  `razon_social` varchar(255) DEFAULT NULL,
-  `documento` varchar(50) DEFAULT NULL,
   `telefono` varchar(50) DEFAULT NULL,
-  `celular` varchar(50) DEFAULT NULL,
-  `fecha_nacimiento` date DEFAULT NULL,
   `email` varchar(255) DEFAULT NULL,
   `direccion` text DEFAULT NULL,
-  `ciudad` varchar(100) DEFAULT NULL,
-  `provincia` varchar(100) DEFAULT NULL,
-  `codigo_postal` varchar(10) DEFAULT NULL,
-  `pais` varchar(100) DEFAULT 'Argentina',
   `notas` text DEFAULT NULL,
-  `categoria` enum('regular','frecuente','vip','mayorista') DEFAULT 'regular',
-  `descuento_especial` decimal(5,2) DEFAULT 0.00,
-  `limite_credito` decimal(10,2) DEFAULT 0.00,
-  `saldo_actual` decimal(10,2) DEFAULT 0.00,
-  `estado` enum('activo','inactivo') DEFAULT 'activo',
-  `fecha_ultima_compra` timestamp NULL DEFAULT NULL,
-  `total_compras` decimal(10,2) DEFAULT 0.00,
-  `cantidad_compras` int(11) DEFAULT 0,
   `activo` tinyint(1) DEFAULT 1,
   `fecha_creacion` timestamp NOT NULL DEFAULT current_timestamp(),
   `fecha_actualizacion` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
@@ -397,12 +468,12 @@ CREATE TABLE `clientes` (
 -- Volcado de datos para la tabla `clientes`
 --
 
-INSERT INTO `clientes` (`id`, `negocio_id`, `codigo_cliente`, `tipo`, `nombre`, `apellido`, `razon_social`, `documento`, `telefono`, `celular`, `fecha_nacimiento`, `email`, `direccion`, `ciudad`, `provincia`, `codigo_postal`, `pais`, `notas`, `categoria`, `descuento_especial`, `limite_credito`, `saldo_actual`, `estado`, `fecha_ultima_compra`, `total_compras`, `cantidad_compras`, `activo`, `fecha_creacion`, `fecha_actualizacion`) VALUES
-(1, 4, NULL, 'persona', 'Roberto', 'Construcciones SA', NULL, NULL, '2215551234', NULL, NULL, 'robert@constsa.com', 'Av. Ituzaingó 1500', NULL, NULL, NULL, 'Argentina', NULL, 'regular', 0.00, 0.00, 0.00, 'activo', NULL, 0.00, 0, 1, '2026-02-27 17:43:39', '2026-02-27 17:43:39'),
-(2, 4, NULL, 'persona', 'Carlos', 'Domínguez', NULL, NULL, '2215552345', NULL, NULL, 'carlos.dom@gmail.com', 'Belgrano 850', NULL, NULL, NULL, 'Argentina', NULL, 'regular', 0.00, 0.00, 0.00, 'activo', NULL, 0.00, 0, 1, '2026-02-27 17:43:39', '2026-02-27 17:43:39'),
-(3, 4, NULL, 'persona', 'Obra', 'Villa Norte', NULL, NULL, '2215553456', NULL, NULL, 'obra.villnorte@mail.com', 'Calle 44 N°1200', NULL, NULL, NULL, 'Argentina', NULL, 'regular', 0.00, 0.00, 0.00, 'activo', NULL, 0.00, 0, 1, '2026-02-27 17:43:39', '2026-02-27 17:43:39'),
-(4, 4, NULL, 'persona', 'Laura', 'Pérez', NULL, NULL, '2215554567', NULL, NULL, 'lperez@gmail.com', 'San Martín 320', NULL, NULL, NULL, 'Argentina', NULL, 'regular', 0.00, 0.00, 0.00, 'activo', NULL, 0.00, 0, 1, '2026-02-27 17:43:39', '2026-02-27 17:43:39'),
-(5, 4, NULL, 'persona', 'Plomería', 'González e Hijos', NULL, NULL, '2215555678', NULL, NULL, 'plomgonzalez@gmail.com', 'Corrientes 780', NULL, NULL, NULL, 'Argentina', NULL, 'regular', 0.00, 0.00, 0.00, 'activo', NULL, 0.00, 0, 1, '2026-02-27 17:43:39', '2026-02-27 17:43:39');
+INSERT INTO `clientes` (`id`, `negocio_id`, `nombre`, `apellido`, `telefono`, `email`, `direccion`, `notas`, `activo`, `fecha_creacion`, `fecha_actualizacion`) VALUES
+(1, 4, 'Roberto', 'Construcciones SA', '2215551234', 'robert@constsa.com', 'Av. Ituzaingó 1500', NULL, 1, '2026-02-27 17:43:39', '2026-02-27 17:43:39'),
+(2, 4, 'Carlos', 'Domínguez', '2215552345', 'carlos.dom@gmail.com', 'Belgrano 850', NULL, 1, '2026-02-27 17:43:39', '2026-02-27 17:43:39'),
+(3, 4, 'Obra', 'Villa Norte', '2215553456', 'obra.villnorte@mail.com', 'Calle 44 N°1200', NULL, 1, '2026-02-27 17:43:39', '2026-02-27 17:43:39'),
+(4, 4, 'Laura', 'Pérez', '2215554567', 'lperez@gmail.com', 'San Martín 320', NULL, 1, '2026-02-27 17:43:39', '2026-02-27 17:43:39'),
+(5, 4, 'Plomería', 'González e Hijos', '2215555678', 'plomgonzalez@gmail.com', 'Corrientes 780', NULL, 1, '2026-02-27 17:43:39', '2026-02-27 17:43:39');
 
 -- --------------------------------------------------------
 
@@ -433,6 +504,8 @@ CREATE TABLE `clientes_peluqueria` (
   `telefono` varchar(40) NOT NULL,
   `email` varchar(120) DEFAULT NULL,
   `notas` text DEFAULT NULL,
+  `ultima_visita` date DEFAULT NULL,
+  `total_visitas` int(11) DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -440,9 +513,9 @@ CREATE TABLE `clientes_peluqueria` (
 -- Volcado de datos para la tabla `clientes_peluqueria`
 --
 
-INSERT INTO `clientes_peluqueria` (`id`, `negocio_id`, `nombre`, `telefono`, `email`, `notas`, `created_at`) VALUES
-(1, 7, 'pancho', '3718563124', '', '', '2026-03-09 21:59:19'),
-(2, 7, 'abi', '378181554', '', '', '2026-03-09 22:00:21');
+INSERT INTO `clientes_peluqueria` (`id`, `negocio_id`, `nombre`, `telefono`, `email`, `notas`, `ultima_visita`, `total_visitas`, `created_at`) VALUES
+(1, 7, 'pancho', '3718563124', '', '', NULL, 0, '2026-03-09 21:59:19'),
+(2, 7, 'abi', '378181554', '', '', NULL, 0, '2026-03-09 22:00:21');
 
 -- --------------------------------------------------------
 
@@ -648,19 +721,71 @@ INSERT INTO `config_enum` (`id`, `negocio_id`, `grupo`, `valor`, `etiqueta`, `or
 (194, 18, 'unidades_medida', 'caja', 'Caja', 6, 1, 1, '2026-03-07 02:49:24', '2026-03-07 02:49:24'),
 (195, 18, 'unidades_medida', 'par', 'Par', 7, 1, 0, '2026-03-07 02:49:24', '2026-03-07 02:49:24'),
 (196, 18, 'unidades_medida', 'metro', 'Metro', 8, 1, 0, '2026-03-07 02:49:24', '2026-03-07 02:49:24'),
-(197, 19, 'metodos_pago', 'efectivo', 'Efectivo', 1, 1, 1, '2026-03-12 01:08:57', '2026-03-12 01:08:57'),
-(198, 19, 'metodos_pago', 'tarjeta_debito', 'Tarjeta Débito', 2, 1, 1, '2026-03-12 01:08:57', '2026-03-12 01:08:57'),
-(199, 19, 'metodos_pago', 'tarjeta_credito', 'Tarjeta Crédito', 3, 1, 1, '2026-03-12 01:08:57', '2026-03-12 01:08:57'),
-(200, 19, 'metodos_pago', 'transferencia', 'Transferencia', 4, 1, 1, '2026-03-12 01:08:57', '2026-03-12 01:08:57'),
-(201, 19, 'metodos_pago', 'mercado_pago', 'Mercado Pago', 5, 1, 0, '2026-03-12 01:08:57', '2026-03-12 01:08:57'),
-(202, 19, 'unidades_medida', 'unidad', 'Unidad', 1, 1, 1, '2026-03-12 01:08:57', '2026-03-12 01:08:57'),
-(203, 19, 'unidades_medida', 'kg', 'Kilogramo', 2, 1, 1, '2026-03-12 01:08:57', '2026-03-12 01:08:57'),
-(204, 19, 'unidades_medida', 'g', 'Gramo', 3, 1, 1, '2026-03-12 01:08:57', '2026-03-12 01:08:57'),
-(205, 19, 'unidades_medida', 'lt', 'Litro', 4, 1, 1, '2026-03-12 01:08:57', '2026-03-12 01:08:57'),
-(206, 19, 'unidades_medida', 'ml', 'Mililitro', 5, 1, 1, '2026-03-12 01:08:57', '2026-03-12 01:08:57'),
-(207, 19, 'unidades_medida', 'caja', 'Caja', 6, 1, 1, '2026-03-12 01:08:57', '2026-03-12 01:08:57'),
-(208, 19, 'unidades_medida', 'par', 'Par', 7, 1, 0, '2026-03-12 01:08:57', '2026-03-12 01:08:57'),
-(209, 19, 'unidades_medida', 'metro', 'Metro', 8, 1, 0, '2026-03-12 01:08:57', '2026-03-12 01:08:57');
+(197, 19, 'metodos_pago', 'efectivo', 'Efectivo', 1, 1, 1, '2026-03-10 17:39:20', '2026-03-10 17:39:20'),
+(198, 19, 'metodos_pago', 'tarjeta_debito', 'Tarjeta Débito', 2, 1, 1, '2026-03-10 17:39:20', '2026-03-10 17:39:20'),
+(199, 19, 'metodos_pago', 'tarjeta_credito', 'Tarjeta Crédito', 3, 1, 1, '2026-03-10 17:39:20', '2026-03-10 17:39:20'),
+(200, 19, 'metodos_pago', 'transferencia', 'Transferencia', 4, 1, 1, '2026-03-10 17:39:20', '2026-03-10 17:39:20'),
+(201, 19, 'metodos_pago', 'mercado_pago', 'Mercado Pago', 5, 1, 0, '2026-03-10 17:39:20', '2026-03-10 17:39:20'),
+(202, 19, 'unidades_medida', 'unidad', 'Unidad', 1, 1, 1, '2026-03-10 17:39:20', '2026-03-10 17:39:20'),
+(203, 19, 'unidades_medida', 'kg', 'Kilogramo', 2, 1, 1, '2026-03-10 17:39:20', '2026-03-10 17:39:20'),
+(204, 19, 'unidades_medida', 'g', 'Gramo', 3, 1, 1, '2026-03-10 17:39:20', '2026-03-10 17:39:20'),
+(205, 19, 'unidades_medida', 'lt', 'Litro', 4, 1, 1, '2026-03-10 17:39:20', '2026-03-10 17:39:20'),
+(206, 19, 'unidades_medida', 'ml', 'Mililitro', 5, 1, 1, '2026-03-10 17:39:20', '2026-03-10 17:39:20'),
+(207, 19, 'unidades_medida', 'caja', 'Caja', 6, 1, 1, '2026-03-10 17:39:20', '2026-03-10 17:39:20'),
+(208, 19, 'unidades_medida', 'par', 'Par', 7, 1, 0, '2026-03-10 17:39:20', '2026-03-10 17:39:20'),
+(209, 19, 'unidades_medida', 'metro', 'Metro', 8, 1, 0, '2026-03-10 17:39:20', '2026-03-10 17:39:20'),
+(210, 20, 'metodos_pago', 'efectivo', 'Efectivo', 1, 1, 1, '2026-03-13 00:26:26', '2026-03-13 00:26:26'),
+(211, 20, 'metodos_pago', 'tarjeta_debito', 'Tarjeta Débito', 2, 1, 1, '2026-03-13 00:26:26', '2026-03-13 00:26:26'),
+(212, 20, 'metodos_pago', 'tarjeta_credito', 'Tarjeta Crédito', 3, 1, 1, '2026-03-13 00:26:26', '2026-03-13 00:26:26'),
+(213, 20, 'metodos_pago', 'transferencia', 'Transferencia', 4, 1, 1, '2026-03-13 00:26:26', '2026-03-13 00:26:26'),
+(214, 20, 'metodos_pago', 'mercado_pago', 'Mercado Pago', 5, 1, 0, '2026-03-13 00:26:26', '2026-03-13 00:26:26'),
+(215, 20, 'unidades_medida', 'unidad', 'Unidad', 1, 1, 1, '2026-03-13 00:26:26', '2026-03-13 00:26:26'),
+(216, 20, 'unidades_medida', 'kg', 'Kilogramo', 2, 1, 1, '2026-03-13 00:26:26', '2026-03-13 00:26:26'),
+(217, 20, 'unidades_medida', 'g', 'Gramo', 3, 1, 1, '2026-03-13 00:26:26', '2026-03-13 00:26:26'),
+(218, 20, 'unidades_medida', 'lt', 'Litro', 4, 1, 1, '2026-03-13 00:26:26', '2026-03-13 00:26:26'),
+(219, 20, 'unidades_medida', 'ml', 'Mililitro', 5, 1, 1, '2026-03-13 00:26:26', '2026-03-13 00:26:26'),
+(220, 20, 'unidades_medida', 'caja', 'Caja', 6, 1, 1, '2026-03-13 00:26:26', '2026-03-13 00:26:26'),
+(221, 20, 'unidades_medida', 'par', 'Par', 7, 1, 0, '2026-03-13 00:26:26', '2026-03-13 00:26:26'),
+(222, 20, 'unidades_medida', 'metro', 'Metro', 8, 1, 0, '2026-03-13 00:26:26', '2026-03-13 00:26:26'),
+(223, 21, 'metodos_pago', 'efectivo', 'Efectivo', 1, 1, 1, '2026-03-17 03:27:36', '2026-03-17 03:27:36'),
+(224, 21, 'metodos_pago', 'tarjeta_debito', 'Tarjeta Débito', 2, 1, 1, '2026-03-17 03:27:36', '2026-03-17 03:27:36'),
+(225, 21, 'metodos_pago', 'tarjeta_credito', 'Tarjeta Crédito', 3, 1, 1, '2026-03-17 03:27:36', '2026-03-17 03:27:36'),
+(226, 21, 'metodos_pago', 'transferencia', 'Transferencia', 4, 1, 1, '2026-03-17 03:27:36', '2026-03-17 03:27:36'),
+(227, 21, 'metodos_pago', 'mercado_pago', 'Mercado Pago', 5, 1, 0, '2026-03-17 03:27:36', '2026-03-17 03:27:36'),
+(228, 21, 'unidades_medida', 'unidad', 'Unidad', 1, 1, 1, '2026-03-17 03:27:36', '2026-03-17 03:27:36'),
+(229, 21, 'unidades_medida', 'kg', 'Kilogramo', 2, 1, 1, '2026-03-17 03:27:36', '2026-03-17 03:27:36'),
+(230, 21, 'unidades_medida', 'g', 'Gramo', 3, 1, 1, '2026-03-17 03:27:36', '2026-03-17 03:27:36'),
+(231, 21, 'unidades_medida', 'lt', 'Litro', 4, 1, 1, '2026-03-17 03:27:36', '2026-03-17 03:27:36'),
+(232, 21, 'unidades_medida', 'ml', 'Mililitro', 5, 1, 1, '2026-03-17 03:27:36', '2026-03-17 03:27:36'),
+(233, 21, 'unidades_medida', 'caja', 'Caja', 6, 1, 1, '2026-03-17 03:27:36', '2026-03-17 03:27:36'),
+(234, 21, 'unidades_medida', 'par', 'Par', 7, 1, 0, '2026-03-17 03:27:36', '2026-03-17 03:27:36'),
+(235, 21, 'unidades_medida', 'metro', 'Metro', 8, 1, 0, '2026-03-17 03:27:36', '2026-03-17 03:27:36'),
+(236, 22, 'metodos_pago', 'efectivo', 'Efectivo', 1, 1, 1, '2026-03-24 22:52:52', '2026-03-24 22:52:52'),
+(237, 22, 'metodos_pago', 'tarjeta_debito', 'Tarjeta Débito', 2, 1, 1, '2026-03-24 22:52:52', '2026-03-24 22:52:52'),
+(238, 22, 'metodos_pago', 'tarjeta_credito', 'Tarjeta Crédito', 3, 1, 1, '2026-03-24 22:52:52', '2026-03-24 22:52:52'),
+(239, 22, 'metodos_pago', 'transferencia', 'Transferencia', 4, 1, 1, '2026-03-24 22:52:52', '2026-03-24 22:52:52'),
+(240, 22, 'metodos_pago', 'mercado_pago', 'Mercado Pago', 5, 1, 0, '2026-03-24 22:52:52', '2026-03-24 22:52:52'),
+(241, 22, 'unidades_medida', 'unidad', 'Unidad', 1, 1, 1, '2026-03-24 22:52:52', '2026-03-24 22:52:52'),
+(242, 22, 'unidades_medida', 'kg', 'Kilogramo', 2, 1, 1, '2026-03-24 22:52:52', '2026-03-24 22:52:52'),
+(243, 22, 'unidades_medida', 'g', 'Gramo', 3, 1, 1, '2026-03-24 22:52:52', '2026-03-24 22:52:52'),
+(244, 22, 'unidades_medida', 'lt', 'Litro', 4, 1, 1, '2026-03-24 22:52:52', '2026-03-24 22:52:52'),
+(245, 22, 'unidades_medida', 'ml', 'Mililitro', 5, 1, 1, '2026-03-24 22:52:52', '2026-03-24 22:52:52'),
+(246, 22, 'unidades_medida', 'caja', 'Caja', 6, 1, 1, '2026-03-24 22:52:52', '2026-03-24 22:52:52'),
+(247, 22, 'unidades_medida', 'par', 'Par', 7, 1, 0, '2026-03-24 22:52:52', '2026-03-24 22:52:52'),
+(248, 22, 'unidades_medida', 'metro', 'Metro', 8, 1, 0, '2026-03-24 22:52:52', '2026-03-24 22:52:52'),
+(249, 23, 'metodos_pago', 'efectivo', 'Efectivo', 1, 1, 1, '2026-03-24 23:08:29', '2026-03-24 23:08:29'),
+(250, 23, 'metodos_pago', 'tarjeta_debito', 'Tarjeta Débito', 2, 1, 1, '2026-03-24 23:08:29', '2026-03-24 23:08:29'),
+(251, 23, 'metodos_pago', 'tarjeta_credito', 'Tarjeta Crédito', 3, 1, 1, '2026-03-24 23:08:29', '2026-03-24 23:08:29'),
+(252, 23, 'metodos_pago', 'transferencia', 'Transferencia', 4, 1, 1, '2026-03-24 23:08:29', '2026-03-24 23:08:29'),
+(253, 23, 'metodos_pago', 'mercado_pago', 'Mercado Pago', 5, 1, 0, '2026-03-24 23:08:29', '2026-03-24 23:08:29'),
+(254, 23, 'unidades_medida', 'unidad', 'Unidad', 1, 1, 1, '2026-03-24 23:08:29', '2026-03-24 23:08:29'),
+(255, 23, 'unidades_medida', 'kg', 'Kilogramo', 2, 1, 1, '2026-03-24 23:08:29', '2026-03-24 23:08:29'),
+(256, 23, 'unidades_medida', 'g', 'Gramo', 3, 1, 1, '2026-03-24 23:08:29', '2026-03-24 23:08:29'),
+(257, 23, 'unidades_medida', 'lt', 'Litro', 4, 1, 1, '2026-03-24 23:08:29', '2026-03-24 23:08:29'),
+(258, 23, 'unidades_medida', 'ml', 'Mililitro', 5, 1, 1, '2026-03-24 23:08:29', '2026-03-24 23:08:29'),
+(259, 23, 'unidades_medida', 'caja', 'Caja', 6, 1, 1, '2026-03-24 23:08:29', '2026-03-24 23:08:29'),
+(260, 23, 'unidades_medida', 'par', 'Par', 7, 1, 0, '2026-03-24 23:08:29', '2026-03-24 23:08:29'),
+(261, 23, 'unidades_medida', 'metro', 'Metro', 8, 1, 0, '2026-03-24 23:08:29', '2026-03-24 23:08:29');
 
 -- --------------------------------------------------------
 
@@ -671,7 +796,6 @@ INSERT INTO `config_enum` (`id`, `negocio_id`, `grupo`, `valor`, `etiqueta`, `or
 CREATE TABLE `detalle_ventas` (
   `id` int(11) NOT NULL,
   `venta_id` int(11) NOT NULL,
-  `negocio_id` int(11) NOT NULL DEFAULT 0,
   `producto_id` int(11) NOT NULL,
   `cantidad` decimal(10,2) NOT NULL,
   `precio_unitario` decimal(10,2) NOT NULL,
@@ -682,34 +806,14 @@ CREATE TABLE `detalle_ventas` (
 -- Volcado de datos para la tabla `detalle_ventas`
 --
 
-INSERT INTO `detalle_ventas` (`id`, `venta_id`, `negocio_id`, `producto_id`, `cantidad`, `precio_unitario`, `subtotal`) VALUES
-(1, 1, 1, 1, 1.00, 2000.00, 2000.00),
-(2, 2, 1, 1, 1.00, 2000.00, 2000.00),
-(3, 3, 6, 67, 1.00, 2000.00, 2000.00),
-(4, 3, 6, 51, 1.00, 820.00, 820.00),
-(5, 4, 4, 23, 1.00, 380.00, 380.00),
-(6, 4, 4, 18, 1.00, 1300.00, 1300.00),
-(7, 13, 3, 7, 1.00, 350.00, 350.00),
-(8, 13, 3, 11, 2.00, 1400.00, 2800.00),
-(9, 14, 6, 49, 1.00, 350.00, 350.00),
-(10, 14, 6, 42, 1.00, 620.00, 620.00),
-(11, 14, 6, 67, 1.00, 2000.00, 2000.00),
-(12, 14, 6, 51, 1.00, 820.00, 820.00),
-(13, 14, 6, 43, 1.00, 480.00, 480.00),
-(14, 15, 3, 3, 1.00, 2800.00, 2800.00),
-(15, 16, 3, 3, 1.00, 2800.00, 2800.00),
-(16, 16, 3, 6, 1.00, 750.00, 750.00),
-(17, 16, 3, 6, 1.00, 750.00, 750.00),
-(18, 17, 3, 6, 1.00, 750.00, 750.00),
-(19, 17, 3, 7, 1.00, 350.00, 350.00),
-(20, 17, 3, 3, 1.00, 2800.00, 2800.00),
-(21, 20, 3, 3, 1.00, 2800.00, 2800.00),
-(22, 20, 3, 6, 1.00, 750.00, 750.00),
-(23, 20, 3, 6, 1.00, 750.00, 750.00),
-(24, 21, 3, 6, 1.00, 750.00, 750.00),
-(25, 21, 3, 7, 1.00, 350.00, 350.00),
-(26, 21, 3, 3, 1.00, 2800.00, 2800.00),
-(27, 21, 3, 3, 1.00, 2800.00, 2800.00);
+INSERT INTO `detalle_ventas` (`id`, `venta_id`, `producto_id`, `cantidad`, `precio_unitario`, `subtotal`) VALUES
+(1, 1, 1, 1.00, 2000.00, 2000.00),
+(2, 2, 1, 1.00, 2000.00, 2000.00),
+(3, 3, 67, 1.00, 2000.00, 2000.00),
+(4, 3, 51, 1.00, 820.00, 820.00),
+(5, 42, 6, 1.00, 750.00, 750.00),
+(6, 44, 6, 1.00, 750.00, 750.00),
+(7, 47, 3, 1.00, 2800.00, 2800.00);
 
 -- --------------------------------------------------------
 
@@ -759,6 +863,29 @@ CREATE TABLE `farmacia_laboratorios` (
   `activo` tinyint(1) DEFAULT 1,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `farmacia_proveedores`
+--
+
+CREATE TABLE `farmacia_proveedores` (
+  `id` int(11) NOT NULL,
+  `negocio_id` int(11) NOT NULL,
+  `nombre` varchar(150) NOT NULL,
+  `cuit` varchar(20) DEFAULT NULL,
+  `tipo` enum('Distribuidora','Laboratorio','Importador','Mayorista','Otro') DEFAULT 'Distribuidora',
+  `condicion_pago` varchar(80) DEFAULT NULL,
+  `contacto` varchar(100) DEFAULT NULL,
+  `telefono` varchar(30) DEFAULT NULL,
+  `email` varchar(120) DEFAULT NULL,
+  `direccion` varchar(200) DEFAULT NULL,
+  `notas` text DEFAULT NULL,
+  `activo` tinyint(1) DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -860,9 +987,8 @@ INSERT INTO `gym_asistencias` (`id`, `negocio_id`, `socio_id`, `fecha`, `hora`, 
 (7, 8, 3, '2026-02-28', '22:07:00', '2026-02-28 01:07:17'),
 (8, 8, 7, '2026-02-28', '22:08:00', '2026-02-28 01:08:33'),
 (9, 8, 1, '2026-02-28', '22:08:00', '2026-02-28 01:08:37'),
-(10, 8, 3, '2026-03-10', '09:49:00', '2026-03-10 12:49:47'),
-(11, 8, 7, '2026-03-10', '09:51:00', '2026-03-10 12:51:47'),
-(12, 8, 2, '2026-03-10', '09:58:00', '2026-03-10 12:58:27');
+(10, 8, 7, '2026-03-23', '20:15:00', '2026-03-23 23:15:41'),
+(11, 8, 3, '2026-03-24', '14:53:23', '2026-03-24 17:53:23');
 
 -- --------------------------------------------------------
 
@@ -896,8 +1022,7 @@ INSERT INTO `gym_clases` (`id`, `negocio_id`, `nombre`, `instructor`, `dia_seman
 (5, 8, 'Pilates', 'Prof. Lucía', 3, '10:00:00', 55, 10, '#8b5cf6', 1, '2026-02-28 00:56:04'),
 (6, 8, 'BoxFit', 'Prof. Marcos', 4, '18:00:00', 60, 15, '#ef4444', 1, '2026-02-28 00:56:04'),
 (7, 8, 'Funcional', 'Prof. Diego', 5, '09:00:00', 60, 20, '#3b82f6', 1, '2026-02-28 00:56:04'),
-(8, 8, 'Stretching', 'Prof. Lucía', 6, '10:00:00', 45, 15, '#06b6d4', 1, '2026-02-28 00:56:04'),
-(9, 8, 'Premium 1', 'pancho', 0, '09:48:00', 60, 20, '#f97316', 1, '2026-03-10 12:49:19');
+(8, 8, 'Stretching', 'Prof. Lucía', 6, '10:00:00', 45, 15, '#06b6d4', 1, '2026-02-28 00:56:04');
 
 -- --------------------------------------------------------
 
@@ -974,6 +1099,7 @@ CREATE TABLE `gym_socios` (
   `fecha_inicio` date DEFAULT NULL,
   `fecha_vencimiento` date DEFAULT NULL,
   `estado` enum('activo','vencido','suspendido','inactivo') DEFAULT 'activo',
+  `qr_token` varchar(64) DEFAULT NULL,
   `foto` varchar(255) DEFAULT NULL,
   `notas` text DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
@@ -983,17 +1109,34 @@ CREATE TABLE `gym_socios` (
 -- Volcado de datos para la tabla `gym_socios`
 --
 
-INSERT INTO `gym_socios` (`id`, `negocio_id`, `nombre`, `apellido`, `email`, `telefono`, `fecha_nacimiento`, `plan_id`, `fecha_inicio`, `fecha_vencimiento`, `estado`, `foto`, `notas`, `created_at`) VALUES
-(1, 8, 'Carlos', 'Rodríguez', 'carlos@mail.com', '351-4001122', NULL, 2, '2026-02-23', '2026-03-25', 'activo', NULL, NULL, '2026-02-28 00:56:04'),
-(2, 8, 'María', 'González', 'maria@mail.com', '351-4003344', NULL, 1, '2026-02-08', '2026-03-10', 'activo', NULL, NULL, '2026-02-28 00:56:04'),
-(3, 8, 'Lucas', 'Fernández', 'lucas@mail.com', '351-4005566', NULL, 5, '2026-03-10', '2026-03-17', 'activo', NULL, NULL, '2026-02-28 00:56:04'),
-(4, 8, 'Sofía', 'Martínez', 'sofia@mail.com', '351-4007788', NULL, 2, '2026-01-24', '2026-02-23', 'vencido', NULL, NULL, '2026-02-28 00:56:04'),
-(5, 8, 'Diego', 'López', 'diego@mail.com', '351-4009900', NULL, 1, '2026-02-13', '2026-03-15', 'activo', NULL, NULL, '2026-02-28 00:56:04'),
-(6, 8, 'Valentina', 'Pérez', 'valentina@mail.com', '351-4112233', NULL, 2, '2026-02-18', '2026-03-20', 'activo', NULL, NULL, '2026-02-28 00:56:04'),
-(7, 8, 'Matías', 'García', 'matias@mail.com', '351-4114455', NULL, 4, '2025-12-10', '2026-12-10', 'activo', NULL, NULL, '2026-02-28 00:56:04'),
-(8, 8, 'Laura', 'Silva', 'laura@mail.com', '351-4116677', NULL, 1, '2026-01-14', '2026-02-13', 'vencido', NULL, NULL, '2026-02-28 00:56:04'),
-(9, 8, 'Agustín', 'Romero', 'agustin@mail.com', '351-4118899', NULL, 2, '2026-02-26', '2026-03-28', 'activo', NULL, NULL, '2026-02-28 00:56:04'),
-(10, 8, 'Camila', 'Torres', 'camila@mail.com', '351-4220011', NULL, 3, '2026-01-09', '2026-04-09', 'activo', NULL, NULL, '2026-02-28 00:56:04');
+INSERT INTO `gym_socios` (`id`, `negocio_id`, `nombre`, `apellido`, `email`, `telefono`, `fecha_nacimiento`, `plan_id`, `fecha_inicio`, `fecha_vencimiento`, `estado`, `qr_token`, `foto`, `notas`, `created_at`) VALUES
+(1, 8, 'Carlos', 'Rodríguez', 'carlos@mail.com', '351-4001122', NULL, 2, '2026-02-23', '2026-03-25', 'activo', 'bb600c273c745288ab4f2f0258c2f759728a13c47d9c04f8aeb3c9dc007e6b3a', NULL, NULL, '2026-02-28 00:56:04'),
+(2, 8, 'María', 'González', 'maria@mail.com', '351-4003344', NULL, 1, '2026-02-08', '2026-03-10', 'vencido', '084555bd7d068e70f0aeabbd2c3ed5acb7d3b6d1711dcb03a3cce7433102b3c8', NULL, NULL, '2026-02-28 00:56:04'),
+(3, 8, 'Lucas', 'Fernández', 'lucas@mail.com', '351-4005566', NULL, 3, '2025-12-30', '2026-03-30', 'activo', '9e062cd61f0f57c76fa76d1aa37d4a4c30e2ca5bb2767e84ec0bef2a15d6e53c', NULL, NULL, '2026-02-28 00:56:04'),
+(4, 8, 'Sofía', 'Martínez', 'sofia@mail.com', '351-4007788', NULL, 2, '2026-01-24', '2026-02-23', 'vencido', '667adcde0b02bbe7f5759afe2cdd334f9ed45dd4b729465c9e6fd1960b67f6f0', NULL, NULL, '2026-02-28 00:56:04'),
+(5, 8, 'Diego', 'López', 'diego@mail.com', '351-4009900', NULL, 1, '2026-02-13', '2026-03-15', 'vencido', 'e8866b07b0e0de22378d1b41d35433302c377cab927b0417ba2c164493d94737', NULL, NULL, '2026-02-28 00:56:04'),
+(6, 8, 'Valentina', 'Pérez', 'valentina@mail.com', '351-4112233', NULL, 2, '2026-02-18', '2026-03-20', 'vencido', '10bee3e89b702354e2d6229f6188dfc36671fb64ba41292930ccd1d5b6c98a6d', NULL, NULL, '2026-02-28 00:56:04'),
+(7, 8, 'Matías', 'García', 'matias@mail.com', '351-4114455', NULL, 4, '2025-12-10', '2026-12-10', 'activo', 'ac278933fe319b0dad45c7b5d5535573f8984da7f7b1e8afe7c2b1566da25dd4', NULL, NULL, '2026-02-28 00:56:04'),
+(8, 8, 'Laura', 'Silva', 'laura@mail.com', '351-4116677', NULL, 1, '2026-01-14', '2026-02-13', 'vencido', 'a23a132d3c058fdadaf3011df58c380d1237ae812e38f02ecd4f06f64b209d52', NULL, NULL, '2026-02-28 00:56:04'),
+(9, 8, 'Agustín', 'Romero', 'agustin@mail.com', '351-4118899', NULL, 2, '2026-02-26', '2026-03-28', 'activo', '9ba4b33998da115117b515d0a32691f09ae9712d420392a2abf0bcfa62a1c28c', NULL, NULL, '2026-02-28 00:56:04'),
+(10, 8, 'Camila', 'Torres', 'camila@mail.com', '351-4220011', NULL, 3, '2026-01-09', '2026-04-09', 'activo', '32d59d14dbae46d74bbd7d5ff358a778fc1e6bbcdcc4ebf13af07ac6609f1559', NULL, NULL, '2026-02-28 00:56:04');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `hospedaje_cargos_extra`
+--
+
+CREATE TABLE `hospedaje_cargos_extra` (
+  `id` int(11) NOT NULL,
+  `reserva_id` int(11) NOT NULL,
+  `negocio_id` int(11) NOT NULL,
+  `descripcion` varchar(200) NOT NULL,
+  `cantidad` decimal(8,2) DEFAULT 1.00,
+  `precio_unit` decimal(10,2) NOT NULL,
+  `total` decimal(10,2) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -1082,7 +1225,9 @@ INSERT INTO `logs_actividad` (`id`, `negocio_id`, `usuario_id`, `accion`, `detal
 (2, NULL, 1, 'logout_superadmin', 'Logout', '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 13_0_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36', '2026-02-28 23:54:03'),
 (3, NULL, 1, 'login_superadmin', 'Login exitoso desde ::1', '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 13_0_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36', '2026-02-28 23:54:53'),
 (4, NULL, 1, 'usuario_desactivado', 'Usuario ID 12', '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 13_0_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36', '2026-03-01 03:28:27'),
-(5, NULL, 1, 'login_superadmin', 'Login exitoso desde ::1', '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-04 14:35:03');
+(5, NULL, 1, 'login_superadmin', 'Login exitoso desde ::1', '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-04 14:35:03'),
+(6, NULL, 1, 'login_superadmin', 'Login exitoso desde ::1', '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-12 17:57:50'),
+(7, NULL, 1, 'login_superadmin', 'Login exitoso desde ::1', '::1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-14 14:22:16');
 
 -- --------------------------------------------------------
 
@@ -1111,7 +1256,13 @@ INSERT INTO `migrations` (`id`, `filename`, `applied_at`) VALUES
 (8, '002_rubro_canchas.sql', '2026-02-27 12:51:55'),
 (9, '003_gastronomia_completo.sql', '2026-02-27 13:00:41'),
 (10, '004_restaurant_mesas_reservas.sql', '2026-02-27 13:03:00'),
-(11, '003_veterinaria.sql', '2026-03-01 19:43:30');
+(11, '003_veterinaria.sql', '2026-03-01 19:43:30'),
+(12, '007_canchas_reservas.sql', '2026-03-23 14:25:43'),
+(13, '008_reservas_cliente_id.sql', '2026-03-23 14:25:52'),
+(14, '009_restaurant_almacen.sql', '2026-03-23 14:56:29'),
+(15, '011_canchas_abonos.sql', '2026-03-24 22:30:22'),
+(16, '012_hospedaje_extras.sql', '2026-03-24 22:40:58'),
+(17, '013_vet_stock.sql', '2026-03-24 22:58:17');
 
 -- --------------------------------------------------------
 
@@ -1166,11 +1317,11 @@ CREATE TABLE `negocios` (
 INSERT INTO `negocios` (`id`, `nombre`, `razon_social`, `cuit`, `condicion_iva`, `rubro`, `rubro_id`, `direccion`, `ciudad`, `provincia`, `codigo_postal`, `telefono`, `email`, `sitio_web`, `instagram`, `facebook`, `whatsapp`, `logo`, `imagen_portada`, `carta_token`, `carta_activa`, `mensaje_ticket`, `mostrar_logo_ticket`, `mostrar_direccion_ticket`, `mostrar_cuit_ticket`, `horarios`, `activo`, `plan_id`, `fecha_vencimiento`, `bloqueado`, `bloqueado_motivo`, `notas_admin`, `estado_suscripcion`, `trial_hasta`, `fecha_registro`, `fecha_alta`, `fecha_actualizacion`) VALUES
 (1, 'Mi Negocio Demo', NULL, NULL, NULL, 'Comercio minorista', NULL, NULL, NULL, NULL, NULL, '+54 11 1234-5678', 'demo@dashbase.local', NULL, NULL, NULL, NULL, NULL, NULL, 'c1d49245d8204a4b8b60d1c7be563a405ccf92bc204f2880d27ef59b692b283d', 1, NULL, 1, 1, 1, NULL, 1, 1, NULL, 0, NULL, NULL, 'trial', NULL, '2026-02-27 03:53:59', NULL, '2026-03-01 00:38:21'),
 (2, 'Almacén Don Juan', NULL, NULL, NULL, 'Almacén / Kiosco', 1, NULL, NULL, NULL, NULL, NULL, 'juan@test.com', NULL, NULL, NULL, NULL, NULL, NULL, 'fed67b9dccc9c40213b289aba59fd8362e094ab913898e7d748e27adaff03eb7', 1, NULL, 1, 1, 1, NULL, 1, 1, NULL, 0, NULL, NULL, 'trial', '2026-03-13', '2026-02-27 12:40:57', NULL, '2026-03-01 00:38:21'),
-(3, 'CicloClub', NULL, NULL, NULL, 'Gastronomía / Bar', 4, NULL, NULL, NULL, NULL, NULL, 'MartinezdeOz@gmail.com', NULL, NULL, NULL, NULL, 'logo_69adde3f589c8_1773002303.png', NULL, '0d399a21bda6f020fd9c306f450b9a5dbad581ed66182c3d644d9dddb190a10a', 1, NULL, 1, 1, 1, '{\"lunes\":{\"activo\":true,\"desde\":\"09:00\",\"hasta\":\"18:00\"},\"martes\":{\"activo\":true,\"desde\":\"09:00\",\"hasta\":\"18:00\"},\"miercoles\":{\"activo\":true,\"desde\":\"09:00\",\"hasta\":\"18:00\"},\"jueves\":{\"activo\":true,\"desde\":\"09:00\",\"hasta\":\"18:00\"},\"viernes\":{\"activo\":true,\"desde\":\"09:00\",\"hasta\":\"18:00\"},\"sabado\":{\"activo\":false,\"desde\":\"09:00\",\"hasta\":\"18:00\"},\"domingo\":{\"activo\":false,\"desde\":\"09:00\",\"hasta\":\"18:00\"}}', 1, 1, NULL, 0, NULL, NULL, 'trial', '2026-03-13', '2026-02-27 12:57:40', NULL, '2026-03-08 20:38:25'),
-(4, 'ferretex', NULL, NULL, NULL, 'Ferretería', 3, NULL, NULL, NULL, NULL, NULL, 'san@martin.cmo', NULL, NULL, NULL, NULL, 'logo_69ac9e51cad48_1772920401.png', NULL, '3b85b643f2c4f0aa43adf8acd5ae32de88f28416abf9074e9770e4c845d9e40a', 1, NULL, 1, 1, 1, '{\"lunes\":{\"activo\":true,\"desde\":\"09:00\",\"hasta\":\"18:00\"},\"martes\":{\"activo\":true,\"desde\":\"09:00\",\"hasta\":\"18:00\"},\"miercoles\":{\"activo\":true,\"desde\":\"09:00\",\"hasta\":\"18:00\"},\"jueves\":{\"activo\":true,\"desde\":\"09:00\",\"hasta\":\"18:00\"},\"viernes\":{\"activo\":true,\"desde\":\"09:00\",\"hasta\":\"18:00\"},\"sabado\":{\"activo\":false,\"desde\":\"09:00\",\"hasta\":\"18:00\"},\"domingo\":{\"activo\":false,\"desde\":\"09:00\",\"hasta\":\"18:00\"}}', 1, 1, NULL, 0, NULL, NULL, 'trial', '2026-03-13', '2026-02-27 17:38:05', NULL, '2026-03-07 21:53:23'),
+(3, 'CicloClub', NULL, NULL, NULL, 'Gastronomía / Bar', 4, NULL, NULL, NULL, NULL, NULL, 'MartinezdeOz@gmail.com', NULL, NULL, NULL, NULL, 'logo_69a3915cee510_1772327260.jpeg', NULL, '0d399a21bda6f020fd9c306f450b9a5dbad581ed66182c3d644d9dddb190a10a', 1, NULL, 1, 1, 1, NULL, 1, 1, NULL, 0, NULL, NULL, 'trial', '2026-03-13', '2026-02-27 12:57:40', NULL, '2026-03-01 01:07:40'),
+(4, 'ferretex', NULL, NULL, NULL, 'Ferretería', 3, NULL, NULL, NULL, NULL, NULL, 'san@martin.cmo', NULL, NULL, NULL, NULL, NULL, NULL, '3b85b643f2c4f0aa43adf8acd5ae32de88f28416abf9074e9770e4c845d9e40a', 1, NULL, 1, 1, 1, NULL, 1, 1, NULL, 0, NULL, NULL, 'trial', '2026-03-13', '2026-02-27 17:38:05', NULL, '2026-03-01 00:38:21'),
 (5, 'SuperDemo', NULL, NULL, NULL, 'Supermercado', 18, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'd4231bba2b8415e513baa1ab33d6e184b872abe218451ccf777026aa092236b9', 1, NULL, 1, 1, 1, NULL, 1, 1, NULL, 0, NULL, NULL, 'trial', NULL, '2026-02-27 18:37:30', NULL, '2026-03-01 00:38:21'),
 (6, 'SuperDemo', NULL, NULL, NULL, 'Supermercado', 18, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '9762181b722a8614ea9b87178dea171226951b67d597fa36ccacd3bb0baef18d', 1, NULL, 1, 1, 1, NULL, 1, 1, NULL, 0, NULL, NULL, 'trial', NULL, '2026-02-27 18:37:54', NULL, '2026-03-01 00:38:21'),
-(7, 'Salón Glam', NULL, NULL, NULL, NULL, 8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'logo_69af436f36768_1773093743.png', NULL, '374ee253de73520bad6397fc887c768a64bf9e148a3225c9d692d346bea4ff6d', 1, NULL, 1, 1, 1, '{\"lunes\":{\"activo\":true,\"desde\":\"09:00\",\"hasta\":\"18:00\"},\"martes\":{\"activo\":true,\"desde\":\"09:00\",\"hasta\":\"18:00\"},\"miercoles\":{\"activo\":true,\"desde\":\"09:00\",\"hasta\":\"18:00\"},\"jueves\":{\"activo\":true,\"desde\":\"09:00\",\"hasta\":\"18:00\"},\"viernes\":{\"activo\":true,\"desde\":\"09:00\",\"hasta\":\"18:00\"},\"sabado\":{\"activo\":false,\"desde\":\"09:00\",\"hasta\":\"18:00\"},\"domingo\":{\"activo\":false,\"desde\":\"09:00\",\"hasta\":\"18:00\"}}', 1, 1, NULL, 0, NULL, NULL, 'trial', NULL, '2026-02-27 19:05:28', NULL, '2026-03-09 22:02:26'),
+(7, 'Salón Glam', NULL, NULL, NULL, NULL, 8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '374ee253de73520bad6397fc887c768a64bf9e148a3225c9d692d346bea4ff6d', 1, NULL, 1, 1, 1, NULL, 1, 1, NULL, 0, NULL, NULL, 'trial', NULL, '2026-02-27 19:05:28', NULL, '2026-03-01 00:38:21'),
 (8, 'FitZone Gym', NULL, NULL, NULL, NULL, 19, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '363de21d0441a049fe877a3a9c3587d26297ebe2c25578dbcaccc881ff3d0de4', 1, NULL, 1, 1, 1, NULL, 1, 1, NULL, 0, NULL, NULL, 'trial', NULL, '2026-02-27 19:41:56', NULL, '2026-03-01 00:38:21'),
 (9, 'gymdemo1', NULL, NULL, NULL, 'Gimnasio / Fitness', 19, NULL, NULL, NULL, NULL, NULL, 'miami@gym.com', NULL, NULL, NULL, NULL, NULL, NULL, '6fb4188b95417d521cd4654a6d5382db09f25e5771d309df66c9c9ddd00021cf', 1, NULL, 1, 1, 1, NULL, 1, 1, NULL, 0, NULL, NULL, 'trial', '2026-03-13', '2026-02-27 21:08:01', NULL, '2026-03-01 00:38:21'),
 (10, 'Ferreteria Casia', NULL, NULL, NULL, 'Ferretería', 3, NULL, NULL, NULL, NULL, NULL, 'nuenz@casia.com', NULL, NULL, NULL, NULL, NULL, NULL, '42357fd1ed688328e6778f9d6a0c344455fbbd56a7105bfc5b321729ebeea9a4', 1, NULL, 1, 1, 1, NULL, 1, 1, NULL, 0, NULL, NULL, 'trial', '2026-03-13', '2026-02-27 23:07:13', NULL, '2026-03-01 00:38:21'),
@@ -1182,7 +1333,11 @@ INSERT INTO `negocios` (`id`, `nombre`, `razon_social`, `cuit`, `condicion_iva`,
 (16, 'neotec', NULL, NULL, NULL, 'Tecnología / Electrónica', 6, NULL, NULL, NULL, NULL, NULL, 'neo@gmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, NULL, 1, 1, 1, NULL, 1, 1, NULL, 0, NULL, NULL, 'trial', '2026-03-16', '2026-03-02 15:21:34', NULL, '2026-03-02 15:21:34'),
 (17, 'RODRIGOREST', NULL, NULL, NULL, 'Gastronomía / Restaurant', 4, NULL, NULL, NULL, NULL, NULL, 'moqndow@gmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, NULL, 1, 1, 1, NULL, 1, 1, NULL, 0, NULL, NULL, 'trial', '2026-03-17', '2026-03-03 22:54:52', NULL, '2026-03-03 22:54:52'),
 (18, 'OscarGym', NULL, NULL, NULL, 'Gimnasio / Fitness', 19, NULL, NULL, NULL, NULL, NULL, 'wlnw@gmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, NULL, 1, 1, 1, NULL, 1, 1, NULL, 0, NULL, NULL, 'trial', '2026-03-20', '2026-03-07 02:49:23', NULL, '2026-03-07 02:49:23'),
-(19, 'panchoto', NULL, NULL, NULL, 'Hospedaje / Hotel', 20, NULL, NULL, NULL, NULL, NULL, 'frankapo42@gmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, NULL, 1, 1, 1, NULL, 1, 1, NULL, 0, NULL, NULL, 'trial', '2026-03-25', '2026-03-12 01:08:57', NULL, '2026-03-12 01:08:57');
+(19, 'Fenix', NULL, NULL, NULL, 'Ferretería', 3, NULL, NULL, NULL, NULL, NULL, 'crisfernu@gmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, NULL, 1, 1, 1, NULL, 1, 1, NULL, 0, NULL, NULL, 'trial', '2026-03-24', '2026-03-10 17:39:20', NULL, '2026-03-10 17:39:20'),
+(20, 'Mundo Digital', NULL, NULL, NULL, 'Tecnología / Electrónica', 6, NULL, NULL, NULL, NULL, NULL, 'dirie@gmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, NULL, 1, 1, 1, NULL, 1, 1, NULL, 0, NULL, NULL, 'trial', '2026-03-26', '2026-03-13 00:26:26', NULL, '2026-03-13 00:26:26'),
+(21, 'CarmenCancha', NULL, NULL, NULL, 'Alquiler de Canchas', 17, NULL, NULL, NULL, NULL, NULL, 'msoq@gmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, NULL, 1, 1, 1, NULL, 1, 1, NULL, 0, NULL, NULL, 'trial', '2026-03-31', '2026-03-17 03:27:36', NULL, '2026-03-17 03:27:36'),
+(22, 'MatHotel', NULL, NULL, NULL, 'Hospedaje / Hotel', 20, NULL, NULL, NULL, NULL, NULL, 'dnoo@gmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, NULL, 1, 1, 1, NULL, 1, 1, NULL, 0, NULL, NULL, 'trial', '2026-04-07', '2026-03-24 22:52:52', NULL, '2026-03-24 22:52:52'),
+(23, 'FarmaCasia', NULL, NULL, NULL, 'Farmacia / Perfumería', 5, NULL, NULL, NULL, NULL, NULL, 'numez@gmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, NULL, 1, 1, 1, NULL, 1, 1, NULL, 0, NULL, NULL, 'trial', '2026-04-07', '2026-03-24 23:08:29', NULL, '2026-03-24 23:08:29');
 
 -- --------------------------------------------------------
 
@@ -1301,8 +1456,7 @@ CREATE TABLE `ordenes_compra` (
 --
 
 INSERT INTO `ordenes_compra` (`id`, `negocio_id`, `proveedor_id`, `numero`, `fecha`, `fecha_entrega_esperada`, `estado`, `subtotal`, `total`, `notas`, `created_by`, `created_at`, `updated_at`) VALUES
-(1, 6, 1, 'OC-0001', '2026-03-03', '2026-03-04', 'enviada', 690.00, 690.00, 'Lo mas rapido posible', 6, '2026-03-03 00:31:45', '2026-03-03 00:31:50'),
-(2, 6, 3, 'OC-0002', '2026-03-08', NULL, 'recibida', 2530.00, 2530.00, 'asdasd', 6, '2026-03-08 20:49:24', '2026-03-08 20:49:36');
+(1, 6, 1, 'OC-0001', '2026-03-03', '2026-03-04', 'enviada', 690.00, 690.00, 'Lo mas rapido posible', 6, '2026-03-03 00:31:45', '2026-03-03 00:31:50');
 
 -- --------------------------------------------------------
 
@@ -1327,9 +1481,7 @@ CREATE TABLE `ordenes_compra_items` (
 
 INSERT INTO `ordenes_compra_items` (`id`, `orden_id`, `producto_id`, `descripcion`, `cantidad`, `precio_unitario`, `subtotal`, `recibido`) VALUES
 (1, 1, 56, 'Manteca 200g', 1.000, 360.00, 360.00, 0.000),
-(2, 1, 44, 'Azúcar Común 1kg', 1.000, 330.00, 330.00, 0.000),
-(3, 2, 43, 'Fideos Tallarín 500g', 8.000, 290.00, 2320.00, 1.000),
-(4, 2, 47, 'Tomate en Lata 400g', 1.000, 210.00, 210.00, 1.000);
+(2, 1, 44, 'Azúcar Común 1kg', 1.000, 330.00, 330.00, 0.000);
 
 -- --------------------------------------------------------
 
@@ -1435,7 +1587,11 @@ INSERT INTO `permisos` (`id`, `usuario_id`, `ver_productos`, `crear_productos`, 
 (12, 16, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0),
 (13, 17, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0),
 (14, 18, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0),
-(15, 19, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0);
+(15, 19, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0),
+(16, 20, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0),
+(17, 21, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0),
+(18, 22, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0),
+(19, 23, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -1585,12 +1741,12 @@ INSERT INTO `productos` (`id`, `negocio_id`, `categoria_id`, `nombre`, `descripc
 (15, 4, 49, 'Cinta métrica 5m', 'Carcasa ABS, traba automática', '7790001004', 700.00, 1400.00, 40, 10, 'unidad', NULL, 1, '2026-02-27 17:43:39', '2026-02-27 17:43:39', NULL, NULL, NULL),
 (16, 4, 49, 'Nivel de burbuja 60cm', 'Aluminio extruido, 3 burbujas', '7790001005', 1400.00, 2800.00, 15, 4, 'unidad', NULL, 1, '2026-02-27 17:43:39', '2026-02-27 17:43:39', NULL, NULL, NULL),
 (17, 4, 50, 'Cable unipolar 2.5mm x 100m', 'Rollo IRAM, color rojo', '7790002001', 18000.00, 32000.00, 8, 2, 'rollo', NULL, 1, '2026-02-27 17:43:39', '2026-02-27 17:43:39', NULL, NULL, NULL),
-(18, 4, 50, 'Llave de luz simple', 'Ticino Magic blanco 10A', '7790002002', 650.00, 1300.00, 49, 10, 'unidad', NULL, 1, '2026-02-27 17:43:39', '2026-03-07 21:51:07', NULL, NULL, NULL),
+(18, 4, 50, 'Llave de luz simple', 'Ticino Magic blanco 10A', '7790002002', 650.00, 1300.00, 50, 10, 'unidad', NULL, 1, '2026-02-27 17:43:39', '2026-02-27 17:43:39', NULL, NULL, NULL),
 (19, 4, 50, 'Tomacorriente doble 10A', 'Con polo a tierra, blanco', '7790002003', 950.00, 1900.00, 35, 8, 'unidad', NULL, 1, '2026-02-27 17:43:39', '2026-02-27 17:43:39', NULL, NULL, NULL),
 (20, 4, 50, 'Disyuntor termomagnético 16A', 'Riel DIN, marca Schneider', '7790002004', 4500.00, 8500.00, 20, 4, 'unidad', NULL, 1, '2026-02-27 17:43:39', '2026-02-27 17:43:39', NULL, NULL, NULL),
 (21, 4, 50, 'Cinta aisladora 19mm x 20m', 'Scotch 33+, negro', '7790002005', 280.00, 580.00, 80, 20, 'unidad', NULL, 1, '2026-02-27 17:43:39', '2026-02-27 17:43:39', NULL, NULL, NULL),
 (22, 4, 51, 'Caño PVC 110mm x 3m', 'Sanitario, color gris', '7790003001', 2800.00, 5200.00, 15, 3, 'unidad', NULL, 1, '2026-02-27 17:43:39', '2026-02-27 17:43:39', NULL, NULL, NULL),
-(23, 4, 51, 'Codo PVC 90° 50mm', 'Para agua fría/caliente', '7790003002', 180.00, 380.00, 59, 15, 'unidad', NULL, 1, '2026-02-27 17:43:39', '2026-03-07 21:51:07', NULL, NULL, NULL),
+(23, 4, 51, 'Codo PVC 90° 50mm', 'Para agua fría/caliente', '7790003002', 180.00, 380.00, 60, 15, 'unidad', NULL, 1, '2026-02-27 17:43:39', '2026-02-27 17:43:39', NULL, NULL, NULL),
 (24, 4, 51, 'Llave de paso esfera 1/2\"', 'Bronce cromado, palanca', '7790003003', 1200.00, 2400.00, 25, 5, 'unidad', NULL, 1, '2026-02-27 17:43:39', '2026-02-27 17:43:39', NULL, NULL, NULL),
 (25, 4, 51, 'Teflón 19mm x 10m', 'Rollo blanco estándar', '7790003004', 120.00, 280.00, 100, 20, 'unidad', NULL, 1, '2026-02-27 17:43:39', '2026-02-27 17:43:39', NULL, NULL, NULL),
 (26, 4, 51, 'Flexo acero inox 1/2\" x 30cm', 'Para conexión de inodoro/canilla', '7790003005', 480.00, 980.00, 30, 8, 'unidad', NULL, 1, '2026-02-27 17:43:39', '2026-02-27 17:43:39', NULL, NULL, NULL),
@@ -1609,16 +1765,16 @@ INSERT INTO `productos` (`id`, `negocio_id`, `categoria_id`, `nombre`, `descripc
 (39, 4, 56, 'Casco de seguridad blanco', 'Clase A, con ajuste de rueda', '7790008002', 1200.00, 2500.00, 20, 5, 'unidad', NULL, 1, '2026-02-27 17:43:39', '2026-02-27 17:43:39', NULL, NULL, NULL),
 (40, 4, 56, 'Antiparras de seguridad', 'Policarbonato, ventilación lateral', '7790008003', 600.00, 1400.00, 25, 6, 'unidad', NULL, 1, '2026-02-27 17:43:39', '2026-02-27 17:43:39', NULL, NULL, NULL),
 (41, 6, 57, 'Aceite Girasol 1.5L', 'Aceite de girasol primera prensada', '7791234500001', 780.00, 1250.00, 48, 10, 'unidad', NULL, 1, '2026-02-27 18:43:47', '2026-02-27 18:43:47', NULL, 1, 'Pasillo A-1'),
-(42, 6, 57, 'Arroz Largo Fino 1kg', 'Arroz largo fino tipo 00', '7791234500002', 380.00, 620.00, 119, 20, 'unidad', NULL, 1, '2026-02-27 18:43:47', '2026-03-08 20:40:33', NULL, 1, 'Pasillo A-1'),
-(43, 6, 57, 'Fideos Tallarín 500g', 'Fideos de sémola de trigo', '7791234500003', 290.00, 480.00, 92, 15, 'unidad', NULL, 1, '2026-02-27 18:43:47', '2026-03-08 20:49:36', NULL, 1, 'Pasillo A-2'),
+(42, 6, 57, 'Arroz Largo Fino 1kg', 'Arroz largo fino tipo 00', '7791234500002', 380.00, 620.00, 120, 20, 'unidad', NULL, 1, '2026-02-27 18:43:47', '2026-02-27 18:43:47', NULL, 1, 'Pasillo A-1'),
+(43, 6, 57, 'Fideos Tallarín 500g', 'Fideos de sémola de trigo', '7791234500003', 290.00, 480.00, 85, 15, 'unidad', NULL, 1, '2026-02-27 18:43:47', '2026-02-27 18:43:47', NULL, 1, 'Pasillo A-2'),
 (44, 6, 57, 'Azúcar Común 1kg', 'Azúcar blanca refinada', '7791234500004', 330.00, 550.00, 60, 15, 'unidad', NULL, 1, '2026-02-27 18:43:47', '2026-02-27 18:43:47', NULL, 1, 'Pasillo A-2'),
 (45, 6, 57, 'Harina 000 1kg', 'Harina de trigo triple cero', '7791234500005', 250.00, 420.00, 70, 15, 'unidad', NULL, 1, '2026-02-27 18:43:47', '2026-02-27 18:43:47', NULL, 1, 'Pasillo A-3'),
 (46, 6, 57, 'Sal Fina 1kg', 'Sal fina de mesa yodada', '7791234500006', 95.00, 180.00, 90, 20, 'unidad', NULL, 1, '2026-02-27 18:43:47', '2026-02-27 18:43:47', NULL, 1, 'Pasillo A-3'),
-(47, 6, 57, 'Tomate en Lata 400g', 'Tomate perita triturado', '7791234500007', 210.00, 380.00, 56, 10, 'unidad', NULL, 1, '2026-02-27 18:43:47', '2026-03-08 20:49:36', NULL, 1, 'Pasillo A-4'),
+(47, 6, 57, 'Tomate en Lata 400g', 'Tomate perita triturado', '7791234500007', 210.00, 380.00, 55, 10, 'unidad', NULL, 1, '2026-02-27 18:43:47', '2026-02-27 18:43:47', NULL, 1, 'Pasillo A-4'),
 (48, 6, 58, 'Coca-Cola 2.25L', 'Gaseosa cola', '7791234500008', 620.00, 950.00, 72, 15, 'unidad', NULL, 1, '2026-02-27 18:43:47', '2026-02-27 18:43:47', NULL, 3, 'Gondola B-1'),
-(49, 6, 58, 'Agua Mineral 1.5L', 'Agua mineral sin gas', '7791234500009', 190.00, 350.00, 143, 30, 'unidad', NULL, 1, '2026-02-27 18:43:47', '2026-03-08 20:40:33', NULL, 3, 'Gondola B-1'),
+(49, 6, 58, 'Agua Mineral 1.5L', 'Agua mineral sin gas', '7791234500009', 190.00, 350.00, 144, 30, 'unidad', NULL, 1, '2026-02-27 18:43:47', '2026-02-27 18:43:47', NULL, 3, 'Gondola B-1'),
 (50, 6, 58, 'Jugo Cepita 1L', 'Jugo de naranja listo para tomar', '7791234500010', 400.00, 680.00, 36, 10, 'unidad', NULL, 1, '2026-02-27 18:43:47', '2026-02-27 18:43:47', NULL, 3, 'Gondola B-2'),
-(51, 6, 58, 'Cerveza Quilmes 1L', 'Cerveza rubia retornable', '7791234500011', 520.00, 820.00, 47, 12, 'unidad', NULL, 1, '2026-02-27 18:43:47', '2026-03-08 20:46:56', NULL, 3, 'Gondola B-3'),
+(51, 6, 58, 'Cerveza Quilmes 1L', 'Cerveza rubia retornable', '7791234500011', 520.00, 820.00, 47, 12, 'unidad', NULL, 1, '2026-02-27 18:43:47', '2026-03-03 00:20:53', NULL, 3, 'Gondola B-3'),
 (52, 6, 58, 'Vino Trapiche 750ml', 'Vino tinto Malbec', '7791234500012', 1100.00, 1800.00, 24, 6, 'unidad', NULL, 1, '2026-02-27 18:43:47', '2026-02-27 18:43:47', NULL, 3, 'Gondola B-4'),
 (53, 6, 59, 'Leche Entera 1L', 'Leche larga vida entera', '7791234500013', 280.00, 420.00, 96, 20, 'unidad', NULL, 1, '2026-02-27 18:43:47', '2026-02-27 18:43:47', NULL, 2, 'Gondola C-1'),
 (54, 6, 59, 'Yogur Natural 190g', 'Yogur natural cremoso', '7791234500014', 190.00, 320.00, 48, 10, 'unidad', NULL, 1, '2026-02-27 18:43:47', '2026-02-27 18:43:47', NULL, 2, 'Heladera 1'),
@@ -1634,8 +1790,11 @@ INSERT INTO `productos` (`id`, `negocio_id`, `categoria_id`, `nombre`, `descripc
 (64, 6, 64, 'Shampoo Sedal 350ml', 'Shampoo para cabello', '7791234500024', 580.00, 950.00, 20, 5, 'unidad', NULL, 1, '2026-02-27 18:43:47', '2026-02-27 18:43:47', NULL, 4, 'Pasillo E-1'),
 (65, 6, 64, 'Jabon Palmolive x3', 'Jabon de tocador pack x3', '7791234500025', 400.00, 680.00, 25, 6, 'unidad', NULL, 1, '2026-02-27 18:43:47', '2026-02-27 18:43:47', NULL, 4, 'Pasillo E-1'),
 (66, 6, 64, 'Desodorante Axe 150ml', 'Desodorante en aerosol', '7791234500026', 720.00, 1200.00, 18, 5, 'unidad', NULL, 1, '2026-02-27 18:43:47', '2026-02-27 18:43:47', NULL, 4, 'Pasillo E-2'),
-(67, 6, 61, 'Cebolla', 'negra', '321331321321', 1000.00, 2000.00, 2, 1, 'kg', 'prod_69a6294b02052_1772497227.jpg', 1, '2026-03-03 00:20:29', '2026-03-08 20:46:56', NULL, NULL, NULL),
-(69, 7, 113, 'corte de cabello', '', NULL, 6000.00, 12000.00, 0, 0, 'unidad', NULL, 1, '2026-03-09 21:56:02', '2026-03-09 21:56:23', NULL, NULL, NULL);
+(67, 6, 61, 'Cebolla', 'negra', '321331321321', 1000.00, 2000.00, 2, 1, 'kg', 'prod_69a6294b02052_1772497227.jpg', 1, '2026-03-03 00:20:29', '2026-03-03 00:20:53', NULL, NULL, NULL),
+(68, 1, 1, 'Lomito', '', '2313231', 30000.00, 35000.00, 3, 0, 'unidad', 'prod_69b4320aaa494_1773416970.webp', 1, '2026-03-13 15:50:04', '2026-03-13 15:50:04', NULL, NULL, NULL),
+(69, 1, 1, 'Polenta Presto Pronta', '500g', '12313221', 20000.00, 27000.00, 20, 5, 'unidad', 'prod_69b432bbabb6b_1773417147.jpg', 1, '2026-03-13 15:53:04', '2026-03-13 15:53:04', NULL, NULL, NULL),
+(70, 1, NULL, 'Fideo Anita', '', NULL, 20000.00, 25000.00, 2, 1, 'unidad', 'prod_69b4330b1c66e_1773417227.jpg', 1, '2026-03-13 15:54:06', '2026-03-13 15:54:06', NULL, NULL, NULL),
+(71, 1, 1, 'Fanta 3L', '', '41212', 20000.00, 30000.00, 3, 1, 'unidad', 'prod_69b43381e016d_1773417345.jpg', 1, '2026-03-13 15:55:48', '2026-03-13 15:55:48', NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -1665,9 +1824,35 @@ CREATE TABLE `proveedores` (
 INSERT INTO `proveedores` (`id`, `negocio_id`, `nombre`, `razon_social`, `cuit`, `contacto`, `telefono`, `email`, `direccion`, `notas`, `activo`, `created_at`) VALUES
 (1, 6, 'Distribuidora Norte', 'Distribuidora Norte S.A.', '30-71234567-8', 'Carlos Méndez', '011-4523-7890', 'ventas@distnorte.com', NULL, NULL, 1, '2026-02-27 18:41:50'),
 (2, 6, 'Lácteos del Valle', 'Lácteos del Valle S.R.L.', '30-68901234-5', 'Ana Rodríguez', '011-4412-5566', 'pedidos@lacteosdelvalle.com', NULL, NULL, 1, '2026-02-27 18:41:50'),
-(3, 6, 'Bebidas Premium 1', 'Bebidas Premium S.A.', '30-70456789-2', 'Roberto Silva', '011-4789-1122', 'comercial@bebidaspremium.com', '', '', 1, '2026-02-27 18:41:50'),
+(3, 6, 'Bebidas Premium', 'Bebidas Premium S.A.', '30-70456789-2', 'Roberto Silva', '011-4789-1122', 'comercial@bebidaspremium.com', NULL, NULL, 1, '2026-02-27 18:41:50'),
 (4, 6, 'Limpieza Total', 'Limpieza Total Dist.', '20-30123456-7', 'Marta López', '011-4654-3322', 'info@limpiezatotal.com', NULL, NULL, 1, '2026-02-27 18:41:50'),
 (5, 6, 'Frío Express', 'Frío Express Logística', '30-72345678-9', 'Diego Ferrara', '011-4901-7788', 'despacho@frioexpress.com', NULL, NULL, 1, '2026-02-27 18:41:50');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `reservas_canchas`
+--
+
+CREATE TABLE `reservas_canchas` (
+  `id` int(11) NOT NULL,
+  `abono_id` int(11) DEFAULT NULL,
+  `cancha_id` int(11) NOT NULL,
+  `cliente_id` int(11) DEFAULT NULL,
+  `cliente_nombre` varchar(150) DEFAULT NULL,
+  `cliente_telefono` varchar(40) DEFAULT NULL,
+  `cliente_email` varchar(150) DEFAULT NULL,
+  `fecha` date NOT NULL,
+  `hora_inicio` time NOT NULL,
+  `hora_fin` time NOT NULL,
+  `duracion_horas` decimal(3,1) DEFAULT 1.0,
+  `monto` decimal(10,2) DEFAULT 0.00,
+  `estado` varchar(50) DEFAULT 'pendiente' COMMENT 'pendiente, confirmada, cancelada, completada',
+  `metodo_pago` varchar(50) DEFAULT NULL,
+  `notas` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -1726,16 +1911,18 @@ CREATE TABLE `restaurant_comandas` (
 --
 
 INSERT INTO `restaurant_comandas` (`id`, `negocio_id`, `mesa_id`, `reserva_id`, `numero`, `mozo_id`, `estado`, `personas`, `observaciones`, `venta_id`, `subtotal`, `descuento`, `total`, `abierta_at`, `cerrada_at`, `updated_at`) VALUES
-(1, 3, 1, NULL, 1, NULL, 'cerrada', 1, NULL, 13, 3150.00, 0.00, 3150.00, '2026-02-27 13:22:05', '2026-03-08 20:21:38', '2026-03-08 20:21:38'),
-(2, 3, 2, NULL, 2, NULL, 'cerrada', 1, NULL, 15, 2800.00, 0.00, 2800.00, '2026-02-27 13:30:23', '2026-03-16 20:51:06', '2026-03-16 20:51:06'),
-(3, 3, 3, NULL, 3, NULL, 'cerrada', 1, NULL, 20, 4300.00, 0.00, 4300.00, '2026-02-27 13:33:47', '2026-03-16 20:53:36', '2026-03-16 20:53:36'),
-(4, 3, 4, NULL, 4, NULL, 'cerrada', 1, NULL, 21, 6700.00, 0.00, 6700.00, '2026-02-27 17:03:33', '2026-03-16 20:53:39', '2026-03-16 20:53:39'),
-(5, 3, 5, NULL, 5, NULL, 'cerrada', 1, NULL, 18, 0.00, 0.00, 0.00, '2026-02-27 17:06:04', '2026-03-16 20:53:10', '2026-03-16 20:53:10'),
-(6, 3, 6, NULL, 6, NULL, 'cerrada', 1, NULL, 19, 0.00, 0.00, 0.00, '2026-02-27 17:19:37', '2026-03-16 20:53:13', '2026-03-16 20:53:13'),
-(7, 3, 7, NULL, 7, NULL, 'abierta', 1, NULL, NULL, 0.00, 0.00, 0.00, '2026-02-27 17:19:53', NULL, '2026-02-27 17:19:53'),
-(8, 3, 8, NULL, 8, NULL, 'abierta', 1, NULL, NULL, 0.00, 0.00, 0.00, '2026-02-27 17:29:19', NULL, '2026-02-27 17:29:19'),
-(9, 3, 9, NULL, 9, NULL, 'abierta', 1, NULL, NULL, 0.00, 0.00, 0.00, '2026-02-27 23:09:14', NULL, '2026-02-27 23:09:14'),
-(10, 3, 2, NULL, 10, 4, 'cerrada', 1, NULL, 22, 0.00, 0.00, 0.00, '2026-03-16 20:53:32', '2026-03-16 20:53:44', '2026-03-16 20:53:44');
+(1, 3, 1, NULL, 1, NULL, 'cerrada', 1, NULL, 48, 0.00, 0.00, 0.00, '2026-02-27 13:22:05', '2026-03-23 14:40:02', '2026-03-23 14:40:02'),
+(2, 3, 2, NULL, 2, NULL, 'cerrada', 1, NULL, 47, 2800.00, 0.00, 2800.00, '2026-02-27 13:30:23', '2026-03-23 14:39:58', '2026-03-23 14:39:58'),
+(3, 3, 3, NULL, 3, NULL, 'cerrada', 1, NULL, 46, 0.00, 0.00, 0.00, '2026-02-27 13:33:47', '2026-03-23 14:39:56', '2026-03-23 14:39:56'),
+(4, 3, 4, NULL, 4, NULL, 'cerrada', 1, NULL, 45, 0.00, 0.00, 0.00, '2026-02-27 17:03:33', '2026-03-23 14:39:52', '2026-03-23 14:39:52'),
+(5, 3, 5, NULL, 5, NULL, 'cerrada', 1, NULL, 37, 0.00, 0.00, 0.00, '2026-02-27 17:06:04', '2026-03-23 14:39:29', '2026-03-23 14:39:29'),
+(6, 3, 6, NULL, 6, NULL, 'cerrada', 1, NULL, 38, 0.00, 0.00, 0.00, '2026-02-27 17:19:37', '2026-03-23 14:39:32', '2026-03-23 14:39:32'),
+(7, 3, 7, NULL, 7, NULL, 'cerrada', 1, NULL, 39, 0.00, 0.00, 0.00, '2026-02-27 17:19:53', '2026-03-23 14:39:35', '2026-03-23 14:39:35'),
+(8, 3, 8, NULL, 8, NULL, 'cerrada', 1, NULL, 40, 0.00, 0.00, 0.00, '2026-02-27 17:29:19', '2026-03-23 14:39:38', '2026-03-23 14:39:38'),
+(9, 3, 9, NULL, 9, NULL, 'cerrada', 1, NULL, 41, 0.00, 0.00, 0.00, '2026-02-27 23:09:14', '2026-03-23 14:39:41', '2026-03-23 14:39:41'),
+(10, 3, 16, NULL, 10, 4, 'cerrada', 1, NULL, 44, 750.00, 0.00, 750.00, '2026-03-13 16:06:55', '2026-03-23 14:39:49', '2026-03-23 14:39:49'),
+(11, 3, 14, NULL, 11, 4, 'cerrada', 1, NULL, 42, 750.00, 0.00, 750.00, '2026-03-14 14:15:27', '2026-03-23 14:39:44', '2026-03-23 14:39:44'),
+(12, 3, 13, NULL, 12, 4, 'cerrada', 1, NULL, 43, 0.00, 0.00, 0.00, '2026-03-17 03:25:55', '2026-03-23 14:39:46', '2026-03-23 14:39:46');
 
 -- --------------------------------------------------------
 
@@ -1767,19 +1954,68 @@ CREATE TABLE `restaurant_comanda_items` (
 --
 
 INSERT INTO `restaurant_comanda_items` (`id`, `comanda_id`, `negocio_id`, `producto_id`, `nombre_item`, `precio_unit`, `cantidad`, `subtotal`, `estado_cocina`, `observaciones`, `sector_cocina`, `enviado_at`, `listo_at`, `entregado_at`, `created_at`, `updated_at`) VALUES
-(1, 2, 3, 3, 'Bife de Chorizo 300g', 2800.00, 1, 2800.00, 'listo', '', 'principal', NULL, '2026-03-08 20:01:38', NULL, '2026-03-07 19:13:37', '2026-03-08 20:01:38'),
-(2, 1, 3, 11, 'Menú del Día', 1400.00, 1, 1400.00, 'cancelado', '', 'principal', NULL, NULL, NULL, '2026-03-08 19:33:13', '2026-03-08 19:33:44'),
-(3, 1, 3, 7, 'Coca-Cola 500ml', 350.00, 1, 350.00, 'listo', '', 'principal', NULL, '2026-03-08 20:01:38', NULL, '2026-03-08 19:33:18', '2026-03-08 20:01:38'),
-(4, 1, 3, 11, 'Menú del Día', 1400.00, 2, 2800.00, 'listo', '', 'principal', NULL, '2026-03-08 20:01:39', NULL, '2026-03-08 19:33:44', '2026-03-08 20:01:39'),
-(5, 3, 3, 3, 'Bife de Chorizo 300g', 2800.00, 1, 2800.00, 'listo', '', 'principal', NULL, '2026-03-16 20:53:21', NULL, '2026-03-08 20:01:56', '2026-03-16 20:53:21'),
-(6, 3, 3, 6, 'Brownie con helado', 750.00, 1, 750.00, 'listo', '', 'principal', NULL, '2026-03-08 20:08:31', NULL, '2026-03-08 20:02:02', '2026-03-08 20:08:31'),
-(7, 4, 3, 3, 'Bife de Chorizo 300g', 2800.00, 1, 2800.00, 'cancelado', '', 'principal', '2026-03-08 20:06:11', NULL, NULL, '2026-03-08 20:06:04', '2026-03-08 20:08:15'),
-(8, 4, 3, 7, 'Coca-Cola 500ml', 350.00, 1, 350.00, 'cancelado', '', 'principal', '2026-03-08 20:07:45', NULL, NULL, '2026-03-08 20:06:38', '2026-03-08 20:08:17'),
-(9, 4, 3, 6, 'Brownie con helado', 750.00, 1, 750.00, 'listo', '', 'principal', '2026-03-08 20:07:45', '2026-03-08 20:08:29', NULL, '2026-03-08 20:07:43', '2026-03-08 20:08:29'),
-(10, 4, 3, 7, 'Coca-Cola 500ml', 350.00, 1, 350.00, 'listo', '', 'principal', '2026-03-08 20:08:50', '2026-03-08 20:09:04', NULL, '2026-03-08 20:08:47', '2026-03-08 20:09:04'),
-(11, 4, 3, 3, 'Bife de Chorizo 300g', 2800.00, 1, 2800.00, 'listo', '', 'principal', '2026-03-08 20:12:29', '2026-03-16 20:53:24', NULL, '2026-03-08 20:12:27', '2026-03-16 20:53:24'),
-(12, 3, 3, 6, 'Brownie con helado', 750.00, 1, 750.00, 'listo', '', 'principal', NULL, '2026-03-16 20:53:21', NULL, '2026-03-08 20:12:35', '2026-03-16 20:53:21'),
-(13, 4, 3, 3, 'Bife de Chorizo 300g', 2800.00, 1, 2800.00, 'pendiente', '', 'principal', NULL, NULL, NULL, '2026-03-16 20:53:31', '2026-03-16 20:53:31');
+(1, 2, 3, 3, 'Bife de Chorizo 300g', 2800.00, 1, 2800.00, 'listo', '', 'principal', NULL, '2026-03-13 16:51:19', NULL, '2026-03-07 19:13:37', '2026-03-13 16:51:19'),
+(2, 10, 3, 6, 'Brownie con helado', 750.00, 1, 750.00, 'listo', '', 'principal', '2026-03-13 16:07:00', '2026-03-13 16:51:15', NULL, '2026-03-13 16:06:59', '2026-03-13 16:51:15'),
+(3, 11, 3, 6, 'Brownie con helado', 750.00, 1, 750.00, 'listo', '', 'principal', NULL, '2026-03-14 14:15:40', NULL, '2026-03-14 14:15:30', '2026-03-14 14:15:40');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `restaurant_compras`
+--
+
+CREATE TABLE `restaurant_compras` (
+  `id` int(11) NOT NULL,
+  `negocio_id` int(11) NOT NULL,
+  `insumo_id` int(11) NOT NULL,
+  `cantidad` decimal(10,3) NOT NULL,
+  `precio_unitario` decimal(10,2) NOT NULL,
+  `total` decimal(10,2) NOT NULL,
+  `proveedor` varchar(150) DEFAULT NULL,
+  `proveedor_id` int(11) DEFAULT NULL,
+  `fecha` date NOT NULL,
+  `notas` text DEFAULT NULL,
+  `usuario_id` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `restaurant_insumos`
+--
+
+CREATE TABLE `restaurant_insumos` (
+  `id` int(11) NOT NULL,
+  `negocio_id` int(11) NOT NULL,
+  `nombre` varchar(150) NOT NULL,
+  `categoria` varchar(100) DEFAULT NULL,
+  `unidad` varchar(30) NOT NULL DEFAULT 'unidad' COMMENT 'kg,g,litro,ml,unidad,docena,etc',
+  `precio_unitario` decimal(10,2) DEFAULT 0.00,
+  `stock_actual` decimal(10,3) DEFAULT 0.000,
+  `stock_minimo` decimal(10,3) DEFAULT 0.000,
+  `activo` tinyint(1) DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `restaurant_mermas`
+--
+
+CREATE TABLE `restaurant_mermas` (
+  `id` int(11) NOT NULL,
+  `negocio_id` int(11) NOT NULL,
+  `insumo_id` int(11) NOT NULL,
+  `cantidad` decimal(10,3) NOT NULL,
+  `motivo` enum('vencimiento','preparacion','accidente','robo','otro') DEFAULT 'otro',
+  `descripcion` varchar(255) DEFAULT NULL,
+  `usuario_id` int(11) DEFAULT NULL,
+  `fecha` date NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -1807,23 +2043,57 @@ CREATE TABLE `restaurant_mesas` (
 --
 
 INSERT INTO `restaurant_mesas` (`id`, `negocio_id`, `sector_id`, `numero`, `nombre`, `capacidad`, `estado`, `pos_x`, `pos_y`, `activo`, `created_at`, `updated_at`) VALUES
-(1, 3, 1, '1', NULL, 4, 'libre', 0, 0, 1, '2026-02-27 13:03:00', '2026-03-08 20:21:38'),
-(2, 3, 1, '2', NULL, 4, 'libre', 0, 0, 1, '2026-02-27 13:03:00', '2026-03-16 20:53:44'),
-(3, 3, 1, '3', NULL, 4, 'libre', 0, 0, 1, '2026-02-27 13:03:00', '2026-03-16 20:51:20'),
-(4, 3, 1, '4', NULL, 4, 'libre', 0, 0, 1, '2026-02-27 13:03:00', '2026-03-16 20:53:07'),
-(5, 3, 1, '5', NULL, 6, 'libre', 0, 0, 1, '2026-02-27 13:03:00', '2026-03-16 20:53:10'),
-(6, 3, 1, '6', NULL, 6, 'libre', 0, 0, 1, '2026-02-27 13:03:00', '2026-03-16 20:53:13'),
-(7, 3, 1, '7', NULL, 2, 'ocupada', 0, 0, 1, '2026-02-27 13:03:00', '2026-02-27 17:19:53'),
-(8, 3, 1, '8', NULL, 2, 'ocupada', 0, 0, 1, '2026-02-27 13:03:00', '2026-02-27 17:29:19'),
-(9, 3, 1, '9', NULL, 4, 'ocupada', 0, 0, 1, '2026-02-27 13:03:00', '2026-02-27 23:09:14'),
+(1, 3, 1, '1', NULL, 4, 'libre', 0, 0, 1, '2026-02-27 13:03:00', '2026-03-23 14:40:02'),
+(2, 3, 1, '2', NULL, 4, 'libre', 0, 0, 1, '2026-02-27 13:03:00', '2026-03-23 14:39:58'),
+(3, 3, 1, '3', NULL, 4, 'libre', 0, 0, 1, '2026-02-27 13:03:00', '2026-03-23 14:39:56'),
+(4, 3, 1, '4', NULL, 4, 'libre', 0, 0, 1, '2026-02-27 13:03:00', '2026-03-23 14:39:52'),
+(5, 3, 1, '5', NULL, 6, 'libre', 0, 0, 1, '2026-02-27 13:03:00', '2026-03-23 14:39:29'),
+(6, 3, 1, '6', NULL, 6, 'libre', 0, 0, 1, '2026-02-27 13:03:00', '2026-03-23 14:39:32'),
+(7, 3, 1, '7', NULL, 2, 'libre', 0, 0, 1, '2026-02-27 13:03:00', '2026-03-23 14:39:35'),
+(8, 3, 1, '8', NULL, 2, 'libre', 0, 0, 1, '2026-02-27 13:03:00', '2026-03-23 14:39:38'),
+(9, 3, 1, '9', NULL, 4, 'libre', 0, 0, 1, '2026-02-27 13:03:00', '2026-03-23 14:39:41'),
 (10, 3, 1, '10', NULL, 4, 'libre', 0, 0, 1, '2026-02-27 13:03:00', '2026-02-27 13:03:00'),
 (11, 3, 2, 'T1', NULL, 4, 'libre', 0, 0, 1, '2026-02-27 13:03:00', '2026-02-27 13:03:00'),
 (12, 3, 2, 'T2', NULL, 4, 'libre', 0, 0, 1, '2026-02-27 13:03:00', '2026-02-27 13:03:00'),
-(13, 3, 2, 'T3', NULL, 6, 'libre', 0, 0, 1, '2026-02-27 13:03:00', '2026-02-27 13:03:00'),
-(14, 3, 2, 'T4', NULL, 2, 'libre', 0, 0, 1, '2026-02-27 13:03:00', '2026-02-27 13:03:00'),
+(13, 3, 2, 'T3', NULL, 6, 'libre', 0, 0, 1, '2026-02-27 13:03:00', '2026-03-23 14:39:46'),
+(14, 3, 2, 'T4', NULL, 2, 'libre', 0, 0, 1, '2026-02-27 13:03:00', '2026-03-23 14:39:44'),
 (15, 3, 3, 'B1', NULL, 2, 'libre', 0, 0, 1, '2026-02-27 13:03:00', '2026-02-27 13:03:00'),
-(16, 3, 3, 'B2', NULL, 2, 'libre', 0, 0, 1, '2026-02-27 13:03:00', '2026-02-27 13:03:00'),
+(16, 3, 3, 'B2', NULL, 2, 'libre', 0, 0, 1, '2026-02-27 13:03:00', '2026-03-23 14:39:49'),
 (17, 3, 3, 'B3', NULL, 2, 'libre', 0, 0, 1, '2026-02-27 13:03:00', '2026-02-27 13:03:00');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `restaurant_proveedores`
+--
+
+CREATE TABLE `restaurant_proveedores` (
+  `id` int(11) NOT NULL,
+  `negocio_id` int(11) NOT NULL,
+  `nombre` varchar(150) NOT NULL,
+  `contacto` varchar(100) DEFAULT NULL,
+  `telefono` varchar(50) DEFAULT NULL,
+  `email` varchar(120) DEFAULT NULL,
+  `direccion` varchar(200) DEFAULT NULL,
+  `notas` text DEFAULT NULL,
+  `activo` tinyint(1) DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `restaurant_recetas`
+--
+
+CREATE TABLE `restaurant_recetas` (
+  `id` int(11) NOT NULL,
+  `negocio_id` int(11) NOT NULL,
+  `producto_id` int(11) NOT NULL,
+  `insumo_id` int(11) NOT NULL,
+  `cantidad_porcion` decimal(10,4) NOT NULL COMMENT 'cantidad de este insumo por porcion del plato',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -1855,10 +2125,7 @@ CREATE TABLE `restaurant_reservas` (
 --
 
 INSERT INTO `restaurant_reservas` (`id`, `negocio_id`, `mesa_id`, `cliente_nombre`, `cliente_telefono`, `cliente_email`, `fecha_reserva`, `hora_inicio`, `hora_fin`, `personas`, `estado`, `observaciones`, `origen`, `usuario_id`, `created_at`, `updated_at`) VALUES
-(1, 3, NULL, 'fran', '+543718563124', 'francisco.goonzalez99@gmail.com', '2026-03-08', '20:00:00', NULL, 2, 'cancelada', '', 'telefono', NULL, '2026-03-08 20:35:23', '2026-03-08 20:37:35'),
-(2, 3, NULL, 'fran', '+543718563124', 'francisco.goonzalez99@gmail.com', '2026-03-08', '20:00:00', NULL, 2, 'cancelada', '', 'telefono', NULL, '2026-03-08 20:35:25', '2026-03-08 20:37:48'),
-(3, 3, NULL, 'fran', '+543718563124', 'francisco.goonzalez99@gmail.com', '2026-03-08', '20:00:00', NULL, 2, 'cancelada', '', 'telefono', NULL, '2026-03-08 20:35:32', '2026-03-08 20:37:51'),
-(4, 3, NULL, 'fran', '+543718563124', 'francisco.goonzalez99@gmail.com', '2026-03-08', '20:00:00', NULL, 2, 'cancelada', '', 'telefono', 4, '2026-03-08 20:37:28', '2026-03-08 20:37:55');
+(1, 3, 2, 'Jiuan', '', '', '2026-03-23', '20:00:00', NULL, 2, 'pendiente', '', 'telefono', 4, '2026-03-23 14:40:33', '2026-03-23 14:40:42');
 
 -- --------------------------------------------------------
 
@@ -2014,6 +2281,7 @@ CREATE TABLE `servicios` (
   `descripcion` text DEFAULT NULL,
   `duracion_min` int(11) NOT NULL DEFAULT 30,
   `precio` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `comision_porcentaje` decimal(5,2) NOT NULL DEFAULT 0.00,
   `categoria` varchar(80) DEFAULT 'General',
   `color` varchar(7) DEFAULT '#8b5cf6',
   `activo` tinyint(1) DEFAULT 1,
@@ -2024,17 +2292,17 @@ CREATE TABLE `servicios` (
 -- Volcado de datos para la tabla `servicios`
 --
 
-INSERT INTO `servicios` (`id`, `negocio_id`, `nombre`, `descripcion`, `duracion_min`, `precio`, `categoria`, `color`, `activo`, `created_at`) VALUES
-(1, 7, 'Corte cabello dama', 'Corte y secado', 45, 2800.00, 'Cabello', '#8b5cf6', 1, '2026-02-27 19:06:59'),
-(2, 7, 'Corte cabello caballero', 'Corte clasico o moderno', 30, 1800.00, 'Cabello', '#8b5cf6', 1, '2026-02-27 19:06:59'),
-(3, 7, 'Coloracion completa', 'Tintura + post tratamiento', 120, 8500.00, 'Color', '#ec4899', 1, '2026-02-27 19:06:59'),
-(4, 7, 'Mechas/Balayage', 'Mechas clasicas o balayage', 150, 12000.00, 'Color', '#ec4899', 1, '2026-02-27 19:06:59'),
-(5, 7, 'Tratamiento keratina', 'Keratina profesional', 90, 9500.00, 'Tratamiento', '#0ea5e9', 1, '2026-02-27 19:06:59'),
-(6, 7, 'Hidratacion profunda', 'Mascarilla + secado', 60, 4200.00, 'Tratamiento', '#0ea5e9', 1, '2026-02-27 19:06:59'),
-(7, 7, 'Peinado de novia', 'Peinado especial + prueba', 90, 15000.00, 'Peinado', '#f59e0b', 1, '2026-02-27 19:06:59'),
-(8, 7, 'Depilacion cejas', 'Depilacion con hilo o cera', 20, 900.00, 'Estetica', '#ef4444', 1, '2026-02-27 19:06:59'),
-(9, 7, 'Manicura', 'Limpieza + esmaltado', 50, 2500.00, 'Unias', '#f472b6', 1, '2026-02-27 19:06:59'),
-(10, 7, 'Pedicura', 'Limpieza + esmaltado pies', 60, 3000.00, 'Unias', '#f472b6', 1, '2026-02-27 19:06:59');
+INSERT INTO `servicios` (`id`, `negocio_id`, `nombre`, `descripcion`, `duracion_min`, `precio`, `comision_porcentaje`, `categoria`, `color`, `activo`, `created_at`) VALUES
+(1, 7, 'Corte cabello dama', 'Corte y secado', 45, 2800.00, 0.00, 'Cabello', '#8b5cf6', 1, '2026-02-27 19:06:59'),
+(2, 7, 'Corte cabello caballero', 'Corte clasico o moderno', 30, 1800.00, 0.00, 'Cabello', '#8b5cf6', 1, '2026-02-27 19:06:59'),
+(3, 7, 'Coloracion completa', 'Tintura + post tratamiento', 120, 8500.00, 0.00, 'Color', '#ec4899', 1, '2026-02-27 19:06:59'),
+(4, 7, 'Mechas/Balayage', 'Mechas clasicas o balayage', 150, 12000.00, 0.00, 'Color', '#ec4899', 1, '2026-02-27 19:06:59'),
+(5, 7, 'Tratamiento keratina', 'Keratina profesional', 90, 9500.00, 0.00, 'Tratamiento', '#0ea5e9', 1, '2026-02-27 19:06:59'),
+(6, 7, 'Hidratacion profunda', 'Mascarilla + secado', 60, 4200.00, 0.00, 'Tratamiento', '#0ea5e9', 1, '2026-02-27 19:06:59'),
+(7, 7, 'Peinado de novia', 'Peinado especial + prueba', 90, 15000.00, 0.00, 'Peinado', '#f59e0b', 1, '2026-02-27 19:06:59'),
+(8, 7, 'Depilacion cejas', 'Depilacion con hilo o cera', 20, 900.00, 0.00, 'Estetica', '#ef4444', 1, '2026-02-27 19:06:59'),
+(9, 7, 'Manicura', 'Limpieza + esmaltado', 50, 2500.00, 0.00, 'Unias', '#f472b6', 1, '2026-02-27 19:06:59'),
+(10, 7, 'Pedicura', 'Limpieza + esmaltado pies', 60, 3000.00, 0.00, 'Unias', '#f472b6', 1, '2026-02-27 19:06:59');
 
 -- --------------------------------------------------------
 
@@ -2057,7 +2325,7 @@ CREATE TABLE `superadmin_users` (
 --
 
 INSERT INTO `superadmin_users` (`id`, `nombre`, `email`, `password`, `activo`, `ultimo_login`, `created_at`) VALUES
-(1, 'Super Admin', 'admin@dashbase.com', '$2y$10$sb9vTv8uEW2aCtUGIPIFte5u0ZCOsb6bfdy/Qew63ja23hDPkWUTq', 1, '2026-03-04 11:35:03', '2026-02-28 23:10:26');
+(1, 'Super Admin', 'admin@dashbase.com', '$2y$10$sb9vTv8uEW2aCtUGIPIFte5u0ZCOsb6bfdy/Qew63ja23hDPkWUTq', 1, '2026-03-14 11:22:16', '2026-02-28 23:10:26');
 
 -- --------------------------------------------------------
 
@@ -2137,6 +2405,7 @@ CREATE TABLE `turnos` (
   `hora_fin` time NOT NULL,
   `duracion_min` int(11) DEFAULT 30,
   `precio` decimal(10,2) DEFAULT 0.00,
+  `metodo_pago` enum('efectivo','transferencia','tarjeta','debito') DEFAULT NULL,
   `estado` enum('pendiente','confirmado','en_curso','completado','cancelado','no_show') DEFAULT 'pendiente',
   `notas` text DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
@@ -2147,28 +2416,20 @@ CREATE TABLE `turnos` (
 -- Volcado de datos para la tabla `turnos`
 --
 
-INSERT INTO `turnos` (`id`, `negocio_id`, `cliente_id`, `cliente_nombre`, `cliente_telefono`, `empleado_id`, `servicio_id`, `servicio_nombre`, `fecha`, `hora_inicio`, `hora_fin`, `duracion_min`, `precio`, `estado`, `notas`, `created_at`, `updated_at`) VALUES
-(1, 7, NULL, 'Maria Gonzalez', '11-4512-3456', NULL, 1, 'Corte cabello dama', '2026-02-27', '09:00:00', '09:45:00', 45, 2800.00, 'confirmado', NULL, '2026-02-27 19:07:25', '2026-02-27 19:07:25'),
-(2, 7, NULL, 'Laura Rodriguez', '11-6734-5678', NULL, 3, 'Coloracion completa', '2026-02-27', '10:00:00', '12:00:00', 120, 8500.00, 'en_curso', NULL, '2026-02-27 19:07:25', '2026-02-27 19:07:25'),
-(3, 7, NULL, 'Ana Martinez', '11-5523-1122', NULL, 6, 'Hidratacion profunda', '2026-02-27', '12:00:00', '13:00:00', 60, 4200.00, 'pendiente', NULL, '2026-02-27 19:07:25', '2026-02-27 19:07:25'),
-(4, 7, NULL, 'Carlos Lopez', '11-3345-6789', NULL, 2, 'Corte cabello caballero', '2026-02-27', '14:00:00', '14:30:00', 30, 1800.00, 'pendiente', NULL, '2026-02-27 19:07:25', '2026-02-27 19:07:25'),
-(5, 7, NULL, 'Valeria Torres', '11-7890-1234', NULL, 9, 'Manicura', '2026-02-27', '15:00:00', '15:50:00', 50, 2500.00, 'pendiente', NULL, '2026-02-27 19:07:25', '2026-02-27 19:07:25'),
-(6, 7, NULL, 'Florencia Paz', '11-9012-3456', NULL, 4, 'Mechas/Balayage', '2026-02-28', '10:00:00', '12:30:00', 150, 12000.00, 'pendiente', NULL, '2026-02-27 19:07:25', '2026-02-27 19:07:25'),
-(7, 7, NULL, 'Sofia Rios', '11-1234-5678', NULL, 7, 'Peinado de novia', '2026-03-01', '09:00:00', '10:30:00', 90, 15000.00, 'confirmado', NULL, '2026-02-27 19:07:25', '2026-02-27 19:07:25'),
-(8, 7, NULL, 'Marta Suarez', '11-4567-8901', NULL, 5, 'Tratamiento keratina', '2026-03-01', '11:00:00', '12:30:00', 90, 9500.00, 'pendiente', NULL, '2026-02-27 19:07:25', '2026-02-27 19:07:25'),
-(9, 7, NULL, 'Patricia Vega', '11-2233-4455', NULL, 1, 'Corte cabello dama', '2026-02-26', '10:00:00', '10:45:00', 45, 2800.00, 'completado', NULL, '2026-02-27 19:07:25', '2026-02-27 19:07:25'),
-(10, 7, NULL, 'Romina Castro', '11-5566-7788', NULL, 3, 'Coloracion completa', '2026-02-26', '14:00:00', '16:00:00', 120, 8500.00, 'completado', NULL, '2026-02-27 19:07:25', '2026-02-27 19:07:25'),
-(11, 7, NULL, 'Fran', '2341221412', NULL, NULL, NULL, '2026-03-07', '20:00:00', '20:30:00', 30, 0.00, 'pendiente', '', '2026-03-07 19:15:44', '2026-03-07 19:15:44'),
-(12, 7, NULL, 'Fran', '2341221412', NULL, NULL, NULL, '2026-03-07', '20:00:00', '20:30:00', 30, 0.00, 'pendiente', '', '2026-03-07 19:15:45', '2026-03-07 19:15:45'),
-(13, 7, NULL, 'Fran', '2341221412', NULL, NULL, NULL, '2026-03-07', '20:00:00', '20:30:00', 30, 0.00, 'pendiente', '', '2026-03-07 19:15:48', '2026-03-07 19:15:48'),
-(14, 7, NULL, 'pancho', '3718563125', NULL, NULL, 'Corte cabello caballero', '2026-03-09', '09:00:00', '09:30:00', 30, 1800.00, 'cancelado', '', '2026-03-09 21:57:46', '2026-03-09 21:59:36'),
-(15, 7, NULL, 'pancho', '3718563125', NULL, NULL, 'Corte cabello caballero', '2026-03-09', '09:00:00', '09:30:00', 30, 1800.00, 'cancelado', '', '2026-03-09 21:57:47', '2026-03-09 21:59:33'),
-(16, 7, NULL, 'pancho', '3718563125', NULL, NULL, 'Corte cabello caballero', '2026-03-09', '09:00:00', '09:30:00', 30, 1800.00, 'cancelado', '', '2026-03-09 21:57:48', '2026-03-09 21:59:39'),
-(17, 7, NULL, 'pancho', '3718563125', NULL, NULL, 'Corte cabello caballero', '2026-03-09', '09:00:00', '09:30:00', 30, 1800.00, 'pendiente', '', '2026-03-09 21:57:48', '2026-03-09 21:57:48'),
-(18, 7, NULL, 'pancho', '3718563125', NULL, NULL, 'Corte cabello caballero', '2026-03-09', '09:00:00', '09:30:00', 30, 1800.00, 'pendiente', '', '2026-03-09 21:58:54', '2026-03-09 21:58:54'),
-(19, 7, NULL, 'abi', '3189295', NULL, NULL, NULL, '2026-03-09', '09:00:00', '09:30:00', 30, 0.00, 'pendiente', '', '2026-03-09 22:00:43', '2026-03-09 22:00:43'),
-(20, 7, NULL, 'abi', '3189295', NULL, NULL, NULL, '2026-03-09', '09:00:00', '09:30:00', 30, 0.00, 'pendiente', '', '2026-03-09 22:00:45', '2026-03-09 22:00:45'),
-(21, 7, 2, 'abi', '378181554', NULL, NULL, NULL, '2026-03-09', '09:00:00', '09:30:00', 30, 0.00, 'pendiente', '', '2026-03-09 22:07:13', '2026-03-09 22:07:13');
+INSERT INTO `turnos` (`id`, `negocio_id`, `cliente_id`, `cliente_nombre`, `cliente_telefono`, `empleado_id`, `servicio_id`, `servicio_nombre`, `fecha`, `hora_inicio`, `hora_fin`, `duracion_min`, `precio`, `metodo_pago`, `estado`, `notas`, `created_at`, `updated_at`) VALUES
+(1, 7, NULL, 'Maria Gonzalez', '11-4512-3456', NULL, 1, 'Corte cabello dama', '2026-02-27', '09:00:00', '09:45:00', 45, 2800.00, NULL, 'confirmado', NULL, '2026-02-27 19:07:25', '2026-02-27 19:07:25'),
+(2, 7, NULL, 'Laura Rodriguez', '11-6734-5678', NULL, 3, 'Coloracion completa', '2026-02-27', '10:00:00', '12:00:00', 120, 8500.00, NULL, 'en_curso', NULL, '2026-02-27 19:07:25', '2026-02-27 19:07:25'),
+(3, 7, NULL, 'Ana Martinez', '11-5523-1122', NULL, 6, 'Hidratacion profunda', '2026-02-27', '12:00:00', '13:00:00', 60, 4200.00, NULL, 'pendiente', NULL, '2026-02-27 19:07:25', '2026-02-27 19:07:25'),
+(4, 7, NULL, 'Carlos Lopez', '11-3345-6789', NULL, 2, 'Corte cabello caballero', '2026-02-27', '14:00:00', '14:30:00', 30, 1800.00, NULL, 'pendiente', NULL, '2026-02-27 19:07:25', '2026-02-27 19:07:25'),
+(5, 7, NULL, 'Valeria Torres', '11-7890-1234', NULL, 9, 'Manicura', '2026-02-27', '15:00:00', '15:50:00', 50, 2500.00, NULL, 'pendiente', NULL, '2026-02-27 19:07:25', '2026-02-27 19:07:25'),
+(6, 7, NULL, 'Florencia Paz', '11-9012-3456', NULL, 4, 'Mechas/Balayage', '2026-02-28', '10:00:00', '12:30:00', 150, 12000.00, NULL, 'pendiente', NULL, '2026-02-27 19:07:25', '2026-02-27 19:07:25'),
+(7, 7, NULL, 'Sofia Rios', '11-1234-5678', NULL, 7, 'Peinado de novia', '2026-03-01', '09:00:00', '10:30:00', 90, 15000.00, NULL, 'confirmado', NULL, '2026-02-27 19:07:25', '2026-02-27 19:07:25'),
+(8, 7, NULL, 'Marta Suarez', '11-4567-8901', NULL, 5, 'Tratamiento keratina', '2026-03-01', '11:00:00', '12:30:00', 90, 9500.00, NULL, 'pendiente', NULL, '2026-02-27 19:07:25', '2026-02-27 19:07:25'),
+(9, 7, NULL, 'Patricia Vega', '11-2233-4455', NULL, 1, 'Corte cabello dama', '2026-02-26', '10:00:00', '10:45:00', 45, 2800.00, NULL, 'completado', NULL, '2026-02-27 19:07:25', '2026-02-27 19:07:25'),
+(10, 7, NULL, 'Romina Castro', '11-5566-7788', NULL, 3, 'Coloracion completa', '2026-02-26', '14:00:00', '16:00:00', 120, 8500.00, NULL, 'completado', NULL, '2026-02-27 19:07:25', '2026-02-27 19:07:25'),
+(11, 7, NULL, 'Fran', '2341221412', NULL, NULL, NULL, '2026-03-07', '20:00:00', '20:30:00', 30, 0.00, NULL, 'pendiente', '', '2026-03-07 19:15:44', '2026-03-07 19:15:44'),
+(12, 7, NULL, 'Fran', '2341221412', NULL, NULL, NULL, '2026-03-07', '20:00:00', '20:30:00', 30, 0.00, NULL, 'pendiente', '', '2026-03-07 19:15:45', '2026-03-07 19:15:45'),
+(13, 7, NULL, 'Fran', '2341221412', NULL, NULL, NULL, '2026-03-07', '20:00:00', '20:30:00', 30, 0.00, NULL, 'pendiente', '', '2026-03-07 19:15:48', '2026-03-07 19:15:48');
 
 -- --------------------------------------------------------
 
@@ -2186,17 +2447,6 @@ CREATE TABLE `turno_servicios` (
   `precio` decimal(10,2) DEFAULT 0.00
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Volcado de datos para la tabla `turno_servicios`
---
-
-INSERT INTO `turno_servicios` (`id`, `turno_id`, `negocio_id`, `servicio_id`, `servicio_nombre`, `duracion_min`, `precio`) VALUES
-(1, 14, 7, 2, 'Corte cabello caballero', 30, 1800.00),
-(2, 15, 7, 2, 'Corte cabello caballero', 30, 1800.00),
-(3, 16, 7, 2, 'Corte cabello caballero', 30, 1800.00),
-(4, 17, 7, 2, 'Corte cabello caballero', 30, 1800.00),
-(5, 18, 7, 2, 'Corte cabello caballero', 30, 1800.00);
-
 -- --------------------------------------------------------
 
 --
@@ -2210,10 +2460,13 @@ CREATE TABLE `usuarios` (
   `apellido` varchar(255) NOT NULL,
   `usuario` varchar(50) NOT NULL,
   `email` varchar(255) DEFAULT NULL,
-  `password` varchar(255) NOT NULL,
+  `password` varchar(255) DEFAULT NULL,
+  `auth_provider` enum('local','google') NOT NULL DEFAULT 'local',
+  `google_sub` varchar(64) DEFAULT NULL,
   `rol` enum('admin','empleado') DEFAULT 'empleado',
   `telefono` varchar(50) DEFAULT NULL,
   `foto` varchar(255) DEFAULT NULL,
+  `avatar_url` varchar(255) DEFAULT NULL,
   `activo` tinyint(1) DEFAULT 1,
   `ultimo_acceso` timestamp NULL DEFAULT NULL,
   `fecha_creacion` timestamp NOT NULL DEFAULT current_timestamp(),
@@ -2224,25 +2477,29 @@ CREATE TABLE `usuarios` (
 -- Volcado de datos para la tabla `usuarios`
 --
 
-INSERT INTO `usuarios` (`id`, `negocio_id`, `nombre`, `apellido`, `usuario`, `email`, `password`, `rol`, `telefono`, `foto`, `activo`, `ultimo_acceso`, `fecha_creacion`, `fecha_actualizacion`) VALUES
-(1, 1, 'Admin', 'Demo', 'admin', NULL, '$2y$10$wT6ZsCWX3oaHZF6pGrA/GO5GyuJ3PqVqJqGKJSdNz04j1wCq1rqlG', 'admin', NULL, NULL, 1, '2026-03-09 22:08:28', '2026-02-27 03:53:59', '2026-03-09 22:08:28'),
-(3, 2, 'Juan', 'García', 'juangarcia', 'juan@test.com', '$2y$10$KzCx1YG0ylXAEyAhlnXzI.l091kO8bbu935OKAd71e0znwUh.oMJy', 'admin', NULL, NULL, 1, NULL, '2026-02-27 12:40:57', '2026-02-27 12:40:57'),
-(4, 3, 'Martin', 'De Oz', 'cicloclub', 'MartinezdeOz@gmail.com', '$2y$10$wT6ZsCWX3oaHZF6pGrA/GO5GyuJ3PqVqJqGKJSdNz04j1wCq1rqlG', 'admin', NULL, NULL, 1, '2026-03-16 20:50:36', '2026-02-27 12:57:40', '2026-03-16 20:50:36'),
-(5, 4, 'San', 'Martin', 'ferretex', 'san@martin.cmo', '$2y$10$9TG9RDJ8gglCrQ0OcszyCOXXjPkSbCYh1.c7wMRPmANDdnxW40B2m', 'admin', NULL, NULL, 1, '2026-03-12 01:08:05', '2026-02-27 17:38:05', '2026-03-12 01:08:05'),
-(6, 6, 'Admin', 'Super', 'superdemo', 'super@demo.com', '$2y$10$LXJYbhJuQfhoeu3x9jBV7eAl.JC1hzF7rRP.Whi/ODa3rfYpBu712', 'admin', NULL, NULL, 1, '2026-03-08 20:39:18', '2026-02-27 18:37:54', '2026-03-08 20:39:18'),
-(7, 7, 'Admin', 'Glam', 'glamdemo', 'glam@demo.com', '$2y$10$ZJ19tUg5VXWsp.tMUe5nzeDs2EkXqEcto2dJhIpJ8DIBlYlfMmqZW', 'admin', NULL, NULL, 1, '2026-03-09 22:08:14', '2026-02-27 19:16:49', '2026-03-09 22:08:14'),
-(8, 8, 'Admin', 'FitZone', 'gymdemo', 'gym@demo.com', '$2y$10$ETr/5x8NscAXu2LzbnGwb.MtEN/ktDVfDVF7qoo4k6yBz7s1cXmpS', 'admin', NULL, NULL, 1, '2026-03-10 12:47:40', '2026-02-27 19:41:56', '2026-03-10 12:47:40'),
-(9, 9, 'Pedro', 'Ramon', 'gymdemo1', 'miami@gym.com', '$2y$10$Yo4U8giRnIeB3h4ECLxUhOAQxf9ZUTN1lRMeMujUHE9v9pBJ7/Ptm', 'admin', NULL, NULL, 1, '2026-02-27 21:08:41', '2026-02-27 21:08:01', '2026-02-27 21:08:41'),
-(10, 10, 'Casia', 'nunez', 'nunezferreteria', 'nuenz@casia.com', '$2y$10$4lrOAAZqxTERAjQZcy/jPO1az7KrTbqNCMnXP4kkKsMzf1y6u9K26', 'admin', NULL, NULL, 1, NULL, '2026-02-27 23:07:13', '2026-02-27 23:07:13'),
-(11, 11, 'Demo', 'Canchas', 'canchasdemo', 'canchasdemo@demo.com', '$2y$10$y4fg.bSGJLVCUBoyus1zJ.gXngMMAAawb2UjYtvvQd3iF.u27RPny', 'admin', NULL, NULL, 1, '2026-03-10 13:00:57', '2026-02-28 01:18:43', '2026-03-10 13:00:57'),
-(12, 12, 'Casia', 'Nunez', 'farmademo', 'algo@nunez.com', '$2y$10$8d.CmXZx5I.xarSCR85r2.3GLSBFrclqMvXbtvbAIeRix.RiskV4.', 'admin', NULL, NULL, 0, '2026-02-28 22:14:15', '2026-02-28 22:14:06', '2026-03-01 03:28:27'),
-(13, 13, 'Casia', 'Nunez', 'hoteldemo', 'hotel@clorinda.cm', '$2y$10$hDcHLzCY445c0CTX0Fi00.ZSBBe/79GM1ARXi6gQhlbUzL/QN3Q9u', 'admin', NULL, NULL, 1, '2026-03-02 14:30:22', '2026-03-01 19:09:22', '2026-03-02 14:30:22'),
-(14, 14, 'Juan', 'De La Rua', 'mascoton', 'vetetuya@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin', NULL, NULL, 1, '2026-03-01 20:13:55', '2026-03-01 19:45:18', '2026-03-01 20:13:55'),
-(15, 15, 'Castor', 'Lopez', 'optidemo', 'ea@gmail.com', '$2y$10$GcUV.7Rhau5srYP7rOhqI.8UZ3PY.t8KD9tW4S10g.wko9gSrIiPO', 'admin', NULL, NULL, 1, '2026-03-02 15:04:34', '2026-03-02 14:55:35', '2026-03-02 15:04:34'),
-(16, 16, 'Matias', 'Mereles', 'neotec', 'neo@gmail.com', '$2y$10$uiA1/ex0uPcHVUQBOLjPauUmLUDrDaWNcg48ZSLGbdOFNKdrcN8f.', 'admin', NULL, NULL, 1, '2026-03-02 15:21:42', '2026-03-02 15:21:34', '2026-03-02 15:21:42'),
-(17, 17, 'Rodrigo', 'Gomez de la Fuente', 'rodrirestaurant', 'moqndow@gmail.com', '$2y$10$VZKVkn/H57s9OwEWpmJU6uhvIzeJnX0tsXqRmqNg9tje0SSqd8cOq', 'admin', NULL, NULL, 1, '2026-03-03 22:55:02', '2026-03-03 22:54:52', '2026-03-03 22:55:02'),
-(18, 18, 'Oscar', 'Gonza', 'oscargym', 'wlnw@gmail.com', '$2y$10$2e/WvsoC7y8Sh9hPRQMT.exOXckLjhxeeEdJdWP08tqvx3CyhRIeW', 'admin', NULL, NULL, 1, '2026-03-07 02:49:33', '2026-03-07 02:49:24', '2026-03-07 02:49:33'),
-(19, 19, 'Francisco', 'Gonzalez', 'frankapo42gmailcom', 'frankapo42@gmail.com', '$2y$10$OiuWGoz2Abv5X.rbGJi1o.GVBbL/sJRPRfRbKpLozZ4RWiKZW.fnS', 'admin', NULL, NULL, 1, '2026-03-12 01:27:46', '2026-03-12 01:08:57', '2026-03-12 01:27:46');
+INSERT INTO `usuarios` (`id`, `negocio_id`, `nombre`, `apellido`, `usuario`, `email`, `password`, `auth_provider`, `google_sub`, `rol`, `telefono`, `foto`, `avatar_url`, `activo`, `ultimo_acceso`, `fecha_creacion`, `fecha_actualizacion`) VALUES
+(1, 1, 'Admin', 'Demo', 'admin', NULL, '$2y$10$wT6ZsCWX3oaHZF6pGrA/GO5GyuJ3PqVqJqGKJSdNz04j1wCq1rqlG', 'local', NULL, 'admin', NULL, NULL, NULL, 1, '2026-03-17 03:29:09', '2026-02-27 03:53:59', '2026-03-17 03:29:09'),
+(3, 2, 'Juan', 'García', 'juangarcia', 'juan@test.com', '$2y$10$KzCx1YG0ylXAEyAhlnXzI.l091kO8bbu935OKAd71e0znwUh.oMJy', 'local', NULL, 'admin', NULL, NULL, NULL, 1, NULL, '2026-02-27 12:40:57', '2026-02-27 12:40:57'),
+(4, 3, 'Martin', 'De Oz', 'cicloclub', 'MartinezdeOz@gmail.com', '$2y$10$wT6ZsCWX3oaHZF6pGrA/GO5GyuJ3PqVqJqGKJSdNz04j1wCq1rqlG', 'local', NULL, 'admin', NULL, NULL, NULL, 1, '2026-03-24 00:38:12', '2026-02-27 12:57:40', '2026-03-24 00:38:12'),
+(5, 4, 'San', 'Martin', 'ferretex', 'san@martin.cmo', '$2y$10$9TG9RDJ8gglCrQ0OcszyCOXXjPkSbCYh1.c7wMRPmANDdnxW40B2m', 'local', NULL, 'admin', NULL, NULL, NULL, 1, '2026-03-07 20:39:29', '2026-02-27 17:38:05', '2026-03-07 20:39:29'),
+(6, 6, 'Admin', 'Super', 'superdemo', 'super@demo.com', '$2y$10$LXJYbhJuQfhoeu3x9jBV7eAl.JC1hzF7rRP.Whi/ODa3rfYpBu712', 'local', NULL, 'admin', NULL, NULL, NULL, 1, '2026-03-07 19:14:24', '2026-02-27 18:37:54', '2026-03-07 19:14:24'),
+(7, 7, 'Admin', 'Glam', 'glamdemo', 'glam@demo.com', '$2y$10$ZJ19tUg5VXWsp.tMUe5nzeDs2EkXqEcto2dJhIpJ8DIBlYlfMmqZW', 'local', NULL, 'admin', NULL, NULL, NULL, 1, '2026-03-24 18:12:24', '2026-02-27 19:16:49', '2026-03-24 18:12:24'),
+(8, 8, 'Admin', 'FitZone', 'gymdemo', 'gym@demo.com', '$2y$10$ETr/5x8NscAXu2LzbnGwb.MtEN/ktDVfDVF7qoo4k6yBz7s1cXmpS', 'local', NULL, 'admin', NULL, NULL, NULL, 1, '2026-03-24 17:58:31', '2026-02-27 19:41:56', '2026-03-24 17:58:31'),
+(9, 9, 'Pedro', 'Ramon', 'gymdemo1', 'miami@gym.com', '$2y$10$Yo4U8giRnIeB3h4ECLxUhOAQxf9ZUTN1lRMeMujUHE9v9pBJ7/Ptm', 'local', NULL, 'admin', NULL, NULL, NULL, 1, '2026-02-27 21:08:41', '2026-02-27 21:08:01', '2026-02-27 21:08:41'),
+(10, 10, 'Casia', 'nunez', 'nunezferreteria', 'nuenz@casia.com', '$2y$10$4lrOAAZqxTERAjQZcy/jPO1az7KrTbqNCMnXP4kkKsMzf1y6u9K26', 'local', NULL, 'admin', NULL, NULL, NULL, 1, NULL, '2026-02-27 23:07:13', '2026-02-27 23:07:13'),
+(11, 11, 'Demo', 'Canchas', 'canchasdemo', 'canchasdemo@demo.com', '$2y$10$y4fg.bSGJLVCUBoyus1zJ.gXngMMAAawb2UjYtvvQd3iF.u27RPny', 'local', NULL, 'admin', NULL, NULL, NULL, 1, '2026-03-24 19:00:01', '2026-02-28 01:18:43', '2026-03-24 19:00:01'),
+(12, 12, 'Casia', 'Nunez', 'farmademo', 'algo@nunez.com', '$2y$10$8d.CmXZx5I.xarSCR85r2.3GLSBFrclqMvXbtvbAIeRix.RiskV4.', 'local', NULL, 'admin', NULL, NULL, NULL, 0, '2026-02-28 22:14:15', '2026-02-28 22:14:06', '2026-03-01 03:28:27'),
+(13, 13, 'Casia', 'Nunez', 'hoteldemo', 'hotel@clorinda.cm', '$2y$10$hDcHLzCY445c0CTX0Fi00.ZSBBe/79GM1ARXi6gQhlbUzL/QN3Q9u', 'local', NULL, 'admin', NULL, NULL, NULL, 1, '2026-03-02 14:30:22', '2026-03-01 19:09:22', '2026-03-02 14:30:22'),
+(14, 14, 'Juan', 'De La Rua', 'mascoton', 'vetetuya@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'local', NULL, 'admin', NULL, NULL, NULL, 1, '2026-03-01 20:13:55', '2026-03-01 19:45:18', '2026-03-01 20:13:55'),
+(15, 15, 'Castor', 'Lopez', 'optidemo', 'ea@gmail.com', '$2y$10$GcUV.7Rhau5srYP7rOhqI.8UZ3PY.t8KD9tW4S10g.wko9gSrIiPO', 'local', NULL, 'admin', NULL, NULL, NULL, 1, '2026-03-02 15:04:34', '2026-03-02 14:55:35', '2026-03-02 15:04:34'),
+(16, 16, 'Matias', 'Mereles', 'neotec', 'neo@gmail.com', '$2y$10$uiA1/ex0uPcHVUQBOLjPauUmLUDrDaWNcg48ZSLGbdOFNKdrcN8f.', 'local', NULL, 'admin', NULL, NULL, NULL, 1, '2026-03-02 15:21:42', '2026-03-02 15:21:34', '2026-03-02 15:21:42'),
+(17, 17, 'Rodrigo', 'Gomez de la Fuente', 'rodrirestaurant', 'moqndow@gmail.com', '$2y$10$VZKVkn/H57s9OwEWpmJU6uhvIzeJnX0tsXqRmqNg9tje0SSqd8cOq', 'local', NULL, 'admin', NULL, NULL, NULL, 1, '2026-03-03 22:55:02', '2026-03-03 22:54:52', '2026-03-03 22:55:02'),
+(18, 18, 'Oscar', 'Gonza', 'oscargym', 'wlnw@gmail.com', '$2y$10$2e/WvsoC7y8Sh9hPRQMT.exOXckLjhxeeEdJdWP08tqvx3CyhRIeW', 'local', NULL, 'admin', NULL, NULL, NULL, 1, '2026-03-07 02:49:33', '2026-03-07 02:49:24', '2026-03-07 02:49:33'),
+(19, 19, 'Cristian', 'Nunez', 'fenixferreteria', 'crisfernu@gmail.com', '$2y$10$HqzmczPwv5zxHagdfWbSpOopB7eMyaxP6AtRH.YGDK5AZDcQ1sSPS', 'local', NULL, 'admin', NULL, NULL, NULL, 1, '2026-03-10 17:39:36', '2026-03-10 17:39:20', '2026-03-10 17:39:36'),
+(20, 20, 'Leandro', 'Dirie', 'mundodigital', 'dirie@gmail.com', '$2y$10$Isfi9DFqt/FOHqbpfyxt7OJz5u2ovBwUUIIelbEpxJBs2P5SXMIUm', 'local', NULL, 'admin', NULL, NULL, NULL, 1, '2026-03-13 00:26:36', '2026-03-13 00:26:26', '2026-03-13 00:26:36'),
+(21, 21, 'Franco', 'Samudio', 'carmencancha', 'msoq@gmail.com', '$2y$10$OoOoA6OlKxllrgjvWXI5zeZh7AA13zbe.1se3THnKmBxFiDY/Eqy.', 'local', NULL, 'admin', NULL, NULL, NULL, 1, '2026-03-17 03:27:48', '2026-03-17 03:27:36', '2026-03-17 03:27:48'),
+(22, 22, 'MAT', 'Hotel', 'hoteldemo1', 'dnoo@gmail.com', '$2y$10$X8QXr6uqU3MKQhhQmsEij.3t2ecTUclYoOOge1Af5VLobKJCUB/ce', 'local', NULL, 'admin', NULL, NULL, NULL, 1, '2026-03-24 22:53:01', '2026-03-24 22:52:52', '2026-03-24 22:53:01'),
+(23, 23, 'Casia', 'Nunez', 'farmademo1', 'numez@gmail.com', '$2y$10$x983Yy6LbYSPZJZMqjTT.ORWsxmBZfqb7t/nRNwYEtKG4MssPX1pq', 'local', NULL, 'admin', NULL, NULL, NULL, 1, '2026-03-24 23:08:38', '2026-03-24 23:08:29', '2026-03-24 23:08:38');
 
 -- --------------------------------------------------------
 
@@ -2255,7 +2512,6 @@ CREATE TABLE `ventas` (
   `negocio_id` int(11) NOT NULL,
   `usuario_id` int(11) NOT NULL,
   `caja_id` int(11) DEFAULT NULL,
-  `cliente_id` int(11) DEFAULT NULL,
   `cliente_nombre` varchar(255) DEFAULT NULL,
   `cliente_telefono` varchar(50) DEFAULT NULL,
   `subtotal` decimal(10,2) NOT NULL,
@@ -2264,39 +2520,60 @@ CREATE TABLE `ventas` (
   `metodo_pago` varchar(50) NOT NULL,
   `estado` enum('completada','cancelada') DEFAULT 'completada',
   `observaciones` text DEFAULT NULL,
-  `fecha_venta` timestamp NOT NULL DEFAULT current_timestamp(),
-  `motivo_cancelacion` text DEFAULT NULL,
-  `cancelada_por` int(11) DEFAULT NULL,
-  `fecha_cancelacion` datetime DEFAULT NULL
+  `fecha_venta` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `ventas`
 --
 
-INSERT INTO `ventas` (`id`, `negocio_id`, `usuario_id`, `caja_id`, `cliente_id`, `cliente_nombre`, `cliente_telefono`, `subtotal`, `descuento`, `total`, `metodo_pago`, `estado`, `observaciones`, `fecha_venta`, `motivo_cancelacion`, `cancelada_por`, `fecha_cancelacion`) VALUES
-(1, 1, 1, 1, NULL, NULL, NULL, 2000.00, 0.00, 2000.00, 'efectivo', 'completada', NULL, '2026-02-27 04:50:58', NULL, NULL, NULL),
-(2, 1, 1, 1, NULL, NULL, NULL, 2000.00, 0.00, 2000.00, 'transferencia', 'completada', NULL, '2026-02-27 05:13:09', NULL, NULL, NULL),
-(3, 6, 6, 5, NULL, NULL, NULL, 2820.00, 0.00, 2820.00, 'tarjeta_debito', 'cancelada', NULL, '2026-03-03 00:20:53', 'error de cobro', 6, '2026-03-08 17:46:56'),
-(4, 4, 5, 4, NULL, NULL, NULL, 1680.00, 0.00, 1680.00, 'transferencia', 'completada', NULL, '2026-03-07 21:51:07', NULL, NULL, NULL),
-(5, 3, 4, NULL, NULL, NULL, NULL, 3150.00, 0.00, 3150.00, 'efectivo', 'completada', 'Comanda #1 - Mesa 1', '2026-03-08 20:01:04', NULL, NULL, NULL),
-(6, 3, 4, NULL, NULL, NULL, NULL, 3150.00, 0.00, 3150.00, 'efectivo', 'completada', 'Comanda #1 - Mesa 1', '2026-03-08 20:01:06', NULL, NULL, NULL),
-(7, 3, 4, NULL, NULL, NULL, NULL, 3150.00, 0.00, 3150.00, 'efectivo', 'completada', 'Comanda #1 - Mesa 1', '2026-03-08 20:01:13', NULL, NULL, NULL),
-(8, 3, 4, NULL, NULL, NULL, NULL, 3150.00, 0.00, 3150.00, 'efectivo', 'completada', 'Comanda #1 - Mesa 1', '2026-03-08 20:02:17', NULL, NULL, NULL),
-(9, 3, 4, NULL, NULL, NULL, NULL, 3150.00, 0.00, 3150.00, 'efectivo', 'completada', 'Comanda #1 - Mesa 1', '2026-03-08 20:02:18', NULL, NULL, NULL),
-(10, 3, 4, NULL, NULL, NULL, NULL, 3150.00, 0.00, 3150.00, 'efectivo', 'completada', 'Comanda #1 - Mesa 1', '2026-03-08 20:02:20', NULL, NULL, NULL),
-(11, 3, 4, NULL, NULL, NULL, NULL, 3150.00, 0.00, 3150.00, 'efectivo', 'completada', 'Comanda #1 - Mesa 1', '2026-03-08 20:16:00', NULL, NULL, NULL),
-(12, 3, 4, NULL, NULL, NULL, NULL, 3150.00, 0.00, 3150.00, 'efectivo', 'completada', 'Comanda #1 - Mesa 1', '2026-03-08 20:16:00', NULL, NULL, NULL),
-(13, 3, 4, NULL, NULL, NULL, NULL, 3150.00, 0.00, 3150.00, 'efectivo', 'completada', 'Comanda #1 - Mesa 1', '2026-03-08 20:21:38', NULL, NULL, NULL),
-(14, 6, 6, 7, NULL, NULL, NULL, 4270.00, 0.00, 4270.00, 'efectivo', 'completada', NULL, '2026-03-08 20:40:33', NULL, NULL, NULL),
-(15, 3, 4, NULL, NULL, NULL, NULL, 2800.00, 0.00, 2800.00, 'efectivo', 'completada', 'Comanda #2 - Mesa 2', '2026-03-16 20:51:06', NULL, NULL, NULL),
-(16, 3, 4, NULL, NULL, NULL, NULL, 4300.00, 0.00, 4300.00, 'efectivo', 'completada', 'Comanda #3 - Mesa 3', '2026-03-16 20:51:20', NULL, NULL, NULL),
-(17, 3, 4, NULL, NULL, NULL, NULL, 3900.00, 0.00, 3900.00, 'efectivo', 'completada', 'Comanda #4 - Mesa 4', '2026-03-16 20:53:07', NULL, NULL, NULL),
-(18, 3, 4, NULL, NULL, NULL, NULL, 0.00, 0.00, 0.00, 'efectivo', 'completada', 'Comanda #5 - Mesa 5', '2026-03-16 20:53:10', NULL, NULL, NULL),
-(19, 3, 4, NULL, NULL, NULL, NULL, 0.00, 0.00, 0.00, 'efectivo', 'completada', 'Comanda #6 - Mesa 6', '2026-03-16 20:53:13', NULL, NULL, NULL),
-(20, 3, 4, NULL, NULL, NULL, NULL, 4300.00, 0.00, 4300.00, 'efectivo', 'completada', 'Comanda #3 - Mesa 3', '2026-03-16 20:53:36', NULL, NULL, NULL),
-(21, 3, 4, NULL, NULL, NULL, NULL, 6700.00, 0.00, 6700.00, 'efectivo', 'completada', 'Comanda #4 - Mesa 4', '2026-03-16 20:53:39', NULL, NULL, NULL),
-(22, 3, 4, NULL, NULL, NULL, NULL, 0.00, 0.00, 0.00, 'efectivo', 'completada', 'Comanda #10 - Mesa 2', '2026-03-16 20:53:44', NULL, NULL, NULL);
+INSERT INTO `ventas` (`id`, `negocio_id`, `usuario_id`, `caja_id`, `cliente_nombre`, `cliente_telefono`, `subtotal`, `descuento`, `total`, `metodo_pago`, `estado`, `observaciones`, `fecha_venta`) VALUES
+(1, 1, 1, 1, NULL, NULL, 2000.00, 0.00, 2000.00, 'efectivo', 'completada', NULL, '2026-02-27 04:50:58'),
+(2, 1, 1, 1, NULL, NULL, 2000.00, 0.00, 2000.00, 'transferencia', 'completada', NULL, '2026-02-27 05:13:09'),
+(3, 6, 6, 5, NULL, NULL, 2820.00, 0.00, 2820.00, 'tarjeta_debito', 'completada', NULL, '2026-03-03 00:20:53'),
+(5, 3, 4, NULL, NULL, NULL, 750.00, 0.00, 750.00, 'efectivo', 'completada', 'Comanda #11 - Mesa 14', '2026-03-14 14:17:14'),
+(6, 3, 4, NULL, NULL, NULL, 750.00, 0.00, 750.00, 'efectivo', 'completada', 'Comanda #11 - Mesa 14', '2026-03-14 14:17:15'),
+(7, 3, 4, NULL, NULL, NULL, 750.00, 0.00, 750.00, 'efectivo', 'completada', 'Comanda #11 - Mesa 14', '2026-03-14 14:17:17'),
+(8, 3, 4, NULL, NULL, NULL, 750.00, 0.00, 750.00, 'efectivo', 'completada', 'Comanda #11 - Mesa 14', '2026-03-14 14:17:17'),
+(9, 3, 4, NULL, NULL, NULL, 750.00, 0.00, 750.00, 'efectivo', 'completada', 'Comanda #11 - Mesa 14', '2026-03-14 14:17:17'),
+(10, 3, 4, NULL, NULL, NULL, 750.00, 0.00, 750.00, 'efectivo', 'completada', 'Comanda #11 - Mesa 14', '2026-03-14 14:17:18'),
+(11, 3, 4, NULL, NULL, NULL, 750.00, 0.00, 750.00, 'efectivo', 'completada', 'Comanda #11 - Mesa 14', '2026-03-14 14:17:40'),
+(12, 3, 4, NULL, NULL, NULL, 750.00, 0.00, 750.00, 'efectivo', 'completada', 'Comanda #11 - Mesa 14', '2026-03-14 14:17:40'),
+(13, 3, 4, NULL, NULL, NULL, 750.00, 0.00, 750.00, 'efectivo', 'completada', 'Comanda #11 - Mesa 14', '2026-03-14 14:17:41'),
+(14, 3, 4, NULL, NULL, NULL, 750.00, 0.00, 750.00, 'efectivo', 'completada', 'Comanda #11 - Mesa 14', '2026-03-14 14:17:41'),
+(15, 3, 4, NULL, NULL, NULL, 750.00, 0.00, 750.00, 'efectivo', 'completada', 'Comanda #11 - Mesa 14', '2026-03-14 14:17:41'),
+(16, 3, 4, NULL, NULL, NULL, 750.00, 0.00, 750.00, 'efectivo', 'completada', 'Comanda #11 - Mesa 14', '2026-03-14 14:17:41'),
+(17, 3, 4, NULL, NULL, NULL, 750.00, 0.00, 750.00, 'efectivo', 'completada', 'Comanda #11 - Mesa 14', '2026-03-14 14:17:41'),
+(18, 3, 4, NULL, NULL, NULL, 750.00, 0.00, 750.00, 'efectivo', 'completada', 'Comanda #11 - Mesa 14', '2026-03-14 14:17:41'),
+(19, 3, 4, NULL, NULL, NULL, 750.00, 0.00, 750.00, 'efectivo', 'completada', 'Comanda #11 - Mesa 14', '2026-03-14 14:17:41'),
+(20, 3, 4, NULL, NULL, NULL, 750.00, 0.00, 750.00, 'efectivo', 'completada', 'Comanda #11 - Mesa 14', '2026-03-14 14:17:42'),
+(21, 3, 4, NULL, NULL, NULL, 750.00, 0.00, 750.00, 'efectivo', 'completada', 'Comanda #11 - Mesa 14', '2026-03-14 14:17:42'),
+(22, 3, 4, NULL, NULL, NULL, 750.00, 0.00, 750.00, 'efectivo', 'completada', 'Comanda #11 - Mesa 14', '2026-03-14 14:17:42'),
+(23, 3, 4, NULL, NULL, NULL, 750.00, 0.00, 750.00, 'efectivo', 'completada', 'Comanda #11 - Mesa 14', '2026-03-14 14:17:42'),
+(24, 3, 4, NULL, NULL, NULL, 750.00, 0.00, 750.00, 'efectivo', 'completada', 'Comanda #11 - Mesa 14', '2026-03-14 14:17:42'),
+(25, 3, 4, NULL, NULL, NULL, 750.00, 0.00, 750.00, 'efectivo', 'completada', 'Comanda #11 - Mesa 14', '2026-03-14 14:17:42'),
+(27, 3, 4, NULL, NULL, NULL, 0.00, 0.00, 0.00, 'efectivo', 'completada', 'Comanda #12 - Mesa 13', '2026-03-23 14:35:11'),
+(28, 3, 4, NULL, NULL, NULL, 0.00, 0.00, 0.00, 'efectivo', 'completada', 'Comanda #12 - Mesa 13', '2026-03-23 14:35:12'),
+(29, 3, 4, NULL, NULL, NULL, 0.00, 0.00, 0.00, 'efectivo', 'completada', 'Comanda #12 - Mesa 13', '2026-03-23 14:35:13'),
+(30, 3, 4, NULL, NULL, NULL, 0.00, 0.00, 0.00, 'efectivo', 'completada', 'Comanda #12 - Mesa 13', '2026-03-23 14:35:16'),
+(31, 3, 4, NULL, NULL, NULL, 0.00, 0.00, 0.00, 'efectivo', 'completada', 'Comanda #12 - Mesa 13', '2026-03-23 14:35:17'),
+(32, 3, 4, NULL, NULL, NULL, 0.00, 0.00, 0.00, 'efectivo', 'completada', 'Comanda #12 - Mesa 13', '2026-03-23 14:35:17'),
+(33, 3, 4, NULL, NULL, NULL, 0.00, 0.00, 0.00, 'efectivo', 'completada', 'Comanda #12 - Mesa 13', '2026-03-23 14:35:17'),
+(34, 3, 4, NULL, NULL, NULL, 0.00, 0.00, 0.00, 'efectivo', 'completada', 'Comanda #12 - Mesa 13', '2026-03-23 14:35:17'),
+(35, 3, 4, NULL, NULL, NULL, 0.00, 0.00, 0.00, 'efectivo', 'completada', 'Comanda #12 - Mesa 13', '2026-03-23 14:35:18'),
+(36, 3, 4, NULL, NULL, NULL, 0.00, 0.00, 0.00, 'efectivo', 'completada', 'Comanda #9 - Mesa 9', '2026-03-23 14:35:24'),
+(37, 3, 4, NULL, NULL, NULL, 0.00, 0.00, 0.00, 'efectivo', 'completada', 'Comanda #5 - Mesa 5', '2026-03-23 14:39:29'),
+(38, 3, 4, NULL, NULL, NULL, 0.00, 0.00, 0.00, 'efectivo', 'completada', 'Comanda #6 - Mesa 6', '2026-03-23 14:39:32'),
+(39, 3, 4, NULL, NULL, NULL, 0.00, 0.00, 0.00, 'efectivo', 'completada', 'Comanda #7 - Mesa 7', '2026-03-23 14:39:35'),
+(40, 3, 4, NULL, NULL, NULL, 0.00, 0.00, 0.00, 'efectivo', 'completada', 'Comanda #8 - Mesa 8', '2026-03-23 14:39:38'),
+(41, 3, 4, NULL, NULL, NULL, 0.00, 0.00, 0.00, 'efectivo', 'completada', 'Comanda #9 - Mesa 9', '2026-03-23 14:39:41'),
+(42, 3, 4, NULL, NULL, NULL, 750.00, 0.00, 750.00, 'efectivo', 'completada', 'Comanda #11 - Mesa 14', '2026-03-23 14:39:44'),
+(43, 3, 4, NULL, NULL, NULL, 0.00, 0.00, 0.00, 'efectivo', 'completada', 'Comanda #12 - Mesa 13', '2026-03-23 14:39:46'),
+(44, 3, 4, NULL, NULL, NULL, 750.00, 0.00, 750.00, 'efectivo', 'completada', 'Comanda #10 - Mesa 16', '2026-03-23 14:39:49'),
+(45, 3, 4, NULL, NULL, NULL, 0.00, 0.00, 0.00, 'efectivo', 'completada', 'Comanda #4 - Mesa 4', '2026-03-23 14:39:52'),
+(46, 3, 4, NULL, NULL, NULL, 0.00, 0.00, 0.00, 'efectivo', 'completada', 'Comanda #3 - Mesa 3', '2026-03-23 14:39:56'),
+(47, 3, 4, NULL, NULL, NULL, 2800.00, 0.00, 2800.00, 'efectivo', 'completada', 'Comanda #2 - Mesa 2', '2026-03-23 14:39:58'),
+(48, 3, 4, NULL, NULL, NULL, 0.00, 0.00, 0.00, 'efectivo', 'completada', 'Comanda #1 - Mesa 1', '2026-03-23 14:40:02');
 
 -- --------------------------------------------------------
 
@@ -2357,6 +2634,45 @@ CREATE TABLE `vet_pacientes` (
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `vet_stock`
+--
+
+CREATE TABLE `vet_stock` (
+  `id` int(11) NOT NULL,
+  `negocio_id` int(11) NOT NULL,
+  `nombre` varchar(150) NOT NULL,
+  `descripcion` text DEFAULT NULL,
+  `categoria` varchar(80) DEFAULT NULL COMMENT 'antiparasitario, vacuna, antibiotico, analgesico, insumo, otro',
+  `unidad` varchar(30) DEFAULT 'unidad' COMMENT 'unidad, caja, frasco, ampolla, comprimido',
+  `stock_actual` decimal(10,2) DEFAULT 0.00,
+  `stock_minimo` decimal(10,2) DEFAULT 0.00 COMMENT 'alerta si stock_actual <= stock_minimo',
+  `precio_costo` decimal(10,2) DEFAULT 0.00,
+  `precio_venta` decimal(10,2) DEFAULT 0.00,
+  `activo` tinyint(1) DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `vet_stock_movimientos`
+--
+
+CREATE TABLE `vet_stock_movimientos` (
+  `id` int(11) NOT NULL,
+  `negocio_id` int(11) NOT NULL,
+  `item_id` int(11) NOT NULL,
+  `tipo` enum('entrada','salida','ajuste') NOT NULL DEFAULT 'salida',
+  `cantidad` decimal(10,2) NOT NULL,
+  `motivo` varchar(200) DEFAULT NULL,
+  `consulta_id` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `vet_vacunas`
 --
 
@@ -2378,6 +2694,15 @@ CREATE TABLE `vet_vacunas` (
 --
 
 --
+-- Indices de la tabla `abonos_canchas`
+--
+ALTER TABLE `abonos_canchas`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `negocio_id` (`negocio_id`),
+  ADD KEY `cancha_id` (`cancha_id`),
+  ADD KEY `estado` (`estado`);
+
+--
 -- Indices de la tabla `audit_logs`
 --
 ALTER TABLE `audit_logs`
@@ -2397,6 +2722,13 @@ ALTER TABLE `cajas`
   ADD KEY `idx_estado` (`estado`);
 
 --
+-- Indices de la tabla `canchas`
+--
+ALTER TABLE `canchas`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `negocio_id` (`negocio_id`);
+
+--
 -- Indices de la tabla `categorias`
 --
 ALTER TABLE `categorias`
@@ -2408,7 +2740,6 @@ ALTER TABLE `categorias`
 --
 ALTER TABLE `clientes`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `codigo_cliente` (`codigo_cliente`),
   ADD KEY `idx_negocio` (`negocio_id`),
   ADD KEY `idx_activo` (`activo`);
 
@@ -2442,8 +2773,7 @@ ALTER TABLE `config_enum`
 ALTER TABLE `detalle_ventas`
   ADD PRIMARY KEY (`id`),
   ADD KEY `idx_venta` (`venta_id`),
-  ADD KEY `idx_producto` (`producto_id`),
-  ADD KEY `idx_negocio` (`negocio_id`);
+  ADD KEY `idx_producto` (`producto_id`);
 
 --
 -- Indices de la tabla `empleados`
@@ -2456,6 +2786,13 @@ ALTER TABLE `empleados`
 -- Indices de la tabla `farmacia_laboratorios`
 --
 ALTER TABLE `farmacia_laboratorios`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_negocio` (`negocio_id`);
+
+--
+-- Indices de la tabla `farmacia_proveedores`
+--
+ALTER TABLE `farmacia_proveedores`
   ADD PRIMARY KEY (`id`),
   ADD KEY `idx_negocio` (`negocio_id`);
 
@@ -2520,8 +2857,17 @@ ALTER TABLE `gym_planes`
 --
 ALTER TABLE `gym_socios`
   ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `qr_token` (`qr_token`),
   ADD KEY `idx_negocio` (`negocio_id`),
   ADD KEY `idx_estado` (`estado`);
+
+--
+-- Indices de la tabla `hospedaje_cargos_extra`
+--
+ALTER TABLE `hospedaje_cargos_extra`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `reserva_id` (`reserva_id`),
+  ADD KEY `negocio_id` (`negocio_id`);
 
 --
 -- Indices de la tabla `hospedaje_habitaciones`
@@ -2673,6 +3019,17 @@ ALTER TABLE `proveedores`
   ADD KEY `negocio_id` (`negocio_id`);
 
 --
+-- Indices de la tabla `reservas_canchas`
+--
+ALTER TABLE `reservas_canchas`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `cancha_id` (`cancha_id`),
+  ADD KEY `fecha` (`fecha`),
+  ADD KEY `estado` (`estado`),
+  ADD KEY `cliente_id` (`cliente_id`),
+  ADD KEY `abono_id` (`abono_id`);
+
+--
 -- Indices de la tabla `restaurant_cocina_sectores`
 --
 ALTER TABLE `restaurant_cocina_sectores`
@@ -2701,6 +3058,31 @@ ALTER TABLE `restaurant_comanda_items`
   ADD KEY `idx_producto` (`producto_id`);
 
 --
+-- Indices de la tabla `restaurant_compras`
+--
+ALTER TABLE `restaurant_compras`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `negocio_id` (`negocio_id`),
+  ADD KEY `insumo_id` (`insumo_id`),
+  ADD KEY `fecha` (`fecha`);
+
+--
+-- Indices de la tabla `restaurant_insumos`
+--
+ALTER TABLE `restaurant_insumos`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `negocio_id` (`negocio_id`);
+
+--
+-- Indices de la tabla `restaurant_mermas`
+--
+ALTER TABLE `restaurant_mermas`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `negocio_id` (`negocio_id`),
+  ADD KEY `insumo_id` (`insumo_id`),
+  ADD KEY `fecha` (`fecha`);
+
+--
 -- Indices de la tabla `restaurant_mesas`
 --
 ALTER TABLE `restaurant_mesas`
@@ -2708,6 +3090,23 @@ ALTER TABLE `restaurant_mesas`
   ADD KEY `idx_negocio` (`negocio_id`),
   ADD KEY `idx_sector` (`sector_id`),
   ADD KEY `idx_estado` (`estado`);
+
+--
+-- Indices de la tabla `restaurant_proveedores`
+--
+ALTER TABLE `restaurant_proveedores`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `negocio_id` (`negocio_id`);
+
+--
+-- Indices de la tabla `restaurant_recetas`
+--
+ALTER TABLE `restaurant_recetas`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `producto_insumo` (`producto_id`,`insumo_id`),
+  ADD KEY `negocio_id` (`negocio_id`),
+  ADD KEY `producto_id` (`producto_id`),
+  ADD KEY `insumo_id` (`insumo_id`);
 
 --
 -- Indices de la tabla `restaurant_reservas`
@@ -2794,6 +3193,7 @@ ALTER TABLE `turno_servicios`
 ALTER TABLE `usuarios`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `usuario` (`usuario`),
+  ADD UNIQUE KEY `uk_usuarios_google_sub` (`google_sub`),
   ADD KEY `idx_usuario` (`usuario`),
   ADD KEY `idx_negocio` (`negocio_id`),
   ADD KEY `idx_activo` (`activo`);
@@ -2807,8 +3207,7 @@ ALTER TABLE `ventas`
   ADD KEY `caja_id` (`caja_id`),
   ADD KEY `idx_negocio` (`negocio_id`),
   ADD KEY `idx_fecha` (`fecha_venta`),
-  ADD KEY `idx_estado` (`estado`),
-  ADD KEY `idx_cliente` (`cliente_id`);
+  ADD KEY `idx_estado` (`estado`);
 
 --
 -- Indices de la tabla `vet_consultas`
@@ -2828,6 +3227,22 @@ ALTER TABLE `vet_pacientes`
   ADD KEY `idx_duenio` (`negocio_id`,`duenio_nombre`);
 
 --
+-- Indices de la tabla `vet_stock`
+--
+ALTER TABLE `vet_stock`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `negocio_id` (`negocio_id`),
+  ADD KEY `activo` (`activo`);
+
+--
+-- Indices de la tabla `vet_stock_movimientos`
+--
+ALTER TABLE `vet_stock_movimientos`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `item_id` (`item_id`),
+  ADD KEY `negocio_id` (`negocio_id`);
+
+--
 -- Indices de la tabla `vet_vacunas`
 --
 ALTER TABLE `vet_vacunas`
@@ -2839,10 +3254,16 @@ ALTER TABLE `vet_vacunas`
 --
 
 --
+-- AUTO_INCREMENT de la tabla `abonos_canchas`
+--
+ALTER TABLE `abonos_canchas`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `audit_logs`
 --
 ALTER TABLE `audit_logs`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=155;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=182;
 
 --
 -- AUTO_INCREMENT de la tabla `cajas`
@@ -2851,10 +3272,16 @@ ALTER TABLE `cajas`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
+-- AUTO_INCREMENT de la tabla `canchas`
+--
+ALTER TABLE `canchas`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `categorias`
 --
 ALTER TABLE `categorias`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=117;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=134;
 
 --
 -- AUTO_INCREMENT de la tabla `clientes`
@@ -2878,13 +3305,13 @@ ALTER TABLE `clientes_peluqueria`
 -- AUTO_INCREMENT de la tabla `config_enum`
 --
 ALTER TABLE `config_enum`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=210;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=262;
 
 --
 -- AUTO_INCREMENT de la tabla `detalle_ventas`
 --
 ALTER TABLE `detalle_ventas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT de la tabla `empleados`
@@ -2896,6 +3323,12 @@ ALTER TABLE `empleados`
 -- AUTO_INCREMENT de la tabla `farmacia_laboratorios`
 --
 ALTER TABLE `farmacia_laboratorios`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `farmacia_proveedores`
+--
+ALTER TABLE `farmacia_proveedores`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
@@ -2920,13 +3353,13 @@ ALTER TABLE `gastos`
 -- AUTO_INCREMENT de la tabla `gym_asistencias`
 --
 ALTER TABLE `gym_asistencias`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT de la tabla `gym_clases`
 --
 ALTER TABLE `gym_clases`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT de la tabla `gym_pagos`
@@ -2947,6 +3380,12 @@ ALTER TABLE `gym_socios`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
+-- AUTO_INCREMENT de la tabla `hospedaje_cargos_extra`
+--
+ALTER TABLE `hospedaje_cargos_extra`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `hospedaje_habitaciones`
 --
 ALTER TABLE `hospedaje_habitaciones`
@@ -2962,19 +3401,19 @@ ALTER TABLE `hospedaje_reservas`
 -- AUTO_INCREMENT de la tabla `logs_actividad`
 --
 ALTER TABLE `logs_actividad`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT de la tabla `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT de la tabla `negocios`
 --
 ALTER TABLE `negocios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT de la tabla `optica_clientes`
@@ -2998,13 +3437,13 @@ ALTER TABLE `optica_recetas`
 -- AUTO_INCREMENT de la tabla `ordenes_compra`
 --
 ALTER TABLE `ordenes_compra`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de la tabla `ordenes_compra_items`
 --
 ALTER TABLE `ordenes_compra_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `pagos`
@@ -3022,7 +3461,7 @@ ALTER TABLE `perfil_negocio`
 -- AUTO_INCREMENT de la tabla `permisos`
 --
 ALTER TABLE `permisos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT de la tabla `planes`
@@ -3046,13 +3485,19 @@ ALTER TABLE `presupuesto_items`
 -- AUTO_INCREMENT de la tabla `productos`
 --
 ALTER TABLE `productos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=70;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=72;
 
 --
 -- AUTO_INCREMENT de la tabla `proveedores`
 --
 ALTER TABLE `proveedores`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT de la tabla `reservas_canchas`
+--
+ALTER TABLE `reservas_canchas`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `restaurant_cocina_sectores`
@@ -3064,13 +3509,31 @@ ALTER TABLE `restaurant_cocina_sectores`
 -- AUTO_INCREMENT de la tabla `restaurant_comandas`
 --
 ALTER TABLE `restaurant_comandas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT de la tabla `restaurant_comanda_items`
 --
 ALTER TABLE `restaurant_comanda_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT de la tabla `restaurant_compras`
+--
+ALTER TABLE `restaurant_compras`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `restaurant_insumos`
+--
+ALTER TABLE `restaurant_insumos`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `restaurant_mermas`
+--
+ALTER TABLE `restaurant_mermas`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `restaurant_mesas`
@@ -3079,10 +3542,22 @@ ALTER TABLE `restaurant_mesas`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
+-- AUTO_INCREMENT de la tabla `restaurant_proveedores`
+--
+ALTER TABLE `restaurant_proveedores`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `restaurant_recetas`
+--
+ALTER TABLE `restaurant_recetas`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `restaurant_reservas`
 --
 ALTER TABLE `restaurant_reservas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de la tabla `restaurant_sectores`
@@ -3130,25 +3605,25 @@ ALTER TABLE `tec_ordenes`
 -- AUTO_INCREMENT de la tabla `turnos`
 --
 ALTER TABLE `turnos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT de la tabla `turno_servicios`
 --
 ALTER TABLE `turno_servicios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT de la tabla `ventas`
 --
 ALTER TABLE `ventas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
 
 --
 -- AUTO_INCREMENT de la tabla `vet_consultas`
@@ -3163,6 +3638,18 @@ ALTER TABLE `vet_pacientes`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT de la tabla `vet_stock`
+--
+ALTER TABLE `vet_stock`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `vet_stock_movimientos`
+--
+ALTER TABLE `vet_stock_movimientos`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `vet_vacunas`
 --
 ALTER TABLE `vet_vacunas`
@@ -3171,6 +3658,12 @@ ALTER TABLE `vet_vacunas`
 --
 -- Restricciones para tablas volcadas
 --
+
+--
+-- Filtros para la tabla `abonos_canchas`
+--
+ALTER TABLE `abonos_canchas`
+  ADD CONSTRAINT `abonos_canchas_ibfk_1` FOREIGN KEY (`cancha_id`) REFERENCES `canchas` (`id`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `audit_logs`
@@ -3184,6 +3677,12 @@ ALTER TABLE `audit_logs`
 ALTER TABLE `cajas`
   ADD CONSTRAINT `cajas_ibfk_1` FOREIGN KEY (`negocio_id`) REFERENCES `negocios` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `cajas_ibfk_2` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `canchas`
+--
+ALTER TABLE `canchas`
+  ADD CONSTRAINT `canchas_ibfk_1` FOREIGN KEY (`negocio_id`) REFERENCES `negocios` (`id`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `categorias`
@@ -3217,6 +3716,12 @@ ALTER TABLE `gastos`
   ADD CONSTRAINT `gastos_ibfk_1` FOREIGN KEY (`negocio_id`) REFERENCES `negocios` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `gastos_ibfk_2` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `gastos_ibfk_3` FOREIGN KEY (`caja_id`) REFERENCES `cajas` (`id`) ON DELETE SET NULL;
+
+--
+-- Filtros para la tabla `hospedaje_cargos_extra`
+--
+ALTER TABLE `hospedaje_cargos_extra`
+  ADD CONSTRAINT `hospedaje_cargos_extra_ibfk_1` FOREIGN KEY (`reserva_id`) REFERENCES `hospedaje_reservas` (`id`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `negocios`
@@ -3269,6 +3774,47 @@ ALTER TABLE `proveedores`
   ADD CONSTRAINT `proveedores_ibfk_1` FOREIGN KEY (`negocio_id`) REFERENCES `negocios` (`id`);
 
 --
+-- Filtros para la tabla `reservas_canchas`
+--
+ALTER TABLE `reservas_canchas`
+  ADD CONSTRAINT `reservas_canchas_ibfk_1` FOREIGN KEY (`cancha_id`) REFERENCES `canchas` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `reservas_canchas_ibfk_2` FOREIGN KEY (`cliente_id`) REFERENCES `clientes_canchas` (`id`) ON DELETE SET NULL;
+
+--
+-- Filtros para la tabla `restaurant_compras`
+--
+ALTER TABLE `restaurant_compras`
+  ADD CONSTRAINT `restaurant_compras_ibfk_1` FOREIGN KEY (`negocio_id`) REFERENCES `negocios` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `restaurant_compras_ibfk_2` FOREIGN KEY (`insumo_id`) REFERENCES `restaurant_insumos` (`id`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `restaurant_insumos`
+--
+ALTER TABLE `restaurant_insumos`
+  ADD CONSTRAINT `restaurant_insumos_ibfk_1` FOREIGN KEY (`negocio_id`) REFERENCES `negocios` (`id`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `restaurant_mermas`
+--
+ALTER TABLE `restaurant_mermas`
+  ADD CONSTRAINT `restaurant_mermas_ibfk_1` FOREIGN KEY (`negocio_id`) REFERENCES `negocios` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `restaurant_mermas_ibfk_2` FOREIGN KEY (`insumo_id`) REFERENCES `restaurant_insumos` (`id`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `restaurant_proveedores`
+--
+ALTER TABLE `restaurant_proveedores`
+  ADD CONSTRAINT `restaurant_proveedores_ibfk_1` FOREIGN KEY (`negocio_id`) REFERENCES `negocios` (`id`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `restaurant_recetas`
+--
+ALTER TABLE `restaurant_recetas`
+  ADD CONSTRAINT `restaurant_recetas_ibfk_1` FOREIGN KEY (`negocio_id`) REFERENCES `negocios` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `restaurant_recetas_ibfk_2` FOREIGN KEY (`producto_id`) REFERENCES `productos` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `restaurant_recetas_ibfk_3` FOREIGN KEY (`insumo_id`) REFERENCES `restaurant_insumos` (`id`) ON DELETE CASCADE;
+
+--
 -- Filtros para la tabla `tec_ordenes`
 --
 ALTER TABLE `tec_ordenes`
@@ -3293,6 +3839,12 @@ ALTER TABLE `ventas`
 --
 ALTER TABLE `vet_consultas`
   ADD CONSTRAINT `vet_consultas_ibfk_1` FOREIGN KEY (`paciente_id`) REFERENCES `vet_pacientes` (`id`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `vet_stock_movimientos`
+--
+ALTER TABLE `vet_stock_movimientos`
+  ADD CONSTRAINT `vet_stock_movimientos_ibfk_1` FOREIGN KEY (`item_id`) REFERENCES `vet_stock` (`id`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `vet_vacunas`
