@@ -466,6 +466,7 @@ function renderTabla() {
                 ${r.estado==='pendiente'?`<button class="btn-table btn-check" title="Confirmar" onclick="cambiarEstado(${r.id},'confirmada')"><i class="fas fa-check"></i></button>`:''}
                 ${r.estado!=='cancelada'?`<button class="btn-table btn-cancel" title="Cancelar" onclick="cambiarEstado(${r.id},'cancelada')"><i class="fas fa-ban"></i></button>`:''}
                 <button class="btn-table btn-edit" title="Editar" onclick="abrirEditar(${r.id})"><i class="fas fa-pen"></i></button>
+                ${r.cliente_telefono ? `<button class="btn-table" title="Recordatorio WhatsApp" style="background:rgba(37,211,102,.12);color:#25d366" onclick="recordatorioWA('${r.cliente_telefono}','${(r.cliente_nombre||'').replace(/'/g,"\\'")}','${r.cancha_nombre}','${r.fecha}','${(r.hora_inicio||'').slice(0,5)}','${(r.hora_fin||'').slice(0,5)}')"><i class="fab fa-whatsapp"></i></button>` : ''}
             </div>
         </td>
     </tr>`).join('');
@@ -992,6 +993,14 @@ document.getElementById('modalHorariosDia').addEventListener('click', e => {
 window.addEventListener('resize', () => {
     if (vistaActual === 'calendario') renderCalendarioMes();
 });
+
+function recordatorioWA(tel, nombre, cancha, fecha, horaInicio, horaFin) {
+    const d = new Date(fecha + 'T00:00:00');
+    const fechaLeg = d.toLocaleDateString('es-AR', {weekday:'long', day:'numeric', month:'long'});
+    const msg = `Hola ${nombre}! 👋 Te recordamos tu reserva en *${cancha}* para el *${fechaLeg}* de *${horaInicio}* a *${horaFin}*. ¡Te esperamos! ⚽`;
+    const num = tel.replace(/\D/g,'');
+    window.open(`https://wa.me/${num}?text=${encodeURIComponent(msg)}`, '_blank');
+}
 
 init();
 </script>

@@ -358,6 +358,47 @@ $base = rtrim(str_replace(str_replace(chr(92), chr(47), $_SERVER['DOCUMENT_ROOT'
 
 <div class="toast" id="toast"></div>
 
+<!-- Modal cargos extra -->
+<div class="modal-overlay" id="modalExtras">
+    <div class="modal-box" style="max-width:560px;">
+        <div class="modal-header">
+            <h3><i class="fas fa-concierge-bell" style="color:var(--hosp);margin-right:8px;"></i>Cargos Extra — Reserva <span id="extReservaId"></span></h3>
+            <button class="modal-close" onclick="document.getElementById('modalExtras').classList.remove('open')">✕</button>
+        </div>
+        <div class="modal-body">
+            <!-- Formulario para agregar -->
+            <div style="background:var(--background);border-radius:12px;padding:14px;margin-bottom:16px;">
+                <p style="font-size:12px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">Agregar cargo</p>
+                <div style="display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:8px;align-items:end;">
+                    <div>
+                        <label style="font-size:11px;color:var(--text-secondary);font-weight:600;display:block;margin-bottom:4px;">Descripción</label>
+                        <input class="fi" type="text" id="extDesc" placeholder="Minibar, room service…" list="extSugerencias">
+                        <datalist id="extSugerencias">
+                            <option value="Minibar"><option value="Room service"><option value="Lavandería">
+                            <option value="Parking"><option value="Desayuno extra"><option value="Cargo por mascota">
+                            <option value="Late checkout"><option value="Extra persona">
+                        </datalist>
+                    </div>
+                    <div>
+                        <label style="font-size:11px;color:var(--text-secondary);font-weight:600;display:block;margin-bottom:4px;">Cant.</label>
+                        <input class="fi" type="number" id="extCant" value="1" min="0.1" step="0.1" style="text-align:center;">
+                    </div>
+                    <div>
+                        <label style="font-size:11px;color:var(--text-secondary);font-weight:600;display:block;margin-bottom:4px;">Precio $</label>
+                        <input class="fi" type="number" id="extPrice" placeholder="0" min="0">
+                    </div>
+                    <button class="btn btn-primary" onclick="agregarExtra()" style="height:40px;padding:0 14px;"><i class="fas fa-plus"></i></button>
+                </div>
+            </div>
+            <!-- Lista de cargos -->
+            <div id="extLista"></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="document.getElementById('modalExtras').classList.remove('open')">Cerrar</button>
+        </div>
+    </div>
+</div>
+
 <script>
 const BASE    = '<?= $base ?>';
 const API_RES = BASE + '/api/hospedaje/reservas.php';
@@ -473,6 +514,11 @@ function verDetalle(id) {
         btns += `<button class="btn btn-primary" onclick="cambiarEstado(${r.id},'checkin')" style="background:#0FD186;border-color:#0FD186;"><i class="fas fa-sign-in-alt"></i> Check-in</button>`;
     if (r.estado === 'checkin')
         btns += `<button class="btn btn-primary" onclick="cambiarEstado(${r.id},'checkout')" style="background:#ef4444;border-color:#ef4444;"><i class="fas fa-sign-out-alt"></i> Check-out</button>`;
+    if (r.estado === 'checkin')
+        btns += `<button class="btn btn-secondary" onclick="abrirExtras(${r.id})" style="border-color:var(--hosp);color:var(--hosp);"><i class="fas fa-concierge-bell"></i> Cargos extra</button>`;
+    btns += `<button class="btn btn-secondary" onclick="imprimirFolio(${r.id})" title="Imprimir folio"><i class="fas fa-print"></i></button>`;
+    if (r.huesped_telefono)
+        btns += `<button class="btn btn-secondary" onclick="waHuesped('${r.huesped_telefono.replace(/'/g,"\\'")}','${esc(r.huesped_nombre)}')" style="background:rgba(37,211,102,.1);color:#25d366;border-color:#25d366;" title="WhatsApp al huésped"><i class="fab fa-whatsapp"></i></button>`;
     if (r.estado !== 'checkout' && r.estado !== 'cancelada')
         btns += `<button class="btn btn-secondary" onclick="cancelar(${r.id})" style="color:#dc2626;border-color:#ef4444;"><i class="fas fa-times"></i> Cancelar</button>`;
     footer.innerHTML = btns;
@@ -619,13 +665,142 @@ function toast(msg, tipo='ok') {
     setTimeout(() => t.classList.remove('show'), 2500);
 }
 
+// ── Cargos extra ─────────────────────────────────────────────────────────────
+const API_EXT = BASE + '/api/hospedaje/extras.php';
+let extrasReservaId = null;
+
+async function abrirExtras(reservaId) {
+    extrasReservaId = reservaId;
+    document.getElementById('extReservaId').textContent = `#${reservaId}`;
+    await cargarExtras();
+    document.getElementById('modalExtras').classList.add('open');
+}
+
+async function cargarExtras() {
+    const r = await fetch(`${API_EXT}?reserva_id=${extrasReservaId}`, {credentials:'include'}).then(x=>x.json());
+    if (!r.success) return;
+    const cargos = r.data.cargos || [];
+    const total  = r.data.total_extras || 0;
+    const lista  = document.getElementById('extLista');
+    if (!cargos.length) {
+        lista.innerHTML = `<p style="color:var(--text-secondary);font-size:13px;text-align:center;padding:16px 0;">Sin cargos extra todavía.</p>`;
+    } else {
+        lista.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:13px;">
+            <thead><tr>
+                <th style="padding:8px;text-align:left;border-bottom:1px solid var(--border);color:var(--text-secondary);font-size:11px;text-transform:uppercase;">Descripción</th>
+                <th style="padding:8px;text-align:center;border-bottom:1px solid var(--border);color:var(--text-secondary);font-size:11px;">Cant.</th>
+                <th style="padding:8px;text-align:right;border-bottom:1px solid var(--border);color:var(--text-secondary);font-size:11px;">Precio</th>
+                <th style="padding:8px;text-align:right;border-bottom:1px solid var(--border);color:var(--text-secondary);font-size:11px;">Total</th>
+                <th style="border-bottom:1px solid var(--border);"></th>
+            </tr></thead>
+            <tbody>${cargos.map(c => `<tr>
+                <td style="padding:8px;border-bottom:1px solid var(--border);">${esc(c.descripcion)}</td>
+                <td style="padding:8px;border-bottom:1px solid var(--border);text-align:center;">${c.cantidad}</td>
+                <td style="padding:8px;border-bottom:1px solid var(--border);text-align:right;">$${Number(c.precio_unit).toLocaleString('es-AR',{minimumFractionDigits:0})}</td>
+                <td style="padding:8px;border-bottom:1px solid var(--border);text-align:right;font-weight:700;">$${Number(c.total).toLocaleString('es-AR',{minimumFractionDigits:0})}</td>
+                <td style="padding:8px;border-bottom:1px solid var(--border);">
+                    <button onclick="eliminarExtra(${c.id})" style="background:none;border:none;cursor:pointer;color:#ef4444;font-size:13px;" title="Eliminar"><i class="fas fa-times"></i></button>
+                </td>
+            </tr>`).join('')}</tbody>
+        </table>
+        <div style="text-align:right;padding:10px 8px 0;font-size:15px;font-weight:700;color:var(--hosp);">
+            Total extras: $${Number(total).toLocaleString('es-AR',{minimumFractionDigits:0})}
+        </div>`;
+    }
+}
+
+async function agregarExtra() {
+    const desc  = document.getElementById('extDesc').value.trim();
+    const cant  = parseFloat(document.getElementById('extCant').value)||1;
+    const price = parseFloat(document.getElementById('extPrice').value)||0;
+    if (!desc || !price) { toast('Completá descripción y precio', 'error'); return; }
+    const r = await fetch(API_EXT, {
+        method:'POST', credentials:'include',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ reserva_id:extrasReservaId, descripcion:desc, cantidad:cant, precio_unit:price })
+    }).then(x=>x.json());
+    if (!r.success) { toast(r.message||'Error', 'error'); return; }
+    document.getElementById('extDesc').value  = '';
+    document.getElementById('extCant').value  = '1';
+    document.getElementById('extPrice').value = '';
+    toast('Cargo agregado ✓');
+    cargarExtras();
+}
+
+async function eliminarExtra(id) {
+    if (!confirm('¿Eliminar este cargo?')) return;
+    const r = await fetch(`${API_EXT}?id=${id}`, {method:'DELETE', credentials:'include'}).then(x=>x.json());
+    if (r.success) cargarExtras();
+    else toast(r.message||'Error', 'error');
+}
+
+// ── Folio (imprimir) ─────────────────────────────────────────────────────────
+async function imprimirFolio(id) {
+    const res = reservas.find(x => x.id == id);
+    if (!res) return;
+    let extras = [];
+    try {
+        const re = await fetch(`${API_EXT}?reserva_id=${id}`, {credentials:'include'}).then(x=>x.json());
+        if (re.success) extras = re.data.cargos || [];
+    } catch {}
+
+    const tipo_label = {noche:'Noche',hora:'Hora',semana:'Semana'}[res.tipo_estadia] || res.tipo_estadia;
+    const totalExtras = extras.reduce((s,c)=>s+parseFloat(c.total||0),0);
+    const totalGral   = parseFloat(res.total||0) + totalExtras;
+    const w = window.open('','_blank','width=600,height=800');
+    w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Folio #${res.id}</title>
+    <style>body{font-family:Arial,sans-serif;padding:32px;color:#1e293b;max-width:500px;margin:0 auto;}
+    h1{font-size:20px;margin-bottom:4px;}
+    .sub{color:#64748b;font-size:13px;margin-bottom:24px;}
+    table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:16px;}
+    th{background:#f1f5f9;padding:8px 10px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:#64748b;}
+    td{padding:8px 10px;border-bottom:1px solid #e2e8f0;}
+    .total{font-size:18px;font-weight:700;text-align:right;padding:12px 0;border-top:2px solid #1e293b;}
+    .sena{color:#059669;}
+    @media print{button{display:none}}</style></head><body>
+    <h1>Folio de Estadía</h1>
+    <div class="sub">Reserva #${res.id} — ${new Date().toLocaleDateString('es-AR')}</div>
+    <table><tr><td><strong>Huésped</strong></td><td>${esc(res.huesped_nombre)}</td></tr>
+    ${res.huesped_dni?`<tr><td>Documento</td><td>${esc(res.huesped_dni)}</td></tr>`:''}
+    ${res.huesped_telefono?`<tr><td>Teléfono</td><td>${esc(res.huesped_telefono)}</td></tr>`:''}
+    <tr><td>Habitación</td><td>N° ${esc(res.hab_numero||'')} ${res.hab_tipo?'('+res.hab_tipo+')':''}</td></tr>
+    <tr><td>Check-in</td><td>${fmtFecha(res.checkin_fecha)} ${res.checkin_hora||''}</td></tr>
+    <tr><td>Check-out</td><td>${fmtFecha(res.checkout_fecha)} ${res.checkout_hora||''}</td></tr>
+    <tr><td>Personas</td><td>${res.personas}</td></tr></table>
+
+    <table><thead><tr><th>Concepto</th><th>Cant.</th><th>P.Unit.</th><th>Total</th></tr></thead><tbody>
+    <tr><td>Estadía (${tipo_label})</td><td>${res.noches}</td><td>$${Number(res.precio_unitario).toLocaleString('es-AR',{minimumFractionDigits:0})}</td><td>$${Number(res.total).toLocaleString('es-AR',{minimumFractionDigits:0})}</td></tr>
+    ${extras.map(c=>`<tr><td>${esc(c.descripcion)}</td><td>${c.cantidad}</td><td>$${Number(c.precio_unit).toLocaleString('es-AR',{minimumFractionDigits:0})}</td><td>$${Number(c.total).toLocaleString('es-AR',{minimumFractionDigits:0})}</td></tr>`).join('')}
+    </tbody></table>
+    ${res['seña']>0?`<p class="sena">Seña abonada: $${Number(res['seña']).toLocaleString('es-AR',{minimumFractionDigits:0})}</p>`:''}
+    <div class="total">TOTAL: $${Number(totalGral).toLocaleString('es-AR',{minimumFractionDigits:0})}</div>
+    ${res['seña']>0?`<div style="text-align:right;font-size:14px;color:#059669;">Saldo pendiente: $${Number(totalGral-res['seña']).toLocaleString('es-AR',{minimumFractionDigits:0})}</div>`:''}
+    <br><button onclick="window.print()">Imprimir</button>
+    </body></html>`);
+    w.document.close();
+}
+
+// ── WhatsApp huésped ─────────────────────────────────────────────────────────
+function waHuesped(tel, nombre) {
+    const msg = `Hola ${nombre}! 👋 Gracias por hospedarte con nosotros. Cualquier consulta estamos a tu disposición. 🏨`;
+    window.open(`https://wa.me/${tel.replace(/\D/g,'')}?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
 document.getElementById('modalDetalle').addEventListener('click', e => {
     if (e.target.id === 'modalDetalle') cerrarDetalle();
 });
 document.getElementById('modalNueva').addEventListener('click', e => {
     if (e.target.id === 'modalNueva') cerrarModalNueva();
 });
-document.addEventListener('keydown', e => { if (e.key === 'Escape') { cerrarDetalle(); cerrarModalNueva(); } });
+document.getElementById('modalExtras').addEventListener('click', e => {
+    if (e.target.id === 'modalExtras') document.getElementById('modalExtras').classList.remove('open');
+});
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+        cerrarDetalle(); cerrarModalNueva();
+        document.getElementById('modalExtras').classList.remove('open');
+    }
+});
 
 cargarHabitaciones();
 cargar();

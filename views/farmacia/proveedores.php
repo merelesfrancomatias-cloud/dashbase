@@ -160,19 +160,12 @@ if (!isset($_SESSION['user_id']) && !isset($_SESSION['usuario_id'])) {
 </div>
 
 <script>
-// Reutiliza la API de proveedores general si existe, sino usa un endpoint propio
-const API = '../../api/farmacia/laboratorios.php'; // usa la misma estructura
+const API = '../../api/farmacia/proveedores.php';
 let todos = [];
 let editingId = null;
 
-// Para proveedores farmacia usamos la API de laboratorios con tipo diferenciado
-// Si hay una API de proveedores general la usamos
-const API_PROV = '../../api/farmacia/proveedores.php';
-
 async function cargar() {
-    // Intentar primero la API específica, sino la de laboratorios
-    let r = await fetch(API_PROV, {credentials:'include'}).catch(()=>null);
-    if (!r || !r.ok) r = await fetch(API, {credentials:'include'});
+    const r = await fetch(API, {credentials:'include'});
     const j = await r.json();
     todos = j.success ? j.data : [];
     actualizarStats();

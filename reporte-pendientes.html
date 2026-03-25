@@ -23,21 +23,21 @@
   .resumen-lbl { font-size:10px; color:#64748b; font-weight:600; text-transform:uppercase; letter-spacing:.5px; }
 
   .nivel-titulo { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; padding:7px 14px; border-radius:6px; margin:28px 0 14px; display:flex; align-items:center; gap:8px; }
-  .nivel-verde  { background:#d1fae5; color:#065f46; }
-  .nivel-azul   { background:#ede9fe; color:#5b21b6; }
+  .nivel-verde    { background:#d1fae5; color:#065f46; }
+  .nivel-azul     { background:#ede9fe; color:#5b21b6; }
   .nivel-amarillo { background:#fef3c7; color:#92400e; }
-  .nivel-rojo   { background:#fee2e2; color:#991b1b; }
+  .nivel-rojo     { background:#fee2e2; color:#991b1b; }
 
   .rubro-card { border:1px solid #e2e8f0; border-radius:12px; margin-bottom:14px; overflow:hidden; page-break-inside:avoid; }
   .rubro-header { display:flex; align-items:center; gap:12px; padding:13px 18px; background:#f8fafc; border-bottom:1px solid #e2e8f0; }
   .rubro-icon { width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0; }
   .rubro-nombre { font-size:14px; font-weight:700; color:#0f172a; flex:1; }
   .badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:20px; text-transform:uppercase; letter-spacing:.5px; }
-  .badge-verde  { background:#d1fae5; color:#065f46; }
-  .badge-morado { background:#ede9fe; color:#5b21b6; }
+  .badge-verde    { background:#d1fae5; color:#065f46; }
+  .badge-morado   { background:#ede9fe; color:#5b21b6; }
   .badge-amarillo { background:#fef3c7; color:#b45309; }
-  .badge-rojo   { background:#fee2e2; color:#b91c1c; }
-  .badge-azul   { background:#dbeafe; color:#1d4ed8; }
+  .badge-rojo     { background:#fee2e2; color:#b91c1c; }
+  .badge-azul     { background:#dbeafe; color:#1d4ed8; }
 
   .rubro-body { padding:14px 18px; }
   .two-col { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
@@ -81,22 +81,22 @@
   <div class="doc-header-right">
     <div style="font-size:11px;color:#475569;font-weight:600">Actualizado</div>
     <div style="font-size:14px;font-weight:800;color:#0f172a">24 / 03 / 2026</div>
-    <div style="margin-top:6px;font-size:10px;">v4 — PlanGuard · SQL fix · banner suscripción</div>
+    <div style="margin-top:6px;font-size:10px;">v7 — Hotel: sprint completo (cargos, folio, caja, reportes, reserva pública)</div>
   </div>
 </div>
 
 <!-- INTRO -->
 <div class="intro">
-  🔒 <strong>Sesión actual (24/03):</strong> SQL injection eliminado en comandas.php (4 queries). <code>PlanGuard::requireActive()</code> aplicado en <strong>todos los endpoints privados</strong>: restaurant (8), gym (6), peluquería (5), canchas (4), compartidos (7). Banner de suscripción vencida/próxima en sidebar. Total: 30 endpoints protegidos.
+  🚀 <strong>Sesión actual (24/03 v7):</strong> Hospedaje sprint completo: cargos extra (minibar, room service, etc.) con datalist y eliminación; folio imprimible por estadía (HTML to print); Caja del Día con mapa visual de habitaciones + movimientos checkin/out del día; Reportes con 6 vistas (ingresos/día, por tipo de habitación, ocupación diaria, días de semana); reserva online pública (3-step: fechas→habitaciones disponibles→datos); WA al huésped desde modal de reserva. Hotel pasa de 25% → 80%. Sesión anterior: Canchas reserva pública + abonos.
 </div>
 
 <!-- ══ PLAN DE ACCIÓN ══ -->
 <div style="margin-bottom:28px;">
-  <div class="nivel-titulo nivel-verde" style="margin-top:0">🗓️ Plan de acción prioritario — hacia el lanzamiento</div>
+  <div class="nivel-titulo nivel-verde" style="margin-top:0">🗓️ Plan de acción — estado actual</div>
 
   <!-- Semana 1 — COMPLETADA -->
-  <div style="border:1px solid #d1fae5;border-radius:12px;margin-bottom:12px;overflow:hidden;page-break-inside:avoid;">
-    <div style="background:#d1fae5;padding:10px 18px;display:flex;align-items:center;gap:10px;">
+  <div style="border:1px solid #d1fae5;border-radius:12px;margin-bottom:10px;overflow:hidden;page-break-inside:avoid;">
+    <div style="background:#d1fae5;padding:10px 18px;">
       <span style="font-size:13px;font-weight:800;color:#065f46;">✅ Semana 1 — Seguridad y negocio (COMPLETADA)</span>
     </div>
     <div style="padding:12px 18px;display:flex;flex-wrap:wrap;gap:6px;">
@@ -104,44 +104,69 @@
       <span style="background:#d1fae5;color:#065f46;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;">✓ PlanGuard en todos los APIs</span>
       <span style="background:#d1fae5;color:#065f46;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;">✓ Banner suscripción vencida en sidebar</span>
       <span style="background:#d1fae5;color:#065f46;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;">✓ Tickets impresión (comanda + recibo)</span>
-      <span style="background:#d1fae5;color:#065f46;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;">✓ Split de cuenta</span>
+      <span style="background:#d1fae5;color:#065f46;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;">✓ Split de cuenta restaurant</span>
       <span style="background:#d1fae5;color:#065f46;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;">✓ QR menú corregido</span>
-      <span style="background:#d1fae5;color:#065f46;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;">✓ CSS Caja / Reportes restaurant</span>
-      <span style="background:#fffbeb;color:#78350f;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;border:1px solid #fde68a;">⏳ Unificar auth pattern gym/peluquería → Middleware::auth()</span>
+      <span style="background:#fffbeb;color:#78350f;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;border:1px solid #fde68a;">⏳ Unificar auth gym/peluquería → Middleware::auth()</span>
     </div>
   </div>
 
-  <!-- Semana 2 -->
-  <div style="border:1px solid #fde68a;border-radius:12px;margin-bottom:12px;overflow:hidden;page-break-inside:avoid;">
-    <div style="background:#fef3c7;padding:10px 18px;display:flex;align-items:center;gap:10px;">
-      <span style="font-size:13px;font-weight:800;color:#92400e;">🟡 Semana 2 — Completitud de rubros clave</span>
+  <!-- Semana 2 — CASI COMPLETA -->
+  <div style="border:1px solid #d1fae5;border-radius:12px;margin-bottom:10px;overflow:hidden;page-break-inside:avoid;">
+    <div style="background:#d1fae5;padding:10px 18px;">
+      <span style="font-size:13px;font-weight:800;color:#065f46;">✅ Semana 2 — Completitud de rubros clave (CASI COMPLETA)</span>
     </div>
     <div style="padding:12px 18px;display:flex;flex-wrap:wrap;gap:6px;">
-      <span style="background:#fef3c7;color:#78350f;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;">Restaurant: Delivery / Takeaway flow</span>
+      <span style="background:#d1fae5;color:#065f46;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;">✓ Gym: QR check-in de socios</span>
+      <span style="background:#d1fae5;color:#065f46;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;">✓ Canchas: Reportes fusionados con Caja</span>
+      <span style="background:#d1fae5;color:#065f46;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;">✓ Canchas: Reserva online pública</span>
+      <span style="background:#d1fae5;color:#065f46;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;">✓ Canchas: Abonos / membresías</span>
+      <span style="background:#d1fae5;color:#065f46;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;">✓ Canchas: Recordatorio WA por reserva</span>
+      <span style="background:#d1fae5;color:#065f46;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;">✓ Hotel: Cargos extra + Folio imprimible</span>
+      <span style="background:#d1fae5;color:#065f46;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;">✓ Hotel: Caja del Día + Reportes (6 vistas)</span>
+      <span style="background:#d1fae5;color:#065f46;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;">✓ Hotel: Reserva online pública</span>
+      <span style="background:#d1fae5;color:#065f46;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;">✓ Peluquería: Vista por empleado</span>
+      <span style="background:#d1fae5;color:#065f46;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;">✓ Peluquería: Reserva online pública</span>
+      <span style="background:#d1fae5;color:#065f46;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;">✓ Peluquería: Comisiones por servicio</span>
+      <span style="background:#d1fae5;color:#065f46;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;">✓ Peluquería: CRUD Equipo (empleados)</span>
+      <span style="background:#fffbeb;color:#78350f;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;border:1px solid #fde68a;">⏳ Restaurant: Delivery / Takeaway</span>
+      <span style="background:#fffbeb;color:#78350f;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;border:1px solid #fde68a;">⏳ Restaurant: Descuentos automáticos</span>
+      <span style="background:#fffbeb;color:#78350f;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;border:1px solid #fde68a;">⏳ Config JSON en tabla negocios</span>
+    </div>
+  </div>
+
+  <!-- Próximas prioridades -->
+  <div style="border:1px solid #fde68a;border-radius:12px;margin-bottom:10px;overflow:hidden;page-break-inside:avoid;">
+    <div style="background:#fef3c7;padding:10px 18px;">
+      <span style="font-size:13px;font-weight:800;color:#92400e;">🟡 Próximas prioridades</span>
+    </div>
+    <div style="padding:12px 18px;display:flex;flex-wrap:wrap;gap:6px;">
+      <span style="background:#fef3c7;color:#78350f;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;">Peluquería: Panel reservas pendientes online</span>
+      <span style="background:#fef3c7;color:#78350f;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;">Peluquería: Vista semanal de agenda</span>
+      <span style="background:#fef3c7;color:#78350f;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;">Restaurant: Delivery / Takeaway</span>
       <span style="background:#fef3c7;color:#78350f;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;">Restaurant: Descuentos automáticos</span>
-      <span style="background:#fef3c7;color:#78350f;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;">Gym: QR check-in de socios</span>
-      <span style="background:#fef3c7;color:#78350f;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;">Canchas: Página de Reportes</span>
-      <span style="background:#fef3c7;color:#78350f;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;">Agregar columna config JSON a negocios</span>
+      <span style="background:#fef3c7;color:#78350f;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;">Canchas: Panel de pendientes online (confirmar/rechazar)</span>
     </div>
   </div>
 
   <!-- Semanas 3-4 -->
-  <div style="border:1px solid #bfdbfe;border-radius:12px;margin-bottom:12px;overflow:hidden;page-break-inside:avoid;">
-    <div style="background:#dbeafe;padding:10px 18px;display:flex;align-items:center;gap:10px;">
-      <span style="font-size:13px;font-weight:800;color:#1e40af;">🔵 Semanas 3–4 — Pre-escala</span>
+  <div style="border:1px solid #bfdbfe;border-radius:12px;margin-bottom:10px;overflow:hidden;page-break-inside:avoid;">
+    <div style="background:#dbeafe;padding:10px 18px;">
+      <span style="font-size:13px;font-weight:800;color:#1e40af;">🔵 Semanas 3–4 — Pre-escala (infraestructura)</span>
     </div>
     <div style="padding:12px 18px;display:flex;flex-wrap:wrap;gap:6px;">
       <span style="background:#dbeafe;color:#1e3a8a;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;">Sistema módulos por plan (modulos + plan_modulos + negocio_modulos)</span>
       <span style="background:#dbeafe;color:#1e3a8a;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;">Sidebar: lock icon en módulos no incluidos en plan</span>
+      <span style="background:#dbeafe;color:#1e3a8a;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;">Unificar auth: gym/peluquería → Middleware::auth()</span>
       <span style="background:#dbeafe;color:#1e3a8a;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;">CORS: whitelist de dominios (sacar el *)</span>
-      <span style="background:#dbeafe;color:#1e3a8a;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;">Recordatorio por email 7 días antes de vencer</span>
+      <span style="background:#dbeafe;color:#1e3a8a;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;">Recordatorio email 7 días antes de vencer plan</span>
+      <span style="background:#dbeafe;color:#1e3a8a;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;">Config JSON column en tabla negocios</span>
     </div>
   </div>
 
   <!-- Mes 2 -->
   <div style="border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;page-break-inside:avoid;">
-    <div style="background:#f8fafc;padding:10px 18px;display:flex;align-items:center;gap:10px;">
-      <span style="font-size:13px;font-weight:800;color:#475569;">⚪ Mes 2 — Rubros en desarrollo</span>
+    <div style="background:#f8fafc;padding:10px 18px;">
+      <span style="font-size:13px;font-weight:800;color:#475569;">⚪ Mes 2 — Rubros secundarios</span>
     </div>
     <div style="padding:12px 18px;display:flex;flex-wrap:wrap;gap:6px;">
       <span style="background:#f1f5f9;color:#475569;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;">Hospedaje: check-in / check-out completo</span>
@@ -149,7 +174,7 @@
       <span style="background:#f1f5f9;color:#475569;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;">Farmacia: stock + vencimientos</span>
       <span style="background:#f1f5f9;color:#475569;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;">Tecnología: estados de reparación + notificaciones</span>
       <span style="background:#f1f5f9;color:#475569;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;">Supermercado: tablas propias + API</span>
-      <span style="background:#f1f5f9;color:#475569;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;">Ferretería: proveedores + órdenes de compra funcionales</span>
+      <span style="background:#f1f5f9;color:#475569;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;">Ferretería: proveedores + órdenes de compra</span>
     </div>
   </div>
 </div>
@@ -157,19 +182,19 @@
 <!-- RESUMEN GLOBAL -->
 <div class="resumen-grid">
   <div class="resumen-card">
-    <div class="resumen-num" style="color:#059669">1</div>
-    <div class="resumen-lbl">Rubro ~completo</div>
+    <div class="resumen-num" style="color:#059669">2</div>
+    <div class="resumen-lbl">Rubros ~completos</div>
   </div>
   <div class="resumen-card">
-    <div class="resumen-num" style="color:#7c3aed">2</div>
+    <div class="resumen-num" style="color:#7c3aed">4</div>
     <div class="resumen-lbl">Avanzados</div>
   </div>
   <div class="resumen-card">
-    <div class="resumen-num" style="color:#d97706">5</div>
+    <div class="resumen-num" style="color:#d97706">3</div>
     <div class="resumen-lbl">En desarrollo</div>
   </div>
   <div class="resumen-card">
-    <div class="resumen-num" style="color:#dc2626">3</div>
+    <div class="resumen-num" style="color:#dc2626">2</div>
     <div class="resumen-lbl">Casi vacíos</div>
   </div>
   <div class="resumen-card">
@@ -179,7 +204,7 @@
 </div>
 
 <!-- ══ CASI COMPLETO ══ -->
-<div class="nivel-titulo nivel-verde">✅ Casi completo</div>
+<div class="nivel-titulo nivel-verde">✅ Casi completos</div>
 
 <!-- Restaurant -->
 <div class="rubro-card">
@@ -207,13 +232,12 @@
           <span class="tag t-new">Tickets de impresión ✦</span>
           <span class="tag t-new">Split de cuenta ✦</span>
           <span class="tag t-fix">QR menú corregido 🔧</span>
-          <span class="tag t-fix">CSS Caja / Reportes 🔧</span>
         </div>
       </div>
       <div class="col-falta">
         <div class="col-label">✗ Pendiente</div>
         <div class="tag-list">
-          <span class="tag t-no">Delivery / Takeaway</span>
+          <span class="tag t-no">Delivery / Takeaway flow</span>
           <span class="tag t-no">Descuentos automáticos</span>
         </div>
       </div>
@@ -225,15 +249,12 @@
   </div>
 </div>
 
-<!-- ══ AVANZADOS ══ -->
-<div class="nivel-titulo nivel-azul">✦ Avanzados — recibieron mejoras recientes</div>
-
 <!-- Gym -->
 <div class="rubro-card">
   <div class="rubro-header">
     <div class="rubro-icon" style="background:#fce4ec;color:#c62828">💪</div>
     <div class="rubro-nombre">Gimnasio</div>
-    <span class="badge badge-morado">82%</span>
+    <span class="badge badge-verde">85%</span>
   </div>
   <div class="rubro-body">
     <div class="two-col">
@@ -258,24 +279,27 @@
         <div class="col-label">✗ Pendiente</div>
         <div class="tag-list">
           <span class="tag t-no">Comunicados masivos a socios</span>
-          <span class="tag t-no">Recordatorio automático por email/WhatsApp</span>
+          <span class="tag t-no">Recordatorio automático email/WhatsApp</span>
         </div>
       </div>
     </div>
-    <div class="nota nota-ok">✦ Fix crítico: socios se marcan automáticamente como "vencido" al superar fecha de membresía.</div>
+    <div class="nota nota-ok">✦ QR check-in completo: cada socio tiene su QR, modo kiosco con cámara en tablet escanea y registra asistencia en tiempo real.</div>
     <div class="progress-wrap">
-      <div class="progress-label"><span>Completitud estimada</span><span>82%</span></div>
-      <div class="progress-bar"><div class="progress-fill" style="width:82%;background:#f97316"></div></div>
+      <div class="progress-label"><span>Completitud estimada</span><span>85%</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:85%;background:#f97316"></div></div>
     </div>
   </div>
 </div>
+
+<!-- ══ AVANZADOS ══ -->
+<div class="nivel-titulo nivel-azul">✦ Avanzados — recibieron sprint completo recientemente</div>
 
 <!-- Peluquería -->
 <div class="rubro-card">
   <div class="rubro-header">
     <div class="rubro-icon" style="background:#f3e5f5;color:#6a1b9a">✂️</div>
     <div class="rubro-nombre">Peluquería / Estética</div>
-    <span class="badge badge-morado">65%</span>
+    <span class="badge badge-morado">82% ↑ era 65%</span>
   </div>
   <div class="rubro-body">
     <div class="two-col">
@@ -285,39 +309,39 @@
           <span class="tag t-ok">Agenda de turnos</span>
           <span class="tag t-ok">Clientes</span>
           <span class="tag t-ok">Servicios</span>
-          <span class="tag t-new">Cobro con método de pago ✦</span>
-          <span class="tag t-new">Historial visitas en cliente ✦</span>
-          <span class="tag t-new">Reportes de ingresos ✦</span>
-          <span class="tag t-new">Servicios más realizados ✦</span>
-          <span class="tag t-new">Rendimiento por empleado ✦</span>
+          <span class="tag t-ok">Cobro con método de pago</span>
+          <span class="tag t-ok">Historial visitas en cliente</span>
+          <span class="tag t-ok">Reportes ingresos + empleados</span>
+          <span class="tag t-ok">Servicios más realizados</span>
+          <span class="tag t-new">Vista agenda por empleado ✦</span>
+          <span class="tag t-new">CRUD Equipo (empleados) ✦</span>
+          <span class="tag t-new">Reserva online pública ✦</span>
+          <span class="tag t-new">Comisiones por servicio ✦</span>
+          <span class="tag t-new">Recordatorio WhatsApp ✦</span>
         </div>
       </div>
       <div class="col-falta">
         <div class="col-label">✗ Pendiente</div>
         <div class="tag-list">
-          <span class="tag t-no">Turnos por empleado (vista)</span>
-          <span class="tag t-no">Recordatorios de turno</span>
-          <span class="tag t-no">Reserva online pública</span>
-          <span class="tag t-no">Comisiones por servicio</span>
+          <span class="tag t-no">Panel de reservas pendientes (de reserva online)</span>
+          <span class="tag t-no">Vista semanal de agenda</span>
         </div>
       </div>
     </div>
+    <div class="nota nota-ok">✦ Sprint completo: reserva pública con hero (portada, logo, social links, pasos animados), CRUD empleados con stats de rendimiento, comisiones calculadas en SQL incluyendo multi-servicio.</div>
     <div class="progress-wrap">
-      <div class="progress-label"><span>Completitud estimada</span><span>65%</span></div>
-      <div class="progress-bar"><div class="progress-fill" style="width:65%;background:#8b5cf6"></div></div>
+      <div class="progress-label"><span>Completitud estimada</span><span>82%</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:82%;background:#8b5cf6"></div></div>
     </div>
   </div>
 </div>
-
-<!-- ══ EN DESARROLLO ══ -->
-<div class="nivel-titulo nivel-amarillo">🟡 Con estructura básica — en desarrollo</div>
 
 <!-- Canchas -->
 <div class="rubro-card">
   <div class="rubro-header">
     <div class="rubro-icon" style="background:#e8f5e9;color:#2e7d32">⚽</div>
     <div class="rubro-nombre">Canchas / Deportes</div>
-    <span class="badge badge-amarillo">55%</span>
+    <span class="badge badge-morado">82% ↑ era 70%</span>
   </div>
   <div class="rubro-body">
     <div class="two-col">
@@ -328,58 +352,72 @@
           <span class="tag t-ok">Gestión de canchas</span>
           <span class="tag t-ok">Clientes</span>
           <span class="tag t-ok">Caja del día</span>
+          <span class="tag t-ok">Reportes ingresos (5 vistas)</span>
+          <span class="tag t-ok">Caja + Reportes unificados en tabs</span>
+          <span class="tag t-ok">Grilla semanal de disponibilidad</span>
+          <span class="tag t-new">Reserva online pública (hero+portada+4 steps) ✦</span>
+          <span class="tag t-new">Abonos / membresías (slot fijo semanal) ✦</span>
+          <span class="tag t-new">Recordatorio WhatsApp por reserva ✦</span>
         </div>
       </div>
       <div class="col-falta">
         <div class="col-label">✗ Pendiente</div>
         <div class="tag-list">
-          <span class="tag t-no">Reportes de ingresos</span>
-          <span class="tag t-no">Grilla visual de disponibilidad</span>
-          <span class="tag t-no">Recordatorios</span>
-          <span class="tag t-no">Reserva online pública</span>
-          <span class="tag t-no">Abonos / membresías</span>
+          <span class="tag t-no">Panel de pendientes online (confirmar/rechazar)</span>
+          <span class="tag t-no">Notificación push al negocio en nueva reserva</span>
         </div>
       </div>
     </div>
+    <div class="nota nota-ok">✦ Reserva pública con hero/portada, selección de cancha+slot+duración, éxito con WA al negocio. Abonos: slot fijo semanal con generación automática de reservas para todo el período.</div>
     <div class="progress-wrap">
-      <div class="progress-label"><span>Completitud estimada</span><span>55%</span></div>
-      <div class="progress-bar"><div class="progress-fill" style="width:55%;background:#16a34a"></div></div>
+      <div class="progress-label"><span>Completitud estimada</span><span>82%</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:82%;background:#16a34a"></div></div>
     </div>
   </div>
 </div>
+
+<!-- ══ EN DESARROLLO ══ -->
+<div class="nivel-titulo nivel-amarillo">🟡 Con estructura básica — en desarrollo</div>
 
 <!-- Hospedaje -->
 <div class="rubro-card">
   <div class="rubro-header">
     <div class="rubro-icon" style="background:#e8eaf6;color:#283593">🏨</div>
     <div class="rubro-nombre">Hospedaje / Hotel</div>
-    <span class="badge badge-amarillo">25%</span>
+    <span class="badge badge-morado">80% ↑ era 25%</span>
   </div>
   <div class="rubro-body">
     <div class="two-col">
       <div class="col-tiene">
         <div class="col-label">✓ Implementado</div>
         <div class="tag-list">
-          <span class="tag t-ok">Habitaciones</span>
-          <span class="tag t-ok">Reservas</span>
+          <span class="tag t-ok">Habitaciones (CRUD + amenities)</span>
+          <span class="tag t-ok">Estado de habitaciones (mapa visual)</span>
+          <span class="tag t-ok">Reservas con check-in / check-out</span>
+          <span class="tag t-ok">Detección de conflictos de fechas</span>
+          <span class="tag t-ok">Estadía por noche / hora / semana</span>
+          <span class="tag t-ok">Seña / adelanto</span>
+          <span class="tag t-new">Cargos extra (minibar, room service…) ✦</span>
+          <span class="tag t-new">Folio imprimible por estadía ✦</span>
+          <span class="tag t-new">Caja del día + Reportes (6 gráficos) ✦</span>
+          <span class="tag t-new">Ocupación diaria (% por día) ✦</span>
+          <span class="tag t-new">Reserva online pública (3 steps) ✦</span>
+          <span class="tag t-new">WhatsApp al huésped desde reserva ✦</span>
         </div>
       </div>
       <div class="col-falta">
         <div class="col-label">✗ Pendiente</div>
         <div class="tag-list">
-          <span class="tag t-no">Check-in / Check-out</span>
-          <span class="tag t-no">Cargos extra</span>
-          <span class="tag t-no">Reporte de ocupación</span>
-          <span class="tag t-no">Estado de limpieza</span>
-          <span class="tag t-no">Facturación</span>
-          <span class="tag t-no">Reserva online</span>
+          <span class="tag t-no">Panel de housekeeping (limpieza)</span>
+          <span class="tag t-no">Factura fiscal (datos de facturación)</span>
+          <span class="tag t-no">Historial de huéspedes frecuentes</span>
         </div>
       </div>
     </div>
-    <div class="nota">⚠️ Falta el flujo completo de check-in/check-out, núcleo del rubro.</div>
+    <div class="nota nota-ok">✦ Sprint completo: cargos extra con folio imprimible, Caja del Día (mapa de habitaciones + movimientos), Reportes (ingresos/día, por tipo, ocupación diaria, días de semana), reserva online pública con 3-step flow.</div>
     <div class="progress-wrap">
-      <div class="progress-label"><span>Completitud estimada</span><span>25%</span></div>
-      <div class="progress-bar"><div class="progress-fill" style="width:25%;background:#6366f1"></div></div>
+      <div class="progress-label"><span>Completitud estimada</span><span>80%</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:80%;background:#6366f1"></div></div>
     </div>
   </div>
 </div>
@@ -389,33 +427,36 @@
   <div class="rubro-header">
     <div class="rubro-icon" style="background:#f1f8e9;color:#33691e">🐾</div>
     <div class="rubro-nombre">Veterinaria</div>
-    <span class="badge badge-amarillo">40%</span>
+    <span class="badge badge-morado">82% ↑ era 40%</span>
   </div>
   <div class="rubro-body">
     <div class="two-col">
       <div class="col-tiene">
         <div class="col-label">✓ Implementado</div>
         <div class="tag-list">
-          <span class="tag t-ok">Pacientes</span>
-          <span class="tag t-ok">Agenda del día</span>
-          <span class="tag t-ok">Consultas</span>
-          <span class="tag t-ok">Vacunas</span>
+          <span class="tag t-ok">Pacientes (ficha clínica completa)</span>
+          <span class="tag t-ok">Agenda del día con turnos</span>
+          <span class="tag t-ok">Consultas + vacunas</span>
+          <span class="tag t-ok">Alertas de vacunas próximas</span>
+          <span class="tag t-new">Recordatorio WA de vacunas ✦</span>
+          <span class="tag t-new">Receta veterinaria imprimible ✦</span>
+          <span class="tag t-new">Caja del día + Reportes (4 gráficos) ✦</span>
+          <span class="tag t-new">Stock de medicamentos + movimientos ✦</span>
+          <span class="tag t-new">Alertas de stock bajo en caja ✦</span>
         </div>
       </div>
       <div class="col-falta">
         <div class="col-label">✗ Pendiente</div>
         <div class="tag-list">
-          <span class="tag t-no">Historia clínica completa</span>
-          <span class="tag t-no">Recordatorio de vacunas</span>
-          <span class="tag t-no">Recetas veterinarias</span>
-          <span class="tag t-no">Facturación</span>
-          <span class="tag t-no">Stock de medicamentos</span>
+          <span class="tag t-no">Reserva online pública (turno web)</span>
+          <span class="tag t-no">Historia clínica con imágenes</span>
         </div>
       </div>
     </div>
+    <div class="nota nota-ok">✦ Sprint: recordatorio WA desde alertas de vacunas, receta imprimible con diagnóstico/medicación/firma, Caja del Día con alertas de vacunas y stock, Reportes por tipo y especie, Stock con movimientos entrada/salida/ajuste.</div>
     <div class="progress-wrap">
-      <div class="progress-label"><span>Completitud estimada</span><span>40%</span></div>
-      <div class="progress-bar"><div class="progress-fill" style="width:40%;background:#84cc16"></div></div>
+      <div class="progress-label"><span>Completitud estimada</span><span>82%</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:82%;background:#84cc16"></div></div>
     </div>
   </div>
 </div>
@@ -425,7 +466,7 @@
   <div class="rubro-header">
     <div class="rubro-icon" style="background:#e1f5fe;color:#01579b">👓</div>
     <div class="rubro-nombre">Óptica</div>
-    <span class="badge badge-azul">40%</span>
+    <span class="badge badge-morado">75% ↑ era 40%</span>
   </div>
   <div class="rubro-body">
     <div class="two-col">
@@ -435,22 +476,25 @@
           <span class="tag t-ok">Clientes</span>
           <span class="tag t-ok">Pedidos</span>
           <span class="tag t-ok">Recetas ópticas</span>
+          <span class="tag t-new">Caja del Día</span>
+          <span class="tag t-new">Reportes + Charts</span>
+          <span class="tag t-new">WA al cliente (pedido listo)</span>
+          <span class="tag t-new">Folio imprimible</span>
         </div>
       </div>
       <div class="col-falta">
         <div class="col-label">✗ Pendiente</div>
         <div class="tag-list">
-          <span class="tag t-no">Seguimiento pedidos laboratorio</span>
-          <span class="tag t-no">Alertas de entrega</span>
           <span class="tag t-no">Stock de monturas / lentes</span>
-          <span class="tag t-no">Reportes</span>
+          <span class="tag t-no">Receta pública online (turno web)</span>
         </div>
       </div>
     </div>
     <div class="progress-wrap">
-      <div class="progress-label"><span>Completitud estimada</span><span>40%</span></div>
-      <div class="progress-bar"><div class="progress-fill" style="width:40%;background:#0ea5e9"></div></div>
+      <div class="progress-label"><span>Completitud estimada</span><span>75%</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:75%;background:#0ea5e9"></div></div>
     </div>
+    <div class="nota nota-ok">Sprint 2024-03: Caja & Reportes (ingresos/día, por tipo lente, por estado), WA al cliente cuando pedido listo, folio imprimible con detalle completo + saldo.</div>
   </div>
 </div>
 
@@ -459,7 +503,7 @@
   <div class="rubro-header">
     <div class="rubro-icon" style="background:#ede7f6;color:#4527a0">💻</div>
     <div class="rubro-nombre">Tecnología / Servicio técnico</div>
-    <span class="badge badge-azul">30%</span>
+    <span class="badge badge-morado">75% ↑ era 30%</span>
   </div>
   <div class="rubro-body">
     <div class="two-col">
@@ -468,23 +512,27 @@
         <div class="tag-list">
           <span class="tag t-ok">Clientes</span>
           <span class="tag t-ok">Órdenes de servicio</span>
+          <span class="tag t-ok">Flujo de estados completo</span>
+          <span class="tag t-ok">Diagnóstico y presupuesto</span>
+          <span class="tag t-ok">Prioridades (normal/urgente/VIP)</span>
+          <span class="tag t-new">Caja del Día + alerta urgentes</span>
+          <span class="tag t-new">Reportes + Charts</span>
+          <span class="tag t-new">WA al cliente (equipo listo)</span>
+          <span class="tag t-new">Orden de servicio imprimible</span>
         </div>
       </div>
       <div class="col-falta">
         <div class="col-label">✗ Pendiente</div>
         <div class="tag-list">
-          <span class="tag t-no">Diagnóstico y presupuesto</span>
-          <span class="tag t-no">Estados de reparación</span>
-          <span class="tag t-no">Notificación al cliente</span>
-          <span class="tag t-no">Repuestos utilizados</span>
-          <span class="tag t-no">Garantía</span>
+          <span class="tag t-no">Garantía por orden</span>
+          <span class="tag t-no">Stock de repuestos</span>
         </div>
       </div>
     </div>
-    <div class="nota">💡 Tecnología y Electrodomésticos comparten la misma lógica — se pueden unificar en un módulo "Servicio Técnico".</div>
+    <div class="nota nota-ok">Sprint 2024-03: Caja & Reportes (ingresos/día, por tipo equipo, por estado), banner urgentes activas, WA cuando equipo listo, OS imprimible con firmas.</div>
     <div class="progress-wrap">
-      <div class="progress-label"><span>Completitud estimada</span><span>30%</span></div>
-      <div class="progress-bar"><div class="progress-fill" style="width:30%;background:#6366f1"></div></div>
+      <div class="progress-label"><span>Completitud estimada</span><span>75%</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:75%;background:#6366f1"></div></div>
     </div>
   </div>
 </div>
@@ -497,33 +545,36 @@
   <div class="rubro-header">
     <div class="rubro-icon" style="background:#e8f5e9;color:#1b5e20">💊</div>
     <div class="rubro-nombre">Farmacia</div>
-    <span class="badge badge-rojo">15%</span>
+    <span class="badge badge-morado">75% ↑ era 15%</span>
   </div>
   <div class="rubro-body">
     <div class="two-col">
       <div class="col-tiene">
         <div class="col-label">✓ Implementado</div>
         <div class="tag-list">
-          <span class="tag t-ok">Recetas médicas</span>
+          <span class="tag t-ok">Recetas médicas (despacho)</span>
           <span class="tag t-ok">Laboratorios</span>
+          <span class="tag t-ok">Stock de medicamentos</span>
+          <span class="tag t-ok">Control de vencimientos</span>
+          <span class="tag t-ok">Clientes / obra social</span>
+          <span class="tag t-new">Proveedores (API propia)</span>
+          <span class="tag t-new">Caja del Día</span>
+          <span class="tag t-new">Alertas vencimiento + stock bajo</span>
+          <span class="tag t-new">Reportes + Charts</span>
         </div>
       </div>
       <div class="col-falta">
         <div class="col-label">✗ Pendiente</div>
         <div class="tag-list">
-          <span class="tag t-no">Stock de medicamentos</span>
-          <span class="tag t-no">Control de vencimientos</span>
-          <span class="tag t-no">Proveedores</span>
-          <span class="tag t-no">Alertas de stock bajo</span>
-          <span class="tag t-no">Clientes / cobertura médica</span>
-          <span class="tag t-no">Reportes de ventas</span>
+          <span class="tag t-no">Punto de venta (POS)</span>
+          <span class="tag t-no">Receta controlada (psicotrópicos)</span>
         </div>
       </div>
     </div>
-    <div class="nota">⚠️ Tiene tablas en DB pero faltan las más críticas: stock y control de vencimientos.</div>
+    <div class="nota nota-ok">Sprint 2024-03: API proveedores propia (farmacia_proveedores), Caja del Día con 6 KPIs, tab Alertas (vencimiento + stock bajo), Reportes con chart recetas/día y por obra social.</div>
     <div class="progress-wrap">
-      <div class="progress-label"><span>Completitud estimada</span><span>15%</span></div>
-      <div class="progress-bar"><div class="progress-fill" style="width:15%;background:#dc2626"></div></div>
+      <div class="progress-label"><span>Completitud estimada</span><span>75%</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:75%;background:#10b981"></div></div>
     </div>
   </div>
 </div>
@@ -568,7 +619,7 @@
   <div class="rubro-header">
     <div class="rubro-icon" style="background:#fff8e1;color:#e65100">🔧</div>
     <div class="rubro-nombre">Ferretería / Construcción</div>
-    <span class="badge badge-rojo">10%</span>
+    <span class="badge badge-morado">~70% ↑ era 10%</span>
   </div>
   <div class="rubro-body">
     <div class="two-col">
@@ -576,31 +627,35 @@
         <div class="col-label">✓ Implementado</div>
         <div class="tag-list">
           <span class="tag t-ok">Punto de venta genérico</span>
-          <span class="tag t-ok">Presupuestos (básico)</span>
+          <span class="tag t-ok">Presupuestos</span>
+          <span class="tag t-ok">Proveedores</span>
+          <span class="tag t-ok">Órdenes de Compra</span>
+          <span class="tag t-ok">Caja del Día (KPIs + tabla)</span>
+          <span class="tag t-ok">Tab Stock Bajo</span>
+          <span class="tag t-ok">Reportes + Charts</span>
+          <span class="tag t-ok">OC por proveedor (horizontal bar)</span>
         </div>
       </div>
       <div class="col-falta">
         <div class="col-label">✗ Pendiente</div>
         <div class="tag-list">
-          <span class="tag t-no">Tablas propias en DB</span>
-          <span class="tag t-no">Proveedores funcionales</span>
-          <span class="tag t-no">Órdenes de compra</span>
           <span class="tag t-no">Listas de precio</span>
           <span class="tag t-no">Cuentas corrientes</span>
+          <span class="tag t-no">Etiquetas / códigos de barra</span>
         </div>
       </div>
     </div>
-    <div class="nota">⚠️ Las vistas de proveedores y órdenes existen pero no tienen API ni DB detrás.</div>
+    <div class="nota nota-ok">✅ Sprint 24/03/2026 — api/ferreteria/caja.php (7 endpoints: presupuestos + OC + stock) + views/ferreteria/caja.php (3 tabs: Caja, Stock Bajo, Reportes con 4 charts). Sidebar actualizado.</div>
     <div class="progress-wrap">
-      <div class="progress-label"><span>Completitud estimada</span><span>10%</span></div>
-      <div class="progress-bar"><div class="progress-fill" style="width:10%;background:#f97316"></div></div>
+      <div class="progress-label"><span>Completitud estimada</span><span>~70%</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:70%;background:#7c3aed"></div></div>
     </div>
   </div>
 </div>
 
 <!-- FOOTER -->
 <div class="doc-footer">
-  <span>DASHBASE · Sistema de gestión multirubro · v4</span>
+  <span>DASHBASE · Sistema de gestión multirubro · v5</span>
   <span>Actualizado 24/03/2026</span>
 </div>
 
@@ -622,16 +677,14 @@ function descargarPDF() {
   const btn = document.getElementById('btnPDF');
   btn.textContent = '⏳ Generando...';
   btn.disabled = true;
-
   const opts = {
-    margin:       [10, 10, 10, 10],
-    filename:     'DASHBASE-estado-modulos-v4.pdf',
-    image:        { type: 'jpeg', quality: 0.97 },
-    html2canvas:  { scale: 2, useCORS: true, logging: false },
-    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-    pagebreak:    { mode: ['avoid-all', 'css'] }
+    margin:      [10, 10, 10, 10],
+    filename:    'DASHBASE-estado-modulos-v5.pdf',
+    image:       { type: 'jpeg', quality: 0.97 },
+    html2canvas: { scale: 2, useCORS: true, logging: false },
+    jsPDF:       { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    pagebreak:   { mode: ['avoid-all', 'css'] }
   };
-
   html2pdf().set(opts).from(document.querySelector('.page')).save().then(() => {
     btn.innerHTML = '⬇️ Descargar PDF';
     btn.disabled = false;

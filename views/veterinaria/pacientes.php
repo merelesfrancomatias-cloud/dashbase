@@ -427,12 +427,20 @@ async function init() {
             const dias = Math.round((new Date(v.proxima_dosis) - hoy) / 86400000);
             const cls  = dias <= 3 ? 'urgente' : dias <= 10 ? 'pronto' : 'ok';
             const lbl  = dias === 0 ? 'Hoy' : dias < 0 ? `Vencida` : `En ${dias}d`;
+            const waBtn = v.duenio_telefono
+                ? `<button onclick="recordatorioVacunaWA('${v.duenio_telefono.replace(/'/g,"\\'")}','${esc(v.duenio_nombre||'').replace(/'/g,"\\'")}','${esc(v.pac_nombre||'').replace(/'/g,"\\'")}','${esc(v.nombre||'').replace(/'/g,"\\'")}','${v.proxima_dosis}')"
+                    style="background:rgba(37,211,102,.15);color:#25d366;border:1px solid rgba(37,211,102,.3);border-radius:7px;padding:3px 8px;font-size:11px;cursor:pointer;font-weight:700;display:inline-flex;align-items:center;gap:4px;"
+                    title="Recordatorio por WhatsApp"><i class="fab fa-whatsapp"></i> Avisar</button>` : '';
             return `<div class="vac-alerta-item">
                 <div>
                     <span class="pac">${esc(v.pac_nombre)}</span>
                     <span style="color:var(--text-secondary);font-size:12px;margin-left:8px;">${esc(v.nombre)}</span>
+                    ${v.duenio_nombre ? `<span style="color:var(--text-secondary);font-size:12px;margin-left:4px;">— ${esc(v.duenio_nombre)}</span>` : ''}
                 </div>
-                <span class="dias ${cls}">${lbl}</span>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="dias ${cls}">${lbl}</span>
+                    ${waBtn}
+                </div>
             </div>`;
         }).join('');
     } else {
@@ -593,6 +601,7 @@ async function abrirFicha(id) {
     const j = await r.json();
     if (!j.success) { toast('Error', 'error'); return; }
     const p = j.data;
+    window.fichaActual = p; // exponer para imprimirReceta()
 
     document.getElementById('fichaNombre').textContent    = p.nombre;
     document.getElementById('fichaSubtitulo').textContent = `${especieLabel[p.especie]||p.especie}${p.raza?' · '+p.raza:''} — ${p.duenio_nombre}`;
@@ -641,11 +650,14 @@ async function abrirFicha(id) {
             ${c.diagnostico ? `<div style="font-size:12px;color:var(--text-secondary);margin-top:3px;"><b>Diag:</b> ${esc(c.diagnostico)}</div>` : ''}
             ${c.tratamiento ? `<div style="font-size:12px;color:var(--text-secondary);"><b>Trat:</b> ${esc(c.tratamiento)}</div>` : ''}
             ${c.medicamentos ? `<div style="font-size:12px;color:var(--text-secondary);"><b>Meds:</b> ${esc(c.medicamentos)}</div>` : ''}
-            <div style="display:flex;gap:14px;margin-top:6px;font-size:11px;color:var(--text-secondary);">
-                ${c.peso_consulta ? `<span><i class="fas fa-weight"></i> ${c.peso_consulta} kg</span>` : ''}
-                ${c.temperatura   ? `<span><i class="fas fa-thermometer-half"></i> ${c.temperatura}°C</span>` : ''}
-                ${c.monto > 0     ? `<span style="color:#059669;font-weight:700;"><i class="fas fa-dollar-sign"></i> ${fmt(c.monto)}</span>` : ''}
-                ${c.proximo_turno ? `<span style="color:#6366f1;"><i class="fas fa-calendar-check"></i> Próx: ${fmtFecha(c.proximo_turno)}</span>` : ''}
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
+                <div style="display:flex;gap:14px;font-size:11px;color:var(--text-secondary);">
+                    ${c.peso_consulta ? `<span><i class="fas fa-weight"></i> ${c.peso_consulta} kg</span>` : ''}
+                    ${c.temperatura   ? `<span><i class="fas fa-thermometer-half"></i> ${c.temperatura}°C</span>` : ''}
+                    ${c.monto > 0     ? `<span style="color:#059669;font-weight:700;"><i class="fas fa-dollar-sign"></i> ${fmt(c.monto)}</span>` : ''}
+                    ${c.proximo_turno ? `<span style="color:#6366f1;"><i class="fas fa-calendar-check"></i> Próx: ${fmtFecha(c.proximo_turno)}</span>` : ''}
+                </div>
+                ${(c.diagnostico || c.tratamiento || c.medicamentos) ? `<button onclick="imprimirReceta(${JSON.stringify(c).replace(/</g,'\\u003c')}, fichaActual)" style="background:none;border:1px solid var(--border);border-radius:7px;padding:3px 8px;font-size:11px;cursor:pointer;color:var(--text-secondary);display:inline-flex;align-items:center;gap:4px;" title="Imprimir receta"><i class="fas fa-print"></i> Receta</button>` : ''}
             </div>
         </div>`).join('') : '<p style="font-size:13px;color:var(--text-secondary);text-align:center;padding:16px 0;">Sin consultas registradas</p>'}
 
@@ -866,6 +878,69 @@ async function guardarVacuna() {
     const j = await r.json();
     if (j.success) { cerrarModalVacuna(); toast('Vacuna registrada ✓'); init(); }
     else toast(j.message || 'Error', 'error');
+}
+
+// ── Recordatorio WA vacuna ────────────────────────────────────────────────────
+function recordatorioVacunaWA(tel, duenio, mascota, vacuna, fecha) {
+    const d = new Date(fecha + 'T00:00:00');
+    const fechaLeg = d.toLocaleDateString('es-AR', {weekday:'long', day:'numeric', month:'long'});
+    const msg = `Hola ${duenio}! 👋 Te recordamos que *${mascota}* tiene pendiente la vacuna *${vacuna}* para el *${fechaLeg}*. Por favor comunicate con nosotros para coordinar el turno. 🐾💉`;
+    window.open(`https://wa.me/${tel.replace(/\D/g,'')}?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+// ── Imprimir receta ───────────────────────────────────────────────────────────
+function imprimirReceta(consulta, paciente) {
+    const w = window.open('','_blank','width=620,height=780');
+    const fechaHoy = new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'long',year:'numeric'});
+    w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Receta Veterinaria</title>
+    <style>
+        body{font-family:Arial,sans-serif;padding:36px;color:#1e293b;max-width:540px;margin:0 auto;}
+        .header{border-bottom:2px solid #84cc16;padding-bottom:14px;margin-bottom:18px;display:flex;justify-content:space-between;align-items:flex-start;}
+        .clinic-name{font-size:20px;font-weight:800;color:#65a30d;}
+        .clinic-sub{font-size:12px;color:#64748b;margin-top:2px;}
+        .fecha{font-size:12px;color:#64748b;text-align:right;}
+        h2{font-size:14px;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin:18px 0 8px;font-weight:700;}
+        .row{display:flex;justify-content:space-between;margin-bottom:5px;font-size:13px;border-bottom:1px solid #f1f5f9;padding-bottom:5px;}
+        .lbl{color:#64748b;min-width:110px;}
+        .val{font-weight:600;}
+        .rx-box{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:14px;margin-top:6px;font-size:14px;line-height:1.6;}
+        .footer{margin-top:40px;border-top:2px solid #84cc16;padding-top:14px;text-align:center;}
+        .firma{margin-top:40px;text-align:right;font-size:12px;color:#64748b;}
+        .firma-linea{border-top:1px solid #1e293b;width:180px;margin:8px 0 4px auto;}
+        @media print{button{display:none;}}
+        button{background:#84cc16;color:#fff;border:none;padding:8px 20px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700;margin-top:16px;}
+    </style></head><body>
+    <div class="header">
+        <div><div class="clinic-name">🐾 Veterinaria</div><div class="clinic-sub">Receta Veterinaria</div></div>
+        <div class="fecha">${fechaHoy}</div>
+    </div>
+    <h2>Datos del paciente</h2>
+    <div class="row"><span class="lbl">Paciente</span><span class="val">${esc(paciente.nombre||'')} (${esc(paciente.especie||'')})</span></div>
+    <div class="row"><span class="lbl">Raza</span><span class="val">${esc(paciente.raza||'—')}</span></div>
+    <div class="row"><span class="lbl">Propietario</span><span class="val">${esc(paciente.duenio_nombre||'')}</span></div>
+    ${paciente.fecha_nacimiento?`<div class="row"><span class="lbl">Edad</span><span class="val">${calcEdad(paciente.fecha_nacimiento)}</span></div>`:''}
+    ${consulta.peso_consulta?`<div class="row"><span class="lbl">Peso</span><span class="val">${consulta.peso_consulta} kg</span></div>`:''}
+    ${consulta.temperatura?`<div class="row"><span class="lbl">Temperatura</span><span class="val">${consulta.temperatura} °C</span></div>`:''}
+    <h2>Diagnóstico</h2>
+    <div class="rx-box">${esc(consulta.diagnostico||'—')}</div>
+    <h2>Tratamiento / Medicación</h2>
+    <div class="rx-box" style="font-size:15px;font-weight:600;">${esc(consulta.tratamiento||'—')}</div>
+    ${consulta.medicamentos?`<h2>Medicamentos</h2><div class="rx-box">${esc(consulta.medicamentos)}</div>`:''}
+    ${consulta.proximo_turno?`<h2>Próximo control</h2><div class="rx-box">Fecha: <strong>${fmtFecha(consulta.proximo_turno)}</strong></div>`:''}
+    <div class="firma">
+        <div class="firma-linea"></div>
+        <div>Firma y sello del veterinario</div>
+    </div>
+    <button onclick="window.print()">🖨️ Imprimir receta</button>
+    </body></html>`);
+    w.document.close();
+}
+
+function calcEdad(fn) {
+    if (!fn) return '—';
+    const hoy = new Date(), nac = new Date(fn);
+    const años = Math.floor((hoy - nac) / (365.25 * 86400000));
+    return años >= 1 ? `${años} año${años>1?'s':''}` : `${Math.floor((hoy-nac)/2628000000)} meses`;
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────

@@ -119,9 +119,10 @@ if ($tipo === 'por_cancha') {
     $stmt->execute([$desde, $hasta, $negocioId]);
     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
     foreach ($rows as &$r) {
-        $r['ingresos']     = round((float)$r['ingresos'], 2);
+        $r['ingresos']       = round((float)$r['ingresos'], 2);
         $r['horas_ocupadas'] = round((float)$r['horas_ocupadas'], 1);
     }
+    unset($r);
     Response::success('OK', $rows);
 }
 

@@ -428,6 +428,15 @@ function botonesCard(o) {
         b += `<button class="btn-est" onclick="editarOrden(${o.id})" title="Editar"><i class="fas fa-edit"></i></button>`;
         b += `<button class="btn-est danger" onclick="cancelarOrden(${o.id})" title="Cancelar"><i class="fas fa-times"></i></button>`;
     }
+    if (o.estado === 'listo' && o.cliente_tel) {
+        const tel = esc(o.cliente_tel);
+        const nom = esc(o.cliente_nombre||'');
+        const eq  = esc([tipoLabel(o.equipo_tipo).replace(/[^\w\s]/g,'').trim(), o.equipo_marca, o.equipo_modelo].filter(Boolean).join(' '));
+        b += `<button class="btn-est" style="background:#25d366;border-color:#25d366;color:#fff;" onclick="waCliente('${tel}','${nom}','${eq}')" title="WhatsApp — listo para retirar"><i class="fab fa-whatsapp"></i></button>`;
+    }
+    if (!['cancelado'].includes(o.estado)) {
+        b += `<button class="btn-est" onclick="imprimirOrden(${o.id})" title="Imprimir orden de servicio"><i class="fas fa-print"></i></button>`;
+    }
     return b;
 }
 
@@ -576,6 +585,98 @@ async function guardarOrden() {
     if (j.success) { cerrarModalOrden(); toast(id?'Orden actualizada ✓':'Orden creada ✓'); init(); }
     else toast(j.message||'Error al guardar','error');
 }
+
+// ── WA al cliente ──────────────────────────────────────────────────────────────
+function waCliente(tel, nombre, equipo) {
+    const num = tel.replace(/\D/g, '');
+    const msg = `Hola ${nombre}! 🔧 Te avisamos que tu *${equipo||'equipo'}* ya está listo para retirar. Podés pasar cuando quieras. ¡Hasta pronto!`;
+    window.open(`https://wa.me/${num}?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+// ── Imprimir orden ─────────────────────────────────────────────────────────────
+async function imprimirOrden(id) {
+    const r = await fetch(`${API_ORD}?id=${id}`, {credentials:'include'});
+    const j = await r.json();
+    if (!j.success) { toast('Error al cargar orden', 'error'); return; }
+    const o = j.data;
+    const saldo    = parseFloat(o.saldo||0);
+    const fechaHoy = new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});
+    const equipo   = [tipoLabel(o.equipo_tipo).replace(/[^\w\s]/g,'').trim(), o.equipo_marca, o.equipo_modelo].filter(Boolean).join(' ');
+    const estColors = {listo:'#0FD186',en_reparacion:'#f59e0b',diagnosticando:'#8b5cf6',esperando_repuesto:'#ef4444',ingresado:'#6366f1',entregado:'#64748b',sin_reparacion:'#94a3b8',cancelado:'#ef4444'};
+    const w = window.open('','_blank');
+    w.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
+    <title>OS #${o.id}</title>
+    <style>
+        * { box-sizing:border-box; margin:0; padding:0; }
+        body { font-family:'Segoe UI',sans-serif; color:#1e293b; padding:32px; max-width:580px; margin:0 auto; }
+        .header { text-align:center; margin-bottom:24px; padding-bottom:16px; border-bottom:2px solid #6366f1; }
+        .header h1 { font-size:22px; font-weight:800; color:#6366f1; }
+        .header p  { font-size:12px; color:#64748b; margin-top:4px; }
+        .ord-num { display:inline-block; background:#6366f1; color:#fff; font-weight:800; font-size:13px; padding:4px 14px; border-radius:20px; margin-top:8px; }
+        h3 { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:#64748b; margin:20px 0 8px; padding-bottom:4px; border-bottom:1px solid #e2e8f0; }
+        .row { display:flex; justify-content:space-between; padding:6px 0; font-size:13px; }
+        .row .label { color:#64748b; }
+        .row .value { font-weight:600; max-width:65%; text-align:right; }
+        .falla-box { background:#fef2f2; border-left:3px solid #ef4444; border-radius:0 8px 8px 0; padding:10px 14px; font-size:13px; margin-bottom:8px; }
+        .diag-box  { background:#f0fdf4; border-left:3px solid #22c55e; border-radius:0 8px 8px 0; padding:10px 14px; font-size:13px; }
+        .total-box { background:#f8fafc; border-radius:10px; padding:14px; margin-top:16px; }
+        .total-box .row { border-bottom:1px solid #e2e8f0; }
+        .total-box .row:last-child { border-bottom:none; font-size:16px; font-weight:800; color:#6366f1; }
+        .saldo-box  { background:#fef2f2; border:1.5px solid #ef4444; border-radius:10px; padding:12px 14px; margin-top:10px; text-align:center; }
+        .saldo-box p { font-weight:700; color:#dc2626; font-size:15px; }
+        .pagado-box { background:#f0fdf4; border:1.5px solid #22c55e; border-radius:10px; padding:10px 14px; margin-top:10px; text-align:center; font-weight:700; color:#166534; }
+        .badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:700; color:#fff; }
+        .firma-box { margin-top:32px; display:flex; justify-content:space-between; }
+        .firma-col { text-align:center; width:45%; }
+        .firma-linea { border-top:1px solid #94a3b8; padding-top:6px; font-size:11px; color:#64748b; margin-top:40px; }
+        .footer { margin-top:20px; text-align:center; font-size:11px; color:#94a3b8; }
+        @media print { button { display:none; } }
+    </style></head><body>
+    <div class="header">
+        <h1>🔧 Servicio Técnico</h1>
+        <p>Orden de Servicio</p>
+        <span class="ord-num">OS #${o.id}</span>
+    </div>
+    <h3>Cliente</h3>
+    <div class="row"><span class="label">Nombre</span><span class="value">${fe(o.cliente_nombre)}</span></div>
+    ${o.cliente_tel?`<div class="row"><span class="label">Teléfono</span><span class="value">${fe(o.cliente_tel)}</span></div>`:''}
+    <div class="row"><span class="label">Fecha ingreso</span><span class="value">${formatFecha(o.fecha_ingreso)}</span></div>
+    ${o.fecha_promesa?`<div class="row"><span class="label">Fecha promesa</span><span class="value">${formatFecha(o.fecha_promesa)}</span></div>`:''}
+    <div class="row"><span class="label">Estado</span><span class="value"><span class="badge" style="background:${estColors[o.estado]||'#94a3b8'}">${estadoInfo(o.estado)}</span></span></div>
+    ${o.prioridad!=='normal'?`<div class="row"><span class="label">Prioridad</span><span class="value">${o.prioridad==='urgente'?'🔴 Urgente':'⭐ VIP'}</span></div>`:''}
+    <h3>Equipo</h3>
+    <div class="row"><span class="label">Tipo</span><span class="value">${tipoLabel(o.equipo_tipo).replace(/[^\w\s]/g,'').trim()}</span></div>
+    ${o.equipo_marca ?`<div class="row"><span class="label">Marca</span><span class="value">${fe(o.equipo_marca)}</span></div>`:''}
+    ${o.equipo_modelo?`<div class="row"><span class="label">Modelo</span><span class="value">${fe(o.equipo_modelo)}</span></div>`:''}
+    ${o.equipo_serie ?`<div class="row"><span class="label">N° Serie / IMEI</span><span class="value">${fe(o.equipo_serie)}</span></div>`:''}
+    ${o.equipo_color ?`<div class="row"><span class="label">Color</span><span class="value">${fe(o.equipo_color)}</span></div>`:''}
+    ${o.accesorios   ?`<div class="row"><span class="label">Accesorios</span><span class="value">${fe(o.accesorios)}</span></div>`:''}
+    ${o.tecnico      ?`<div class="row"><span class="label">Técnico</span><span class="value">${fe(o.tecnico)}</span></div>`:''}
+    <h3>Diagnóstico</h3>
+    <p style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:6px;">Falla reportada:</p>
+    <div class="falla-box">${fe(o.falla_reportada)}</div>
+    ${o.diagnostico?`<p style="font-size:11px;font-weight:700;color:#64748b;margin:8px 0 6px;">Diagnóstico técnico:</p><div class="diag-box">${fe(o.diagnostico)}</div>`:''}
+    <h3>Presupuesto</h3>
+    <div class="total-box">
+        <div class="row"><span class="label">Mano de obra</span><span class="value">${fmt(o.mano_obra)}</span></div>
+        <div class="row"><span class="label">Repuestos</span><span class="value">${fmt(o.repuestos_total)}</span></div>
+        <div class="row"><span class="label">Total</span><span class="value">${fmt(o.total)}</span></div>
+        ${parseFloat(o.seña||0)>0?`<div class="row"><span class="label">Seña abonada</span><span class="value">${fmt(o.seña)}</span></div>`:''}
+    </div>
+    ${saldo>0?`<div class="saldo-box"><p>Saldo pendiente: ${fmt(saldo)}</p></div>`:`<div class="pagado-box">✓ Pagado en su totalidad</div>`}
+    ${o.observaciones?`<h3>Observaciones</h3><p style="font-size:13px;padding:10px;background:#f8fafc;border-radius:8px;">${fe(o.observaciones)}</p>`:''}
+    <div class="firma-box">
+        <div class="firma-col"><div class="firma-linea">Firma del cliente</div></div>
+        <div class="firma-col"><div class="firma-linea">Firma del técnico</div></div>
+    </div>
+    <div class="footer"><p>Servicio Técnico · OS #${o.id} · ${fechaHoy}</p></div>
+    <div style="margin-top:20px;text-align:center;">
+        <button onclick="window.print()" style="background:#6366f1;color:#fff;border:none;padding:10px 24px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;">🖨️ Imprimir</button>
+    </div>
+    </body></html>`);
+    w.document.close();
+}
+function fe(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function estadoInfo(e) {

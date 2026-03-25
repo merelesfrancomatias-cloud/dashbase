@@ -224,6 +224,9 @@ if (isset($_SESSION['negocio_id'])) {
             <a href="../ferreteria/ordenes.php" class="menu-item" data-page="ordenes-ferreteria">
                 <i class="fas fa-clipboard-list"></i><span>Órdenes de Compra</span>
             </a>
+            <a href="../ferreteria/caja.php" class="menu-item" data-page="caja-ferreteria">
+                <i class="fas fa-cash-register"></i><span>Caja & Reportes</span>
+            </a>
         </div>
         <?php endif; ?>
 
@@ -312,6 +315,12 @@ if (isset($_SESSION['negocio_id'])) {
             <a href="../canchas/caja.php" class="menu-item" data-page="caja-canchas">
                 <i class="fas fa-cash-register"></i><span>Caja del Día</span>
             </a>
+            <a href="../canchas/abonos.php" class="menu-item" data-page="abonos-canchas">
+                <i class="fas fa-id-card"></i><span>Abonos</span>
+            </a>
+            <a href="../canchas/reserva-publica.php?negocio=<?= (int)($_SESSION['negocio_id'] ?? 0) ?>" class="menu-item" data-page="reserva-online-canchas" target="_blank">
+                <i class="fas fa-globe"></i><span>Reserva Online</span>
+            </a>
         </div>
         <?php endif; ?>
 
@@ -324,6 +333,12 @@ if (isset($_SESSION['negocio_id'])) {
             </a>
             <a href="../hospedaje/reservas.php" class="menu-item" data-page="reservas-hosp">
                 <i class="fas fa-calendar-check"></i><span>Reservas</span>
+            </a>
+            <a href="../hospedaje/caja.php" class="menu-item" data-page="caja-hosp">
+                <i class="fas fa-cash-register"></i><span>Caja & Reportes</span>
+            </a>
+            <a href="../hospedaje/reserva-publica.php?negocio=<?= (int)($_SESSION['negocio_id'] ?? 0) ?>" class="menu-item" data-page="reserva-online-hosp" target="_blank">
+                <i class="fas fa-globe"></i><span>Reserva Online</span>
             </a>
         </div>
         <?php endif; ?>
@@ -338,6 +353,12 @@ if (isset($_SESSION['negocio_id'])) {
             <a href="../veterinaria/agenda.php" class="menu-item" data-page="agenda-vet">
                 <i class="fas fa-calendar-alt"></i><span>Agenda del Día</span>
             </a>
+            <a href="../veterinaria/caja.php" class="menu-item" data-page="caja-vet">
+                <i class="fas fa-cash-register"></i><span>Caja & Reportes</span>
+            </a>
+            <a href="../veterinaria/stock.php" class="menu-item" data-page="stock-vet">
+                <i class="fas fa-box-open"></i><span>Stock</span>
+            </a>
         </div>
         <?php endif; ?>
 
@@ -345,6 +366,9 @@ if (isset($_SESSION['negocio_id'])) {
         <?php if ($esFarmacia): ?>
         <div class="menu-section">
             <h3 class="menu-section-title">Farmacia</h3>
+            <a href="../farmacia/caja.php" class="menu-item" data-page="caja-farm">
+                <i class="fas fa-cash-register"></i><span>Caja & Reportes</span>
+            </a>
             <a href="../farmacia/recetas.php" class="menu-item" data-page="recetas-farm">
                 <i class="fas fa-prescription"></i><span>Recetas</span>
             </a>
@@ -376,6 +400,9 @@ if (isset($_SESSION['negocio_id'])) {
             <a href="../optica/pedidos.php" class="menu-item" data-page="ped-opt">
                 <i class="fas fa-glasses"></i><span>Pedidos</span>
             </a>
+            <a href="../optica/caja.php" class="menu-item" data-page="caja-opt">
+                <i class="fas fa-cash-register"></i><span>Caja & Reportes</span>
+            </a>
         </div>
         <?php endif; ?>
 
@@ -387,6 +414,9 @@ if (isset($_SESSION['negocio_id'])) {
             </a>
             <a href="../tecnologia/ordenes.php" class="menu-item" data-page="ord-tec">
                 <i class="fas fa-tools"></i><span>Órdenes de Servicio</span>
+            </a>
+            <a href="../tecnologia/caja.php" class="menu-item" data-page="caja-tec">
+                <i class="fas fa-cash-register"></i><span>Caja & Reportes</span>
             </a>
         </div>
         <?php endif; ?>

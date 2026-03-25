@@ -540,6 +540,15 @@ function botonesEstado(p) {
         btns += `<button class="btn-estado" onclick="editarPedido(${p.id})" title="Editar"><i class="fas fa-edit"></i></button>`;
         btns += `<button class="btn-estado danger" onclick="cancelarPedido(${p.id})" title="Cancelar"><i class="fas fa-times"></i></button>`;
     }
+    if (p.estado === 'listo' && p.cliente_tel) {
+        const telEsc = esc(p.cliente_tel);
+        const nomEsc = esc(p.cliente_nombre||'');
+        const armEsc = esc(p.armazon||'');
+        btns += `<button class="btn-estado" style="background:#25d366;border-color:#25d366;color:#fff;" onclick="waCliente('${telEsc}','${nomEsc}','${armEsc}')" title="WhatsApp — listo para retirar"><i class="fab fa-whatsapp"></i></button>`;
+    }
+    if (!['cancelado'].includes(p.estado)) {
+        btns += `<button class="btn-estado" onclick="imprimirFolio(${p.id})" title="Imprimir folio"><i class="fas fa-print"></i></button>`;
+    }
     return btns;
 }
 
@@ -729,6 +738,96 @@ function toast(msg, tipo='ok') {
     t.style.background = tipo === 'error' ? '#ef4444' : '#1e293b';
     t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2500);
 }
+
+// ── WA al cliente ──────────────────────────────────────────────────────────────
+function waCliente(tel, nombre, armazon) {
+    const num = tel.replace(/\D/g, '');
+    const armTxt = armazon ? `, *${armazon}*` : '';
+    const msg = `Hola ${nombre}! 👓 Te avisamos que tu pedido óptico${armTxt} ya está listo para retirar. Podés pasar cuando quieras. ¡Hasta pronto!`;
+    window.open(`https://wa.me/${num}?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+// ── Imprimir folio ─────────────────────────────────────────────────────────────
+async function imprimirFolio(id) {
+    const r = await fetch(`${API_PED}?id=${id}`, {credentials:'include'});
+    const j = await r.json();
+    if (!j.success) { toast('Error al cargar pedido', 'error'); return; }
+    const p = j.data;
+    const saldo = parseFloat(p.saldo||0);
+    const fechaHoy = new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});
+    const estadoColors = {listo:'#0FD186',laboratorio:'#0ea5e9',pendiente:'#f59e0b',presupuesto:'#94a3b8',entregado:'#6366f1',cancelado:'#ef4444'};
+    const w = window.open('','_blank');
+    w.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
+    <title>Pedido #${p.id}</title>
+    <style>
+        * { box-sizing:border-box; margin:0; padding:0; }
+        body { font-family:'Segoe UI',sans-serif; color:#1e293b; padding:32px; max-width:580px; margin:0 auto; }
+        .header { text-align:center; margin-bottom:24px; padding-bottom:16px; border-bottom:2px solid #0ea5e9; }
+        .header h1 { font-size:22px; font-weight:800; color:#0ea5e9; }
+        .header p  { font-size:12px; color:#64748b; margin-top:4px; }
+        .pedido-num { display:inline-block; background:#0ea5e9; color:#fff; font-weight:800; font-size:13px; padding:4px 12px; border-radius:20px; margin-top:8px; }
+        h3 { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:#64748b; margin:20px 0 8px; padding-bottom:4px; border-bottom:1px solid #e2e8f0; }
+        .row { display:flex; justify-content:space-between; padding:6px 0; font-size:13px; }
+        .row .label { color:#64748b; }
+        .row .value { font-weight:600; }
+        .total-box { background:#f8fafc; border-radius:10px; padding:14px; margin-top:16px; }
+        .total-box .row { border-bottom:1px solid #e2e8f0; }
+        .total-box .row:last-child { border-bottom:none; font-size:16px; font-weight:800; color:#0ea5e9; }
+        .saldo-box { background:#fef2f2; border:1.5px solid #ef4444; border-radius:10px; padding:12px 14px; margin-top:10px; text-align:center; }
+        .saldo-box p { font-weight:700; color:#dc2626; font-size:15px; }
+        .pagado-box { background:#f0fdf4; border:1.5px solid #22c55e; border-radius:10px; padding:10px 14px; margin-top:10px; text-align:center; font-weight:700; color:#166534; }
+        .badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:700; color:#fff; }
+        .footer { margin-top:28px; text-align:center; font-size:11px; color:#94a3b8; }
+        @media print { button { display:none; } }
+    </style></head><body>
+    <div class="header">
+        <h1>👓 Óptica</h1>
+        <p>Comprobante de Pedido</p>
+        <span class="pedido-num">Pedido #${p.id}</span>
+    </div>
+
+    <h3>Cliente</h3>
+    <div class="row"><span class="label">Nombre</span><span class="value">${fe(p.cliente_nombre)}</span></div>
+    ${p.obra_social ? `<div class="row"><span class="label">Obra social</span><span class="value">${fe(p.obra_social)}</span></div>` : ''}
+    <div class="row"><span class="label">Fecha del folio</span><span class="value">${fechaHoy}</span></div>
+    <div class="row"><span class="label">Estado</span><span class="value"><span class="badge" style="background:${estadoColors[p.estado]||'#94a3b8'}">${estadoInfo(p.estado).label}</span></span></div>
+
+    ${p.armazon || p.lente_tipo ? `
+    <h3>Especificaciones</h3>
+    ${p.armazon ? `<div class="row"><span class="label">Armazón</span><span class="value">${fe(p.armazon)}${p.armazon_color?' — '+fe(p.armazon_color):''}</span></div>` : ''}
+    <div class="row"><span class="label">Tipo de lente</span><span class="value">${lenteTipoLabel(p.lente_tipo)}</span></div>
+    ${p.lente_material ? `<div class="row"><span class="label">Material</span><span class="value">${fe(p.lente_material)}</span></div>` : ''}
+    ${p.lente_tratamiento ? `<div class="row"><span class="label">Tratamiento</span><span class="value">${fe(p.lente_tratamiento)}</span></div>` : ''}
+    ` : ''}
+
+    ${p.laboratorio ? `
+    <h3>Laboratorio</h3>
+    <div class="row"><span class="label">Laboratorio</span><span class="value">${fe(p.laboratorio)}</span></div>
+    ${p.fecha_entrega_est ? `<div class="row"><span class="label">Entrega estimada</span><span class="value">${formatFecha(p.fecha_entrega_est)}</span></div>` : ''}
+    ` : ''}
+
+    <h3>Pago</h3>
+    <div class="total-box">
+        <div class="row"><span class="label">Armazón</span><span class="value">${fmt(p.armazon_precio)}</span></div>
+        <div class="row"><span class="label">Lentes</span><span class="value">${fmt(p.lente_precio)}</span></div>
+        ${parseFloat(p.descuento||0)>0?`<div class="row"><span class="label">Descuento</span><span class="value" style="color:#ef4444;">- ${fmt(p.descuento)}</span></div>`:''}
+        <div class="row"><span class="label">Total</span><span class="value">${fmt(p.total)}</span></div>
+        ${parseFloat(p.seña||0)>0?`<div class="row"><span class="label">Seña abonada</span><span class="value">${fmt(p.seña)}</span></div>`:''}
+    </div>
+    ${saldo > 0
+        ? `<div class="saldo-box"><p>Saldo pendiente: ${fmt(saldo)}</p></div>`
+        : `<div class="pagado-box">✓ Pagado en su totalidad</div>`}
+
+    ${p.observaciones ? `<h3>Observaciones</h3><p style="font-size:13px;padding:10px;background:#f8fafc;border-radius:8px;">${fe(p.observaciones)}</p>` : ''}
+
+    <div class="footer"><p>Gracias por su confianza · ${fechaHoy}</p></div>
+    <div style="margin-top:24px;text-align:center;">
+        <button onclick="window.print()" style="background:#0ea5e9;color:#fff;border:none;padding:10px 24px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;">🖨️ Imprimir</button>
+    </div>
+    </body></html>`);
+    w.document.close();
+}
+function fe(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 ['modalPedido','modalCobrar'].forEach(id => {
     document.getElementById(id).addEventListener('click', e => {

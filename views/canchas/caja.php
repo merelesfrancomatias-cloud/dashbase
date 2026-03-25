@@ -60,6 +60,7 @@ if (!isset($_SESSION['user_id'])) {
 .metodo-efectivo      { background:rgba(22,163,74,.12);color:#16a34a; }
 .metodo-transferencia { background:rgba(59,130,246,.12);color:#3b82f6; }
 .metodo-tarjeta       { background:rgba(139,92,246,.12);color:#8b5cf6; }
+.metodo-otro,.metodo-null { background:var(--border);color:var(--text-secondary); }
 
 /* ── Por cancha (caja) ────────────────────────────────────────────────────── */
 .cancha-row { display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--border); }
@@ -153,10 +154,10 @@ canvas { max-height:220px; }
 
             <!-- Tabs -->
             <div class="tab-bar">
-                <button class="tab-btn active" onclick="setTab('caja')">
+                <button class="tab-btn active" data-tab="caja" onclick="setTab('caja')">
                     <i class="fas fa-cash-register"></i> Caja del Día
                 </button>
-                <button class="tab-btn" onclick="setTab('rep')">
+                <button class="tab-btn" data-tab="rep" onclick="setTab('rep')">
                     <i class="fas fa-chart-line"></i> Reportes
                 </button>
             </div>
@@ -275,8 +276,8 @@ function esc(s) {
 let repCargado = false;
 
 function setTab(t) {
-    document.querySelectorAll('.tab-btn').forEach((b, i) =>
-        b.classList.toggle('active', (i === 0 ? 'caja' : 'rep') === t));
+    document.querySelectorAll('.tab-btn').forEach(b =>
+        b.classList.toggle('active', b.dataset.tab === t));
     document.getElementById('pane-caja').classList.toggle('active', t === 'caja');
     document.getElementById('pane-rep').classList.toggle('active',  t === 'rep');
     document.getElementById('ctrlCaja').style.display = t === 'caja' ? '' : 'none';
@@ -308,8 +309,11 @@ function cambiarDia(d) {
 
 async function cargarCaja() {
     const fecha = document.getElementById('inputFecha').value;
-    const r = await fetch(`../../api/canchas/caja.php?fecha=${fecha}`);
-    const j = await r.json();
+    let j;
+    try {
+        const r = await fetch(`../../api/canchas/caja.php?fecha=${fecha}`);
+        j = await r.json();
+    } catch (e) { console.warn('cargarCaja:', e); return; }
     if (!j.success) return;
     const { totales, porCancha, detalle, semana } = j.data;
 
@@ -346,10 +350,11 @@ async function cargarCaja() {
 
     // Mini chart
     const maxB = Math.max(...semana.map(s => parseFloat(s.ingresos||0)), 1);
+    const hoyFecha = hoyStr();
     document.getElementById('barChart').innerHTML = semana.length
         ? semana.map(s => {
             const h = Math.max(Math.round(parseFloat(s.ingresos||0) / maxB * 60), 2);
-            const esHoy = s.fecha === hoyStr();
+            const esHoy = s.fecha === hoyFecha;
             const lbl = new Date(s.fecha + 'T00:00:00').toLocaleDateString('es-AR', {day:'2-digit', month:'2-digit'});
             return `<div class="bar-col">
                 <div class="bar-rect" style="height:${h}px;opacity:${esHoy?1:.5};${esHoy?'box-shadow:0 2px 8px rgba(22,163,74,.4)':''}"></div>
@@ -371,7 +376,7 @@ async function cargarCaja() {
                     <td>${esc(r.cliente_nombre||'—')}</td>
                     <td style="color:var(--text-secondary)">${esc(r.cliente_telefono||'—')}</td>
                     <td style="font-weight:700;color:#16a34a">${fmt(r.monto)}</td>
-                    <td><span class="metodo-badge metodo-${r.metodo_pago}">${esc(r.metodo_pago)}</span></td>
+                    <td><span class="metodo-badge metodo-${r.metodo_pago||'otro'}">${esc(r.metodo_pago||'otro')}</span></td>
                 </tr>`).join('')}
             </tbody>
             <tfoot><tr style="background:var(--background)">
@@ -408,7 +413,7 @@ document.querySelectorAll('.p-btn').forEach(b => b.addEventListener('click', () 
     const d = parseInt(b.dataset.d);
     document.getElementById('rDesde').value = fmtDate(new Date(hoy - (d-1)*864e5));
     document.getElementById('rHasta').value = fmtDate(hoy);
-    cargarReportes();
+    if (document.getElementById('pane-rep').classList.contains('active')) cargarReportes();
 }));
 
 async function cargarReportes() {
@@ -417,13 +422,20 @@ async function cargarReportes() {
     document.getElementById('icoRef').className = 'fas fa-sync-alt spin';
     const qs = `desde=${desde}&hasta=${hasta}`;
 
-    const [res, dias, canchas, horas, semana] = await Promise.all([
-        fetch(`${REP_API}?tipo=resumen&${qs}`).then(r => r.json()),
-        fetch(`${REP_API}?tipo=ingresos_dia&${qs}`).then(r => r.json()),
-        fetch(`${REP_API}?tipo=por_cancha&${qs}`).then(r => r.json()),
-        fetch(`${REP_API}?tipo=ocupacion_horaria&${qs}`).then(r => r.json()),
-        fetch(`${REP_API}?tipo=dias_semana&${qs}`).then(r => r.json()),
-    ]);
+    let res, dias, canchas, horas, semana;
+    try {
+        [res, dias, canchas, horas, semana] = await Promise.all([
+            fetch(`${REP_API}?tipo=resumen&${qs}`).then(r => r.json()),
+            fetch(`${REP_API}?tipo=ingresos_dia&${qs}`).then(r => r.json()),
+            fetch(`${REP_API}?tipo=por_cancha&${qs}`).then(r => r.json()),
+            fetch(`${REP_API}?tipo=ocupacion_horaria&${qs}`).then(r => r.json()),
+            fetch(`${REP_API}?tipo=dias_semana&${qs}`).then(r => r.json()),
+        ]);
+    } catch (e) {
+        console.warn('cargarReportes:', e);
+        document.getElementById('icoRef').className = 'fas fa-sync-alt';
+        return;
+    }
 
     document.getElementById('icoRef').className = 'fas fa-sync-alt';
 
