@@ -18,11 +18,11 @@ try {
                 $query = "SELECT c.*, u.nombre AS usuario_nombre, u.apellido AS usuario_apellido
                           FROM cajas c
                           INNER JOIN usuarios u ON c.usuario_id = u.id
-                          WHERE c.usuario_id = :usuario_id AND c.estado = 'abierta'
+                          WHERE c.usuario_id = :usuario_id AND c.negocio_id = :negocio_id AND c.estado = 'abierta'
                           ORDER BY c.fecha_apertura DESC
                           LIMIT 1";
                 $stmt = $db->prepare($query);
-                $stmt->execute([':usuario_id' => $usuarioId]);
+                $stmt->execute([':usuario_id' => $usuarioId, ':negocio_id' => $negocioId]);
                 $caja = $stmt->fetch();
 
                 if (!$caja) {
@@ -93,9 +93,9 @@ try {
 
             // Verificar que no haya caja abierta
             $checkStmt = $db->prepare(
-                "SELECT COUNT(*) AS total FROM cajas WHERE usuario_id = :usuario_id AND estado = 'abierta'"
+                "SELECT COUNT(*) AS total FROM cajas WHERE usuario_id = :usuario_id AND negocio_id = :negocio_id AND estado = 'abierta'"
             );
-            $checkStmt->execute([':usuario_id' => $usuarioId]);
+            $checkStmt->execute([':usuario_id' => $usuarioId, ':negocio_id' => $negocioId]);
             $result = $checkStmt->fetch();
 
             if ($result['total'] > 0) {
@@ -123,9 +123,9 @@ try {
             }
 
             $getCajaStmt = $db->prepare(
-                "SELECT * FROM cajas WHERE id = :id AND usuario_id = :usuario_id AND estado = 'abierta'"
+                "SELECT * FROM cajas WHERE id = :id AND usuario_id = :usuario_id AND negocio_id = :negocio_id AND estado = 'abierta'"
             );
-            $getCajaStmt->execute([':id' => $data->caja_id, ':usuario_id' => $usuarioId]);
+            $getCajaStmt->execute([':id' => $data->caja_id, ':usuario_id' => $usuarioId, ':negocio_id' => $negocioId]);
             $caja = $getCajaStmt->fetch();
 
             if (!$caja) {
@@ -157,11 +157,12 @@ try {
                      diferencia    = :diferencia,
                      observaciones = :observaciones,
                      fecha_cierre  = CURRENT_TIMESTAMP
-                 WHERE id = :id AND usuario_id = :usuario_id"
+                 WHERE id = :id AND usuario_id = :usuario_id AND negocio_id = :negocio_id"
             );
             $stmt->execute([
                 ':id'           => $data->caja_id,
                 ':usuario_id'   => $usuarioId,
+                ':negocio_id'   => $negocioId,
                 ':monto_ventas' => $montoVentas,
                 ':monto_gastos' => $montoGastos,
                 ':monto_final'  => $montoFinal,
