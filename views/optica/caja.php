@@ -47,16 +47,17 @@ $base = rtrim(str_replace(str_replace(chr(92), chr(47), $_SERVER['DOCUMENT_ROOT'
         }
         .stat-card {
             background:var(--surface); border:1.5px solid var(--border);
-            border-radius:14px; padding:16px;
+            border-radius:14px; padding:14px 16px;
+            display:flex; flex-direction:column; justify-content:flex-start; min-width:0;
         }
         .stat-card .sc-icon {
             width:36px; height:36px; border-radius:10px;
             display:flex; align-items:center; justify-content:center;
-            font-size:16px; margin-bottom:10px;
+            font-size:16px; margin-bottom:10px; flex-shrink:0;
             background:var(--opt-light); color:var(--opt);
         }
-        .stat-card .sc-val  { font-size:26px; font-weight:800; color:var(--text-primary); line-height:1; }
-        .stat-card .sc-lbl  { font-size:11px; color:var(--text-secondary); margin-top:4px; font-weight:600; text-transform:uppercase; letter-spacing:.5px; }
+        .stat-card .sc-val  { font-size:20px; font-weight:800; color:var(--text-primary); line-height:1.2; word-break:break-word; min-width:0; }
+        .stat-card .sc-lbl  { font-size:10px; color:var(--text-secondary); margin-top:4px; font-weight:700; text-transform:uppercase; letter-spacing:.3px; line-height:1.3; }
 
         /* Tabla pedidos */
         .section-title {
@@ -171,6 +172,12 @@ $base = rtrim(str_replace(str_replace(chr(92), chr(47), $_SERVER['DOCUMENT_ROOT'
         <button class="tab-btn" onclick="mostrarTab('reportes',this)">
             <i class="fas fa-chart-bar"></i> Reportes
         </button>
+        <button class="tab-btn" id="tabBtnAlertas" onclick="mostrarTab('alertas',this)">
+            <i class="fas fa-bell"></i> Alertas <span id="alertasBadge" style="display:none;background:#ef4444;color:#fff;border-radius:20px;padding:1px 7px;font-size:11px;font-weight:800;margin-left:4px;">0</span>
+        </button>
+        <button class="tab-btn" onclick="mostrarTab('laboratorio',this)">
+            <i class="fas fa-flask"></i> Laboratorio
+        </button>
     </div>
 
     <!-- ══ TAB CAJA ══════════════════════════════════════════════════════════════ -->
@@ -237,14 +244,48 @@ $base = rtrim(str_replace(str_replace(chr(92), chr(47), $_SERVER['DOCUMENT_ROOT'
             </div>
         </div>
     </div>
+    <!-- ══ TAB ALERTAS ═════════════════════════════════════════════════════════ -->
+    <div id="tabAlertas" style="display:none;">
+        <div id="alertasContent" style="padding:0 24px 24px;">
+            <div style="text-align:center;padding:40px;color:var(--text-secondary);"><i class="fas fa-spinner fa-spin"></i></div>
+        </div>
+    </div>
+
+    <!-- ══ TAB LABORATORIO ══════════════════════════════════════════════════════ -->
+    <div id="tabLaboratorio" style="display:none;">
+        <div style="padding:0 24px 24px;">
+            <div style="margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+                <span style="font-size:13px;font-weight:700;color:var(--text-secondary);"><i class="fas fa-flask" style="color:var(--opt);margin-right:6px;"></i>Pedidos en Laboratorio</span>
+            </div>
+            <div class="pedidos-tabla">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Cliente</th>
+                            <th>Armazón</th>
+                            <th>Laboratorio</th>
+                            <th>Envío</th>
+                            <th>Entrega Est.</th>
+                            <th>Días</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="labTbody">
+                        <tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text-secondary);"><i class="fas fa-spinner fa-spin"></i></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-const BASE     = '<?= $base ?>';
-const API_CAJA = BASE + '/api/optica/caja.php';
-const API_PED  = BASE + '/api/optica/pedidos.php';
+const BASE       = '<?= $base ?>';
+const API_CAJA   = BASE + '/api/optica/caja.php';
+const API_PED    = BASE + '/api/optica/pedidos.php';
+const API_ALERTA = BASE + '/api/optica/alertas.php';
 
 const charts = {};
 let repCargado = false;
@@ -255,15 +296,30 @@ async function init() {
     const hoy = new Date().toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
     document.getElementById('subtitulo').textContent = hoy.charAt(0).toUpperCase() + hoy.slice(1);
     await Promise.all([cargarResumen(), cargarPedidosHoy()]);
+    // Cargar badge de alertas sin bloquear
+    fetch(API_ALERTA, {credentials:'include'}).then(r => r.json()).then(j => {
+        if (j.success && j.data.total_alertas > 0) {
+            const badge = document.getElementById('alertasBadge');
+            badge.textContent = j.data.total_alertas;
+            badge.style.display = 'inline';
+        }
+    }).catch(() => {});
 }
 
 // ── Tabs ──────────────────────────────────────────────────────────────────────
+let labCargado = false;
+let alertasCargado = false;
+
 function mostrarTab(tab, btn) {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    document.getElementById('tabCaja').style.display     = tab === 'caja'     ? '' : 'none';
-    document.getElementById('tabReportes').style.display = tab === 'reportes' ? '' : 'none';
-    if (tab === 'reportes' && !repCargado) cargarReportes(30, document.querySelector('.periodo-btn.active'));
+    document.getElementById('tabCaja').style.display        = tab === 'caja'        ? '' : 'none';
+    document.getElementById('tabReportes').style.display    = tab === 'reportes'    ? '' : 'none';
+    document.getElementById('tabAlertas').style.display     = tab === 'alertas'     ? '' : 'none';
+    document.getElementById('tabLaboratorio').style.display = tab === 'laboratorio' ? '' : 'none';
+    if (tab === 'reportes'   && !repCargado)     cargarReportes(30, document.querySelector('.periodo-btn.active'));
+    if (tab === 'alertas'    && !alertasCargado) cargarAlertas();
+    if (tab === 'laboratorio'&& !labCargado)     cargarLaboratorio();
 }
 
 // ── Resumen ────────────────────────────────────────────────────────────────────
@@ -275,7 +331,7 @@ async function cargarResumen() {
     document.getElementById('cajaStats').innerHTML = `
         <div class="stat-card">
             <div class="sc-icon" style="background:rgba(15,209,134,.1);color:#059669;"><i class="fas fa-dollar-sign"></i></div>
-            <div class="sc-val">${fmt(d.ingresos_hoy)}</div>
+            <div class="sc-val">${fmtCompact(d.ingresos_hoy)}</div>
             <div class="sc-lbl">Ingresos hoy</div>
         </div>
         <div class="stat-card">
@@ -295,7 +351,7 @@ async function cargarResumen() {
         </div>
         <div class="stat-card">
             <div class="sc-icon" style="background:rgba(239,68,68,.1);color:#dc2626;"><i class="fas fa-exclamation-circle"></i></div>
-            <div class="sc-val">${fmt(d.monto_saldo)}</div>
+            <div class="sc-val">${fmtCompact(d.monto_saldo)}</div>
             <div class="sc-lbl">Saldo pendiente</div>
         </div>
         <div class="stat-card">
@@ -546,9 +602,121 @@ function lenteTipoLabel(t) {
             solar:'Solar',contacto:'Contacto',sin_lente:'Sin lente'}[t]||t||'—';
 }
 function fmt(n)  { return '$' + Number(n||0).toLocaleString('es-AR', {minimumFractionDigits:0}); }
+function fmtCompact(n) {
+    const v = Number(n||0);
+    if (v >= 1000000) return '$' + (v/1000000).toLocaleString('es-AR',{minimumFractionDigits:1,maximumFractionDigits:1}) + 'M';
+    if (v >= 10000)   return '$' + Math.round(v/1000).toLocaleString('es-AR') + 'k';
+    return '$' + v.toLocaleString('es-AR',{minimumFractionDigits:0});
+}
 function esc(s)  { return String(s||'').replace(/'/g,"\\'"); }
 function esc2(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function formatFecha(f) { if (!f) return ''; const [y,m,d] = f.split('-'); return `${d}/${m}/${y}`; }
+
+// ── Alertas ────────────────────────────────────────────────────────────────────
+async function cargarAlertas() {
+    alertasCargado = true;
+    const r = await fetch(API_ALERTA, {credentials:'include'});
+    const j = await r.json();
+    const cont = document.getElementById('alertasContent');
+    if (!j.success) { cont.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Error al cargar alertas</p></div>`; return; }
+    const d = j.data;
+    if (d.total_alertas === 0 && d.con_saldo.count === 0) {
+        cont.innerHTML = `<div class="empty-state" style="padding:48px;"><i class="fas fa-check-circle" style="color:#0FD186;opacity:1;font-size:48px;"></i><p style="margin-top:12px;font-size:15px;font-weight:600;color:#059669;">Todo en orden — sin alertas pendientes</p></div>`;
+        return;
+    }
+    const secciones = [
+        { key:'listos_sin_entregar', titulo:'Listos sin entregar (≥ 3 días)', color:'#0FD186', icon:'fas fa-check-circle',
+          cols:['Cliente','Armazón','Teléfono','Días esperando','Total','Saldo'],
+          row: p => `<tr>
+            <td style="font-weight:700;">${esc2(p.cliente_nombre)}</td>
+            <td>${esc2(p.armazon||'—')}</td>
+            <td>${p.cliente_tel ? `<a href="https://wa.me/${p.cliente_tel.replace(/\D/g,'')}" target="_blank" style="color:#25d366;"><i class="fab fa-whatsapp"></i> ${esc2(p.cliente_tel)}</a>` : '—'}</td>
+            <td><strong style="color:#dc2626;">${p.dias_esperando}d</strong></td>
+            <td>${fmt(p.total)}</td>
+            <td>${parseFloat(p.saldo||0) > 0 ? `<span style="color:#dc2626;font-weight:700;">${fmt(p.saldo)}</span>` : '<span style="color:#059669;">✓</span>'}</td>
+          </tr>`},
+        { key:'lab_retrasados', titulo:'Laboratorio vencido (fecha est. superada)', color:'#ef4444', icon:'fas fa-clock',
+          cols:['Cliente','Armazón','Laboratorio','Fecha Est.','Días retraso'],
+          row: p => `<tr>
+            <td style="font-weight:700;">${esc2(p.cliente_nombre)}</td>
+            <td>${esc2(p.armazon||'—')}</td>
+            <td>${esc2(p.laboratorio||'—')}</td>
+            <td>${formatFecha(p.fecha_entrega_est)}</td>
+            <td><strong style="color:#dc2626;">${p.dias_retraso}d</strong></td>
+          </tr>`},
+        { key:'lab_sin_fecha', titulo:'Sin fecha de entrega estimada (> 5 días)', color:'#f59e0b', icon:'fas fa-question-circle',
+          cols:['Cliente','Armazón','Laboratorio','Días en lab'],
+          row: p => `<tr>
+            <td style="font-weight:700;">${esc2(p.cliente_nombre)}</td>
+            <td>${esc2(p.armazon||'—')}</td>
+            <td>${esc2(p.laboratorio||'—')}</td>
+            <td><strong style="color:#d97706;">${p.dias_en_lab}d</strong></td>
+          </tr>`},
+        { key:'con_saldo', titulo:'Con saldo pendiente', color:'#6366f1', icon:'fas fa-dollar-sign',
+          cols:['Cliente','Estado','Total','Saldo'],
+          row: p => `<tr>
+            <td style="font-weight:700;">${esc2(p.cliente_nombre)}</td>
+            <td><span class="badge badge-${p.estado}">${estadoLabel(p.estado)}</span></td>
+            <td>${fmt(p.total)}</td>
+            <td><span style="color:#dc2626;font-weight:700;">${fmt(p.saldo)}</span></td>
+          </tr>`},
+    ];
+    cont.innerHTML = secciones.map(sec => {
+        const cnt = d[sec.key]?.count || 0;
+        if (!cnt) return '';
+        return `
+        <div style="margin-bottom:24px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+                <i class="${sec.icon}" style="color:${sec.color};"></i>
+                <span style="font-weight:700;font-size:14px;">${sec.titulo}</span>
+                <span style="background:${sec.color};color:#fff;border-radius:20px;padding:2px 8px;font-size:12px;font-weight:800;">${cnt}</span>
+            </div>
+            <div class="pedidos-tabla">
+                <table>
+                    <thead><tr>${sec.cols.map(c=>`<th>${c}</th>`).join('')}</tr></thead>
+                    <tbody>${d[sec.key].items.map(sec.row).join('')}</tbody>
+                </table>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+// ── Laboratorio ────────────────────────────────────────────────────────────────
+async function cargarLaboratorio() {
+    labCargado = true;
+    const r = await fetch(`${API_PED}?estado=laboratorio`, {credentials:'include'});
+    const j = await r.json();
+    const tbody = document.getElementById('labTbody');
+    if (!j.success || !j.data.pedidos.length) {
+        tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><i class="fas fa-flask"></i><p>No hay pedidos en laboratorio</p></div></td></tr>`;
+        return;
+    }
+    tbody.innerHTML = j.data.pedidos.map(p => {
+        const hoy = new Date();
+        let diasInfo = '—';
+        if (p.fecha_entrega_est) {
+            const diff = Math.ceil((new Date(p.fecha_entrega_est) - hoy) / 86400000);
+            diasInfo = diff < 0
+                ? `<strong style="color:#dc2626;">${Math.abs(diff)}d retraso</strong>`
+                : `<span style="color:#059669;">${diff}d restantes</span>`;
+        } else if (p.created_at) {
+            const dias = Math.ceil((hoy - new Date(p.created_at)) / 86400000);
+            diasInfo = `<span style="color:#d97706;">${dias}d sin fecha</span>`;
+        }
+        return `<tr>
+            <td style="font-weight:700;">${esc2(p.cliente_nombre)}</td>
+            <td>${esc2(p.armazon||'—')}</td>
+            <td>${esc2(p.laboratorio||'—')}</td>
+            <td>${p.fecha_envio_lab ? formatFecha(p.fecha_envio_lab) : '—'}</td>
+            <td>${p.fecha_entrega_est ? formatFecha(p.fecha_entrega_est) : '<span style="color:#d97706;">Sin fecha</span>'}</td>
+            <td>${diasInfo}</td>
+            <td>
+                ${p.cliente_tel ? `<a href="https://wa.me/${p.cliente_tel.replace(/\D/g,'')}" target="_blank" class="btn-sm btn-wa"><i class="fab fa-whatsapp"></i></a>` : ''}
+            </td>
+        </tr>`;
+    }).join('');
+}
+
 function toast(msg, tipo='ok') {
     const t = document.getElementById('toast');
     t.textContent = msg;

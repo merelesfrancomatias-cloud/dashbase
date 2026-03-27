@@ -187,6 +187,12 @@ $base = rtrim(str_replace(str_replace(chr(92), chr(47), $_SERVER['DOCUMENT_ROOT'
             </div>
         </div>
 
+        <!-- Banner alertas -->
+        <div id="alertasBanner" style="display:none;margin:12px 24px 0;border-radius:12px;padding:10px 16px;background:rgba(239,68,68,.07);border:1.5px solid rgba(239,68,68,.3);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;" id="alertasResumen"></div>
+            <a href="caja.php#alertas" style="font-size:12px;font-weight:700;color:#dc2626;text-decoration:none;white-space:nowrap;">Ver todas <i class="fas fa-arrow-right"></i></a>
+        </div>
+
         <!-- Stats / Filtros rápidos -->
         <div class="stats-bar" id="statsBar">
             <div class="stat-pill all active" onclick="setFiltroEstado('')" id="pill-all">
@@ -399,9 +405,10 @@ $base = rtrim(str_replace(str_replace(chr(92), chr(47), $_SERVER['DOCUMENT_ROOT'
 <div class="toast" id="toast"></div>
 
 <script>
-const BASE      = '<?= $base ?>';
-const API_PED   = BASE + '/api/optica/pedidos.php';
-const API_CLI   = BASE + '/api/optica/clientes.php';
+const BASE       = '<?= $base ?>';
+const API_PED    = BASE + '/api/optica/pedidos.php';
+const API_CLI    = BASE + '/api/optica/clientes.php';
+const API_ALERTA = BASE + '/api/optica/alertas.php';
 
 let todosPedidos = [];
 let pedidosFiltrados = [];
@@ -437,6 +444,19 @@ async function init() {
     document.getElementById('st-entregado').textContent= st.entregados  || 0;
     document.getElementById('st-saldo').textContent    = st.con_saldo   || 0;
     aplicarFiltros();
+
+    // Banner de alertas (no bloquea)
+    fetch(API_ALERTA, {credentials:'include'}).then(ra => ra.json()).then(ja => {
+        if (!ja.success) return;
+        const d = ja.data;
+        const partes = [];
+        if (d.listos_sin_entregar.count) partes.push(`<span style="display:flex;align-items:center;gap:5px;"><i class="fas fa-check-circle" style="color:#0FD186;"></i> <strong>${d.listos_sin_entregar.count}</strong> listos sin retirar</span>`);
+        if (d.lab_retrasados.count)      partes.push(`<span style="display:flex;align-items:center;gap:5px;"><i class="fas fa-clock" style="color:#ef4444;"></i> <strong>${d.lab_retrasados.count}</strong> retrasados en lab</span>`);
+        if (d.lab_sin_fecha.count)       partes.push(`<span style="display:flex;align-items:center;gap:5px;"><i class="fas fa-question-circle" style="color:#f59e0b;"></i> <strong>${d.lab_sin_fecha.count}</strong> sin fecha estimada</span>`);
+        if (!partes.length) return;
+        document.getElementById('alertasResumen').innerHTML = partes.join('<span style="color:var(--border);">|</span>');
+        document.getElementById('alertasBanner').style.display = 'flex';
+    }).catch(() => {});
 
     // Cargar clientes para el modal
     const rc = await fetch(API_CLI, {credentials:'include'});

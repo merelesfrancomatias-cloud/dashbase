@@ -400,6 +400,9 @@ if (isset($_SESSION['negocio_id'])) {
             <a href="../optica/pedidos.php" class="menu-item" data-page="ped-opt">
                 <i class="fas fa-glasses"></i><span>Pedidos</span>
             </a>
+            <a href="../optica/stock.php" class="menu-item" data-page="stock-opt">
+                <i class="fas fa-box-open"></i><span>Stock</span>
+            </a>
             <a href="../optica/caja.php" class="menu-item" data-page="caja-opt">
                 <i class="fas fa-cash-register"></i><span>Caja & Reportes</span>
             </a>

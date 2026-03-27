@@ -149,6 +149,17 @@ if ($method === 'POST') {
         ]);
     }
 
+    // Log seguimiento (estado inicial)
+    $pdo->prepare("
+        INSERT INTO optica_seguimiento (negocio_id, pedido_id, estado_anterior, estado_nuevo, notas, usuario_id)
+        VALUES (:nid, :pid, NULL, :estado, 'Pedido creado', :uid)
+    ")->execute([
+        ':nid'    => $negocioId,
+        ':pid'    => $pedidoId,
+        ':estado' => $d['estado'] ?? 'pendiente',
+        ':uid'    => $usuarioId,
+    ]);
+
     Response::success('Pedido creado', ['id' => $pedidoId], 201);
 }
 
@@ -174,6 +185,19 @@ if ($method === 'PUT') {
         }
         $pdo->prepare("UPDATE optica_pedidos SET {$fields} WHERE id = :id AND negocio_id = :nid")
             ->execute($params);
+
+        // Log de seguimiento
+        $pdo->prepare("
+            INSERT INTO optica_seguimiento (negocio_id, pedido_id, estado_anterior, estado_nuevo, notas, usuario_id)
+            VALUES (:nid, :pid, :eant, :enuevo, :notas, :uid)
+        ")->execute([
+            ':nid'    => $negocioId,
+            ':pid'    => $id,
+            ':eant'   => $pedido['estado'],
+            ':enuevo' => $nuevoEstado,
+            ':notas'  => $d['notas'] ?? null,
+            ':uid'    => $usuarioId,
+        ]);
 
         // Si se entrega y hay saldo pendiente, registrar en caja
         if ($nuevoEstado === 'entregado' && (float)$pedido['saldo'] > 0) {
@@ -218,6 +242,7 @@ if ($method === 'PUT') {
             fecha_envio_lab=:fenvio, fecha_entrega_est=:festim, observaciones=:obs
         WHERE id = :id AND negocio_id = :nid
     ");
+    $nuevoEstadoFull = $d['estado'] ?? $pedido['estado'];
     $stmt->execute([
         ':arm'      => $d['armazon']           ?? $pedido['armazon'],
         ':armcolor' => $d['armazon_color']     ?? $pedido['armazon_color'],
@@ -232,7 +257,7 @@ if ($method === 'PUT') {
         ':sena'     => $sena,
         ':saldo'    => $saldo,
         ':mp'       => $d['metodo_pago']       ?? $pedido['metodo_pago'],
-        ':estado'   => $d['estado']            ?? $pedido['estado'],
+        ':estado'   => $nuevoEstadoFull,
         ':lab'      => $d['laboratorio']       ?? $pedido['laboratorio'],
         ':fenvio'   => $d['fecha_envio_lab']   ?? $pedido['fecha_envio_lab'],
         ':festim'   => $d['fecha_entrega_est'] ?? $pedido['fecha_entrega_est'],
@@ -240,6 +265,22 @@ if ($method === 'PUT') {
         ':id'       => $id,
         ':nid'      => $negocioId,
     ]);
+
+    // Log seguimiento si cambió el estado
+    if ($nuevoEstadoFull !== $pedido['estado']) {
+        $pdo->prepare("
+            INSERT INTO optica_seguimiento (negocio_id, pedido_id, estado_anterior, estado_nuevo, notas, usuario_id)
+            VALUES (:nid, :pid, :eant, :enuevo, :notas, :uid)
+        ")->execute([
+            ':nid'    => $negocioId,
+            ':pid'    => $id,
+            ':eant'   => $pedido['estado'],
+            ':enuevo' => $nuevoEstadoFull,
+            ':notas'  => $d['observaciones'] ?? null,
+            ':uid'    => $usuarioId,
+        ]);
+    }
+
     Response::success('Pedido actualizado');
 }
 
